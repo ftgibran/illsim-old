@@ -1,0 +1,29 @@
+{
+  "name": "illsim",
+  "description": "Illness Simulation",
+  "main": "",
+  "authors": [
+    "Felipe Gibran Eleuterio Toledo <ft.gibran@gmail.com>"
+  ],
+  "license": "MIT",
+  "keywords": [
+    "illness",
+    "ill",
+    "simulation",
+    "sim",
+    "epidemic"
+  ],
+  "homepage": "http://illsim.herokuapp.com",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "devDependencies": {
+    "css-utils": "^0.3.0",
+    "font-awesome": "^4.6.3"
+  }
+}
