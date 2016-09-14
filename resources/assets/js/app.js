@@ -32,8 +32,11 @@ const ANI_INF_REDUCE_RATE = .6;
  * Initial Configuration
  */
 var container = document.getElementById('network');
+var canvas;
+var context;
 
 var network;
+var timeline;
 
 var nodes;
 var edges;
@@ -43,7 +46,7 @@ var options = {
 		borderWidth: 3,
 		borderWidthSelected: 3,
 		shape: "dot",
-		size: NODE_SIZE_MIN
+		size: 15
 	},
 	edges: {
 		color: "#666666",
@@ -54,8 +57,7 @@ var options = {
 		selectConnectedEdges: false
 	},
 	"physics": {
-		"minVelocity": 0.05,
-		"solver": "forceAtlas2Based"
+		"minVelocity": 0.05
 	},
 	groups: {
 		i: {
@@ -90,13 +92,13 @@ function init() {
 function createNetwork(data) {
 	network = new vis.Network(container, normalizeData(data), options);
 
-	network.on('afterDrawing', function() {
-		var timeline = new TimelineLite({
-			paused: false,
-			repeat: -1,
-			onUpdate: infection
-		});
-		timeline.time(10000);
+	canvas = document.getElementsByTagName("canvas")[0];
+	context = canvas.getContext("2d");
+
+	timeline = new TimelineMax({
+		delay: 1,
+		repeat: -1,
+		onUpdate: infection
 	});
 
 	function normalizeData(data) {
@@ -165,45 +167,68 @@ function infect(infected, target) {
 
 function infectionAnimation(infected, target) {
 
-	setTimeout(ani_infected, ANI_INF_1_DELAY, target);
+	//setTimeout(ani_infected, ANI_INF_1_DELAY, target);
 
-	var positionsFrom = network.getPositions([infected.id]);
-	var domFrom = network.canvasToDOM(positionsFrom[infected.id]);
+	var infected_pos = network.getPositions([infected.id])[infected.id];
+	var target_pos = network.getPositions([target.id])[target.id];
 
-	var positionsTo = network.getPositions([target.id]);
-	var domTo = network.canvasToDOM(positionsTo[target.id]);
+	var target_size = target.size = 15;
 
-	var dot = document.createElement("div");
-	container.appendChild(dot);
+	var dot = {
+		x: infected_pos.x,
+		y: infected_pos.y,
+		draw: function() {
+			context.beginPath();
+			context.arc(this.x, this.y, 6, 0, 2 * Math.PI, false);
+			context.fillStyle = 'black';
+			context.fill();
+		}
+	};
 
-	dot.className = "dot";
+	var draw = function() {
+		dot.draw();
+	}
 
-	var width = dot.offsetWidth;
-	var height = dot.offsetHeight;
-
-	dot.style["width"] = (width * network.getScale()) + "px";
-	dot.style["height"] = (height * network.getScale()) + "px";
-	dot.style["left"] = (domFrom.x - width / 2) + "px";
-	dot.style["top"] = (domFrom.y - height / 2) + "px";
+	network.on('afterDrawing', draw);
 
 	TweenMax.to(dot, .6, {
-		left: (domTo.x - width / 2) + "px",
-		top: (domTo.y - height / 2) + "px",
+		x: target_pos.x,
+		y: target_pos.y,
 		ease: Power2.easeOut,
-		onComplete: function() {
-			setTimeout(function() {
-				target.group = "i";
-				nodes.update(target);
-				container.removeChild(dot);
-				//Shake it!
-				network.moveNode(
-					target.id,
-					positionsTo[target.id].x + Math.random() * 30 - 15,
-					positionsTo[target.id].y + Math.random() * 30 - 15
-				);
-			}, 500);
+		onUpdate: function() {
+			network.redraw();
 		}
 	});
+
+	TweenMax.to(target, .6, {
+		delay: .5,
+		size: target.size * 1.5,
+		ease: Power2.easeOut,
+		onUpdate: function() {
+			nodes.update(target);
+		},
+		onComplete: function() {
+			network.off('afterDrawing', draw);
+			target.group = "i";
+			nodes.update(target);
+			//Shake it!
+			network.moveNode(
+				target.id,
+				target_pos.x + Math.random() * 30 - 15,
+				target_pos.y + Math.random() * 30 - 15
+			);
+			TweenMax.to(target, .4, {
+				size: target_size,
+				ease: Power3.easeOut,
+				onUpdate: function() {
+					nodes.update(target);
+				}
+			});
+		}
+	});
+
+
+
 }
 
 function ani_infected(infected) {

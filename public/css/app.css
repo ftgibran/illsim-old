@@ -7955,11 +7955,4 @@ button.close {
   overflow: visible;
   clip: auto; }
 
-.dot {
-  background: #000;
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  position: absolute; }
-
 /*# sourceMappingURL=app.css.map */

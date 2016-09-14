@@ -1,7 +1,7 @@
 {
 	"node": {
-		"min": 20,
-		"max": 20,
+		"min": 40,
+		"max": 40,
 		"maxEdges": 2,
 		"groups": [{
 			"ref": "s"
@@ -16,11 +16,11 @@
 		}]
 	},
 	"edge": {
-		"min": 30,
-		"max": 30,
+		"min": 60,
+		"max": 60,
 		"rate": {
-			"min": 0.5,
-			"max": 0.5,
+			"min": 0.1,
+			"max": 0.1,
 			"precision": 1,
 			"distribution": "uniform"
 		}
