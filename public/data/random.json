@@ -1,0 +1,28 @@
+{
+	"node": {
+		"min": 20,
+		"max": 20,
+		"maxEdges": 2,
+		"groups": [{
+			"ref": "s"
+		}, {
+			"ref": "i",
+			"quantType": "number",
+			"quant": 2
+		}, {
+			"ref": "r",
+			"quantType": "percent",
+			"quant": 20
+		}]
+	},
+	"edge": {
+		"min": 30,
+		"max": 30,
+		"rate": {
+			"min": 0.5,
+			"max": 0.5,
+			"precision": 1,
+			"distribution": "uniform"
+		}
+	}
+}

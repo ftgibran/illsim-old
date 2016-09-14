@@ -54,7 +54,8 @@ var options = {
 		selectConnectedEdges: false
 	},
 	"physics": {
-		"minVelocity": 0.05
+		"minVelocity": 0.05,
+		"solver": "forceAtlas2Based"
 	},
 	groups: {
 		i: {
@@ -82,29 +83,36 @@ $(function() {
  */
 
 function init() {
-	$.getJSON("/data/example.json", createNetwork);
+	//$.getJSON("/data/example.json", createNetwork);
+	$.getJSON("/data/random.json", randomData);
 }
 
 function createNetwork(data) {
-	network = new vis.Network(container, getData(data), options);
-	//$('body').click(infection);
-	setInterval(infection, 1000);
-}
+	network = new vis.Network(container, normalizeData(data), options);
 
-function getData(data) {
-
-	$.each(data.edges, function(index, edge) {
-		edge.label = edge.rate * 100 + "%";
-		edge.width = 3 + edge.rate * 10;
+	network.on('afterDrawing', function() {
+		var timeline = new TimelineLite({
+			paused: false,
+			repeat: -1,
+			onUpdate: infection
+		});
+		timeline.time(10000);
 	});
 
-	nodes = new vis.DataSet(data.nodes);
-	edges = new vis.DataSet(data.edges);
+	function normalizeData(data) {
+		$.each(data.edges, function(index, edge) {
+			edge.label = (Math.round(edge.rate * 1000) / 10) + "%";
+			edge.width = 3 + edge.rate * 10;
+		});
 
-	return {
-		nodes: nodes,
-		edges: edges
-	};
+		nodes = new vis.DataSet(data.nodes);
+		edges = new vis.DataSet(data.edges);
+
+		return {
+			nodes: nodes,
+			edges: edges
+		};
+	}
 }
 
 function getNeighbors(node) {
@@ -147,7 +155,7 @@ function infection() {
 function infect(infected, target) {
 	var edge = getEdge(infected, target)[0];
 
-	if (target.group !== "i")
+	if (target.group === "s")
 		if (Math.random() < edge.rate) {
 			edge.rate = 0;
 			edges.update(edge);
@@ -181,13 +189,13 @@ function infectionAnimation(infected, target) {
 	TweenMax.to(dot, .6, {
 		left: (domTo.x - width / 2) + "px",
 		top: (domTo.y - height / 2) + "px",
-		//opacity: .5,
 		ease: Power2.easeOut,
 		onComplete: function() {
-			target.group = "i";
-			nodes.update(target);
 			setTimeout(function() {
+				target.group = "i";
+				nodes.update(target);
 				container.removeChild(dot);
+				//Shake it!
 				network.moveNode(
 					target.id,
 					positionsTo[target.id].x + Math.random() * 30 - 15,
@@ -227,4 +235,97 @@ function ani_infected_2(infected) {
 		infected.size -= ANI_INF_REDUCE_RATE;
 		nodes.update(infected);
 	}
+}
+
+// Random
+
+function randomData(config) {
+
+	var n = randomNodes(config);
+	var e = randomEdges(config);
+
+	createNetwork({
+		nodes: n,
+		edges: e
+	});
+
+}
+
+function randomNodes(config) {
+
+	var nodeConfig = config.node;
+
+	// Get the number of nodes that will be generate
+	var quant = Math.round(Math.random() * (nodeConfig.max - nodeConfig.min) + nodeConfig.min);
+	var rNodes = [];
+
+	//Get a random group left to avoid undefined
+	var groupLeft = nodeConfig.groups[Math.floor(Math.random() * nodeConfig.groups.length)];
+
+	//Scan each node group and apply the quantity
+	$.each(nodeConfig.groups, function(index, group) {
+		if (group.quant === undefined) {
+			groupLeft = group;
+			return;
+		}
+		switch (group.quantType) {
+			case "percent":
+				addNode(group, group.quant / 100 * quant);
+				break;
+
+			default:
+				addNode(group, group.quant);
+				break;
+		}
+	});
+
+	//Add what is left
+	addNode(groupLeft, quant - rNodes.length);
+
+	function addNode(group, quant) {
+		for (var i = 0; i < quant; i++)
+			rNodes.push({
+				id: rNodes.length,
+				group: group.ref
+			});
+	}
+
+	nodes = new vis.DataSet(rNodes);
+	return rNodes;
+}
+
+function randomEdges(config) {
+
+	var edgesConfig = config.edge;
+	edges = new vis.DataSet();
+
+	var quant = Math.round(Math.random() * (edgesConfig.max - edgesConfig.min) + edgesConfig.min);
+
+	for (var i = 0; i < quant; i++) {
+		var n = 0;
+		do {
+			var samples = getSamples(nodes.get());
+			var edge = getEdge(samples[0], samples[1]);
+
+			//The nodes can't exceed the max edges setted
+			if (getNeighbors(samples[0]).length <= config.node.maxEdges && getNeighbors(samples[1]).length <= config.node.maxEdges)
+				if (_.isEmpty(edge)) {
+					edges.add({
+						"from": samples[0].id,
+						"to": samples[1].id,
+						"rate": Math.random() * (edgesConfig.rate.max - edgesConfig.rate.min) + edgesConfig.rate.min
+					});
+					break;
+				}
+		} while (n++ < 10);
+	}
+
+	function getSamples(items) {
+		var sample1 = _.sample(items);
+		var sample2 = _.sample(_.without(items, sample1));
+
+		return [sample1, sample2];
+	}
+
+	return edges.get();
 }
