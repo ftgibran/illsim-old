@@ -7955,4 +7955,12 @@ button.close {
   overflow: visible;
   clip: auto; }
 
+.centered {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  /* bring your own prefixes */
+  -webkit-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%); }
+
 /*# sourceMappingURL=app.css.map */

@@ -1,28 +1,41 @@
 {
 	"node": {
-		"min": 40,
-		"max": 40,
-		"maxEdges": 2,
+		"min": 60,
+		"max": 120,
+		"maxEdges": 4,
 		"groups": [{
 			"ref": "s"
 		}, {
 			"ref": "i",
 			"quantType": "number",
-			"quant": 2
+			"quant": 5
 		}, {
-			"ref": "r",
+			"ref": "v",
 			"quantType": "percent",
 			"quant": 20
-		}]
+		}],
+		"recover": {
+			"rate": {
+				"min": 0.01,
+				"max": 0.03
+			}
+		},
+		"death": {
+			"rate": {
+				"min": 0.01,
+				"max": 0.03
+			}
+		}
 	},
 	"edge": {
-		"min": 60,
-		"max": 60,
-		"rate": {
-			"min": 0.1,
-			"max": 0.1,
-			"precision": 1,
-			"distribution": "uniform"
+		"min": 90,
+		"max": 150,
+		"infect": {
+			"rate": {
+				"min": 0.01,
+				"max": 0.3
+			}
 		}
+
 	}
 }

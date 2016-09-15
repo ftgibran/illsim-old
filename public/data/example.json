@@ -1,150 +1,294 @@
 {
 	"nodes": [{
 			"id": 1,
-			"group": "s"
+			"group": "s",
+			"recover": {
+				"rate": 0.1
+			},
+			"death": {
+				"rate": 0.01
+			}
 		}, {
 			"id": 2,
-			"group": "s"
+			"group": "s",
+			"recover": {
+				"rate": 0.1
+			},
+			"death": {
+				"rate": 0.01
+			}
 		}, {
 			"id": 3,
-			"group": "s"
+			"group": "s",
+			"recover": {
+				"rate": 0.1
+			},
+			"death": {
+				"rate": 0.01
+			}
 		}, {
 			"id": 4,
-			"group": "s"
+			"group": "s",
+			"recover": {
+				"rate": 0.1
+			},
+			"death": {
+				"rate": 0.01
+			}
 		}, {
 			"id": 5,
-			"group": "s"
+			"group": "s",
+			"recover": {
+				"rate": 0.1
+			},
+			"death": {
+				"rate": 0.01
+			}
 		}, {
 			"id": 6,
-			"group": "i"
+			"group": "i",
+			"recover": {
+				"rate": 0.1
+			},
+			"death": {
+				"rate": 0.01
+			}
 		}, {
 			"id": 7,
-			"group": "s"
+			"group": "s",
+			"recover": {
+				"rate": 0.1
+			},
+			"death": {
+				"rate": 0.01
+			}
 		}, {
 			"id": 8,
-			"group": "s"
+			"group": "s",
+			"recover": {
+				"rate": 0.1
+			},
+			"death": {
+				"rate": 0.01
+			}
 		}, {
 			"id": 9,
-			"group": "s"
+			"group": "s",
+			"recover": {
+				"rate": 0.1
+			},
+			"death": {
+				"rate": 0.01
+			}
 		}, {
 			"id": 10,
-			"group": "s"
+			"group": "s",
+			"recover": {
+				"rate": 0.1
+			},
+			"death": {
+				"rate": 0.01
+			}
 		}, {
 			"id": 11,
-			"group": "s"
+			"group": "s",
+			"recover": {
+				"rate": 0.1
+			},
+			"death": {
+				"rate": 0.01
+			}
 		}, {
 			"id": 12,
-			"group": "s"
+			"group": "s",
+			"recover": {
+				"rate": 0.1
+			},
+			"death": {
+				"rate": 0.01
+			}
 		}, {
 			"id": 13,
-			"group": "s"
+			"group": "s",
+			"recover": {
+				"rate": 0.1
+			},
+			"death": {
+				"rate": 0.01
+			}
 		}, {
 			"id": 14,
-			"group": "s"
+			"group": "s",
+			"recover": {
+				"rate": 0.1
+			},
+			"death": {
+				"rate": 0.01
+			}
 		}, {
 			"id": 15,
-			"group": "s"
+			"group": "s",
+			"recover": {
+				"rate": 0.1
+			},
+			"death": {
+				"rate": 0.01
+			}
 		}, {
 			"id": 16,
-			"group": "s"
+			"group": "s",
+			"recover": {
+				"rate": 0.1
+			},
+			"death": {
+				"rate": 0.01
+			}
 		}
 
 	],
 	"edges": [{
 		"from": 1,
 		"to": 2,
-		"rate": 0.2
+		"infect": {
+			"rate": 0.1
+		}
 	}, {
 		"from": 2,
 		"to": 3,
-		"rate": 0.1
+		"infect": {
+			"rate": 0.2
+		}
 	}, {
 		"from": 3,
 		"to": 4,
-		"rate": 0.1
+		"infect": {
+			"rate": 0.1
+		}
 	}, {
 		"from": 5,
 		"to": 6,
-		"rate": 0.1
+		"infect": {
+			"rate": 0.1
+		}
 	}, {
 		"from": 6,
 		"to": 7,
-		"rate": 0.1
+		"infect": {
+			"rate": 0.1
+		}
 	}, {
 		"from": 7,
 		"to": 8,
-		"rate": 0.2
+		"infect": {
+			"rate": 0.2
+		}
 	}, {
 		"from": 9,
 		"to": 10,
-		"rate": 0.1
+		"infect": {
+			"rate": 0.1
+		}
 	}, {
 		"from": 10,
 		"to": 11,
-		"rate": 0.1
+		"infect": {
+			"rate": 0.1
+		}
 	}, {
 		"from": 11,
 		"to": 12,
-		"rate": 0.3
+		"infect": {
+			"rate": 0.3
+		}
 	}, {
 		"from": 13,
 		"to": 14,
-		"rate": 0.1
+		"infect": {
+			"rate": 0.1
+		}
 	}, {
 		"from": 14,
 		"to": 15,
-		"rate": 0.1
+		"infect": {
+			"rate": 0.1
+		}
 	}, {
 		"from": 15,
 		"to": 16,
-		"rate": 0.4
+		"infect": {
+			"rate": 0.4
+		}
 	}, {
 		"from": 1,
 		"to": 5,
-		"rate": 0.1
+		"infect": {
+			"rate": 0.1
+		}
 	}, {
 		"from": 2,
 		"to": 6,
-		"rate": 0.3
+		"infect": {
+			"rate": 0.3
+		}
 	}, {
 		"from": 3,
 		"to": 7,
-		"rate": 0.1
+		"infect": {
+			"rate": 0.1
+		}
 	}, {
 		"from": 4,
 		"to": 8,
-		"rate": 0.1
+		"infect": {
+			"rate": 0.1
+		}
 	}, {
 		"from": 5,
 		"to": 9,
-		"rate": 0.2
+		"infect": {
+			"rate": 0.2
+		}
 	}, {
 		"from": 6,
 		"to": 10,
-		"rate": 0.1
+		"infect": {
+			"rate": 0.1
+		}
 	}, {
 		"from": 7,
 		"to": 11,
-		"rate": 0.1
+		"infect": {
+			"rate": 0.1
+		}
 	}, {
 		"from": 8,
 		"to": 12,
-		"rate": 0.3
+		"infect": {
+			"rate": 0.3
+		}
 	}, {
 		"from": 9,
 		"to": 13,
-		"rate": 0.1
+		"infect": {
+			"rate": 0.1
+		}
 	}, {
 		"from": 10,
 		"to": 14,
-		"rate": 0.2
+		"infect": {
+			"rate": 0.2
+		}
 	}, {
 		"from": 11,
 		"to": 15,
-		"rate": 0.1
+		"infect": {
+			"rate": 0.1
+		}
 	}, {
 		"from": 12,
 		"to": 16,
-		"rate": 0.2
+		"infect": {
+			"rate": 0.2
+		}
 	}]
 }
