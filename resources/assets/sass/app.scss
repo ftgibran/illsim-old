@@ -1,6 +1,7 @@
 
 // Fonts
-@import url(https://fonts.googleapis.com/css?family=Raleway:300,400,600);
+@import 'https://fonts.googleapis.com/css?family=Raleway:300,400,600';
+@import 'https://fonts.googleapis.com/css?family=Fredericka+the+Great';
 
 // Variables
 @import "variables";
@@ -23,4 +24,8 @@
   left: 50%;
   /* bring your own prefixes */
   transform: translate(-50%, -50%);
+}
+
+.illsim {
+	font-family: 'Fredericka the Great', cursive;
 }

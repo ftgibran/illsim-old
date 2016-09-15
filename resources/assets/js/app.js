@@ -20,8 +20,8 @@ const app = new Vue({
  * Constants
  */
 
-const ANI_SCALE = .4;
-const INFECTION_INTERVAL = 100;
+const TIME_SCALE = .4;
+const ATTEMPT_INTERVAL = 100;
 
 /**
  * Initial Configuration
@@ -89,12 +89,12 @@ $(function() {
  */
 
 function init() {
-	//$.getJSON("/data/example.json", createNetwork);
-	$.getJSON("/data/random.json", factory);
+	//$.getJSON("/data/Example1.json", createNetwork);
+	$.getJSON("/data/FactoryFullRandom.json", factory);
 }
 
 function createNetwork(data) {
-	network = new vis.Network(container, normalizeData(data), options);
+	network = new vis.Network(container, normalize(data), options);
 
 	canvas = document.getElementsByTagName("canvas")[0];
 	context = canvas.getContext("2d");
@@ -109,10 +109,10 @@ function createNetwork(data) {
 			infectAttempt();
 			recoverAttempt();
 			killAttempt();
-		}, INFECTION_INTERVAL);
+		}, ATTEMPT_INTERVAL);
 	});
 
-	function normalizeData(data) {
+	function normalize(data) {
 		//Label edges with their rates
 		$.each(data.edges, function(index, edge) {
 			edge.label = (Math.round(edge.infect.rate * 1000) / 10) + "%";
@@ -192,14 +192,14 @@ function recoverAttempt() {
 
 		infected.size = options.nodes.size;
 
-		TweenMax.to(infected, NODE_EXPAND_TIME * ANI_SCALE, {
+		TweenMax.to(infected, NODE_EXPAND_TIME * TIME_SCALE, {
 			size: options.nodes.size * NODE_EXPAND_SCALE,
 			ease: Power2.easeOut,
 			onUpdate: function() {
 				nodes.update(infected);
 			},
 			onComplete: function() {
-				TweenMax.to(infected, NODE_RETRACT_TIME * ANI_SCALE, {
+				TweenMax.to(infected, NODE_RETRACT_TIME * TIME_SCALE, {
 					size: options.nodes.size,
 					ease: Elastic.easeOut.config(1, 0.3),
 					onUpdate: function() {
@@ -237,9 +237,9 @@ function killAttempt() {
 		var edges_id = network.getConnectedEdges(infected.id);
 
 		edges.get(edges_id).forEach(function(edge) {
-			TweenMax.to(edge, EDGE_RETRACT_TIME * ANI_SCALE, {
+			TweenMax.to(edge, EDGE_RETRACT_TIME * TIME_SCALE, {
 				width: EDGE_RETRACT_SIZE,
-				delay: EDGE_RETRACT_DELAY,
+				delay: EDGE_RETRACT_DELAY * TIME_SCALE,
 				ease: Power1.easeOut,
 				onUpdate: function() {
 					edges.update(edge);
@@ -250,7 +250,7 @@ function killAttempt() {
 			});
 		});
 
-		TweenMax.to(infected, NODE_RETRACT_TIME * ANI_SCALE, {
+		TweenMax.to(infected, NODE_RETRACT_TIME * TIME_SCALE, {
 			size: options.nodes.size * NODE_RETRACT_SCALE,
 			ease: Power1.easeOut,
 			onUpdate: function() {
@@ -311,7 +311,7 @@ function infectAttempt() {
 		network.on('afterDrawing', draw);
 
 		//Dot moviment animation
-		TweenMax.to(dot, DOT_MOVIMENT_TIME * ANI_SCALE, {
+		TweenMax.to(dot, DOT_MOVIMENT_TIME * TIME_SCALE, {
 			x: target_pos.x,
 			y: target_pos.y,
 			ease: Power2.easeOut,
@@ -321,8 +321,8 @@ function infectAttempt() {
 		});
 
 		//Node expand animation
-		TweenMax.to(target, NODE_EXPAND_TIME * ANI_SCALE, {
-			delay: NODE_EXPAND_DELAY * ANI_SCALE,
+		TweenMax.to(target, NODE_EXPAND_TIME * TIME_SCALE, {
+			delay: NODE_EXPAND_DELAY * TIME_SCALE,
 			size: options.nodes.size * NODE_EXPAND_SCALE,
 			ease: Power2.easeOut,
 			onUpdate: function() {
@@ -343,7 +343,7 @@ function infectAttempt() {
 				);
 
 				//Node retract animation
-				TweenMax.to(target, NODE_RETRACT_TIME * ANI_SCALE, {
+				TweenMax.to(target, NODE_RETRACT_TIME * TIME_SCALE, {
 					size: options.nodes.size,
 					ease: Power3.easeOut,
 					onUpdate: function() {
@@ -422,41 +422,46 @@ function factory(config) {
 
 		var quant = Math.round(randomRange(edgesConfig.min, edgesConfig.max));
 
-		//Adds edges for each node to prevent node alone
-		$.each(nodes, function(index, node1) {
-			var node2 = _.sample(_.without(nodes, node1));
-			edges.add({
-				from: node1,
-				to: node2,
-				infect: {
-					"rate": randomRange(edgesConfig.infect.rate.min, edgesConfig.infect.rate.max)
-				}
-			});
-			if (--quant <= 0)
-				return edges;
-		});
+		//Adds edges
+		while (quant > 0) {
+			var changed = false;
+			nodes.forEach(function(node1) {
+				if (quant <= 0) return;
+				var pool = nodes.get();
+				do {
+					var node2 = _.sample(pool, node1); //get a random node
+					pool = _.without(pool, node2); //pop node2 from the pool
 
-		//Apply the rest of edges
-		for (var i = 0; i < quant; i++) {
-			var n = 0;
-			do {
-				var samples = getSamples(nodes.get());
-				var neighbors = [getNeighbors(samples[0]), getNeighbors(samples[1])];
-				var edge = getEdge(samples[0], samples[1]);
-
-				//The nodes can't exceed the max edges setted
-				if (neighbors[0].length <= config.node.maxEdges && neighbors[1].length <= config.node.maxEdges)
-					if (_.isEmpty(edge)) {
-						edges.add({
-							from: samples[0].id,
-							to: samples[1].id,
-							infect: {
-								"rate": randomRange(edgesConfig.infect.rate.min, edgesConfig.infect.rate.max)
-							}
-						});
+					if (addEdge(node1, node2)) {
+						quant--;
+						changed = true;
 						break;
 					}
-			} while (n++ < 10);
+				} while (!_.isEmpty(pool)); //Attempt limit
+			});
+			if (!changed) break;
+		}
+
+		function addEdge(node1, node2) {
+			if (node1.id === node2.id) return false;
+
+			var neighbors1 = getNeighbors(node1);
+			var neighbors2 = getNeighbors(node2);
+			var edge = getEdge(node1, node2);
+
+			//The nodes can't exceed the max edges setted
+			if (neighbors1.length < config.node.maxEdges && neighbors2.length < config.node.maxEdges)
+				if (_.isEmpty(edge)) {
+					edges.add({
+						from: node1.id,
+						to: node2.id,
+						infect: {
+							"rate": randomRange(edgesConfig.infect.rate.min, edgesConfig.infect.rate.max)
+						}
+					});
+					return true;
+				}
+			return false;
 		}
 
 		function getNeighbors(node) {

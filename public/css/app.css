@@ -1,5 +1,6 @@
 @charset "UTF-8";
-@import url(https://fonts.googleapis.com/css?family=Raleway:300,400,600);
+@import 'https://fonts.googleapis.com/css?family=Raleway:300,400,600';
+@import 'https://fonts.googleapis.com/css?family=Fredericka+the+Great';
 /*!
  * Bootstrap v3.3.7 (http://getbootstrap.com)
  * Copyright 2011-2016 Twitter, Inc.
@@ -7962,5 +7963,8 @@ button.close {
   /* bring your own prefixes */
   -webkit-transform: translate(-50%, -50%);
   transform: translate(-50%, -50%); }
+
+.illsim {
+  font-family: 'Fredericka the Great', cursive; }
 
 /*# sourceMappingURL=app.css.map */
