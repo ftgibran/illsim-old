@@ -20,8 +20,8 @@ const app = new Vue({
  * Constants
  */
 
-const TIME_SCALE = .4;
-const ATTEMPT_INTERVAL = 100;
+const TIME_SCALE = 1;
+const ATTEMPT_INTERVAL = 400;
 
 /**
  * Initial Configuration
@@ -90,7 +90,7 @@ $(function() {
 
 function init() {
 	//$.getJSON("/data/Example1.json", createNetwork);
-	$.getJSON("/data/FactoryFullRandom.json", factory);
+	$.getJSON("/data/FactoryFullRandom.json", factoryFullRandom);
 }
 
 function createNetwork(data) {
@@ -360,7 +360,7 @@ function infectAttempt() {
  * Factories
  */
 
-function factory(config) {
+function factoryFullRandom(config) {
 
 	createNetwork({
 		nodes: nodesFactory().get(),
