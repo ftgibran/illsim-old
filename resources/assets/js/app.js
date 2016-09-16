@@ -17,13 +17,6 @@ const app = new Vue({
 });
 
 /**
- * Constants
- */
-
-const TIME_SCALE = 1;
-const ATTEMPT_INTERVAL = 400;
-
-/**
  * Initial Configuration
  */
 var container = document.getElementById('network');
@@ -34,6 +27,19 @@ var network;
 
 var nodes;
 var edges;
+
+var illsim = {
+	animation: {
+		time: true,
+		scale: 1, //.4
+		step: 400 //100
+	},
+	simulation: {
+		infectBy: 'edge',
+		birthWhenDie: true,
+		susceptibleCanDie: true
+	}
+};
 
 var options = {
 	nodes: {
@@ -52,7 +58,8 @@ var options = {
 		selectConnectedEdges: false
 	},
 	"physics": {
-		"minVelocity": 0.05
+		"minVelocity": 0.05,
+		"solver": "hierarchicalRepulsion"
 	},
 	groups: {
 		i: { //Infected
@@ -74,7 +81,7 @@ var options = {
 			color: '#b0bec5'
 		}
 	}
-}
+};
 
 /**
  * Initialization
@@ -89,8 +96,11 @@ $(function() {
  */
 
 function init() {
+	nodes = new vis.DataSet();
+	edges = new vis.DataSet();
 	//$.getJSON("/data/Example1.json", createNetwork);
-	$.getJSON("/data/FactoryFullRandom.json", factoryFullRandom);
+	//$.getJSON("/data/FactoryFullRandom.json", factoryFullRandom);
+	$.getJSON("/data/FactoryUniformFormat.json", factoryUniformFormat);
 }
 
 function createNetwork(data) {
@@ -106,16 +116,21 @@ function createNetwork(data) {
 	network.once('afterDrawing', function() {
 		$('.loading').hide();
 		setInterval(function() {
-			infectAttempt();
-			recoverAttempt();
-			killAttempt();
-		}, ATTEMPT_INTERVAL);
+			nodesGroup("i").forEach(function(infected) {
+				infectAttempt(infected);
+				recoverAttempt(infected);
+				killAttempt(infected);
+			});
+			nodesGroup("r").forEach(function(recovered) {
+				killAttempt(recovered);
+			});
+		}, options.step);
 	});
 
 	function normalize(data) {
 		//Label edges with their rates
 		$.each(data.edges, function(index, edge) {
-			edge.label = (Math.round(edge.infect.rate * 1000) / 10) + "%";
+			//edge.label = (Math.round(edge.infect.rate * 1000) / 10) + "%";
 			edge.width = 3 + edge.infect.rate * 10;
 		});
 
@@ -171,104 +186,37 @@ function nodesGroup(group) {
  * Attempts
  */
 
-function recoverAttempt() {
-	nodesGroup("i").forEach(function(infected) {
-		recover(infected);
+function infectAttempt(infected) {
+
+	var neighbors = nodes.get(infected.neighbors);
+	neighbors.forEach(function(neighbor) {
+		infectByNode(neighbor);
 	});
 
-	function recover(infected) {
-		if (Math.random() < infected.recover.rate) {
-			infected.group = "r";
-			nodes.update(infected);
-			recover_ani(infected);
-		}
-	}
+	function infectByNode(target) {
+		if (target.group !== "s") return;
 
-	function recover_ani(infected) {
-
-		const NODE_EXPAND_TIME = .4;
-		const NODE_EXPAND_SCALE = 1.3;
-		const NODE_RETRACT_TIME = 2;
-
-		infected.size = options.nodes.size;
-
-		TweenMax.to(infected, NODE_EXPAND_TIME * TIME_SCALE, {
-			size: options.nodes.size * NODE_EXPAND_SCALE,
-			ease: Power2.easeOut,
-			onUpdate: function() {
-				nodes.update(infected);
-			},
-			onComplete: function() {
-				TweenMax.to(infected, NODE_RETRACT_TIME * TIME_SCALE, {
-					size: options.nodes.size,
-					ease: Elastic.easeOut.config(1, 0.3),
-					onUpdate: function() {
-						nodes.update(infected);
-					}
-				});
-			}
-		});
-	}
-}
-
-function killAttempt() {
-	nodesGroup("i").forEach(function(infected) {
-		recover(infected);
-	});
-
-	function recover(infected) {
-		if (Math.random() < infected.death.rate) {
-			infected.group = "d";
-			nodes.update(infected);
-			death_ani(infected);
-		}
-	}
-
-	function death_ani(infected) {
-
-		const NODE_RETRACT_SCALE = .6;
-		const NODE_RETRACT_TIME = 2.5;
-		const EDGE_RETRACT_TIME = 1;
-		const EDGE_RETRACT_SIZE = 0;
-		const EDGE_RETRACT_DELAY = 1;
-
-		infected.size = options.nodes.size;
-
-		var edges_id = network.getConnectedEdges(infected.id);
-
-		edges.get(edges_id).forEach(function(edge) {
-			TweenMax.to(edge, EDGE_RETRACT_TIME * TIME_SCALE, {
-				width: EDGE_RETRACT_SIZE,
-				delay: EDGE_RETRACT_DELAY * TIME_SCALE,
-				ease: Power1.easeOut,
-				onUpdate: function() {
-					edges.update(edge);
-				},
-				onComplete: function() {
-					edges.remove(edge);
+		var quant = 0;
+		var neighbors = nodes.get(target.neighbors, {
+			filter: function(neighbor) {
+				if (neighbor.group === "i") {
+					quant++;
+					return true;
 				}
-			});
-		});
-
-		TweenMax.to(infected, NODE_RETRACT_TIME * TIME_SCALE, {
-			size: options.nodes.size * NODE_RETRACT_SCALE,
-			ease: Power1.easeOut,
-			onUpdate: function() {
-				nodes.update(infected);
+				return false
 			}
 		});
+
+		var rate = 1 - Math.exp(-target.infect.rate * quant);
+
+		if (Math.random() < rate) {
+			target.group = "t";
+			nodes.update(target);
+			infect_ani(_.sample(neighbors), target);
+		}
 	}
-}
 
-function infectAttempt() {
-	nodesGroup("i").forEach(function(infected) {
-		var neighbors = nodes.get(infected.neighbors);
-		neighbors.forEach(function(neighbor) {
-			infect(infected, neighbor);
-		});
-	});
-
-	function infect(infected, target) {
+	function infectByEdge(infected, target) {
 		if (target.group !== "s") return;
 
 		var edge = getEdge(infected, target)[0];
@@ -311,7 +259,7 @@ function infectAttempt() {
 		network.on('afterDrawing', draw);
 
 		//Dot moviment animation
-		TweenMax.to(dot, DOT_MOVIMENT_TIME * TIME_SCALE, {
+		TweenMax.to(dot, DOT_MOVIMENT_TIME * illsim.animation.scale, {
 			x: target_pos.x,
 			y: target_pos.y,
 			ease: Power2.easeOut,
@@ -321,8 +269,8 @@ function infectAttempt() {
 		});
 
 		//Node expand animation
-		TweenMax.to(target, NODE_EXPAND_TIME * TIME_SCALE, {
-			delay: NODE_EXPAND_DELAY * TIME_SCALE,
+		TweenMax.to(target, NODE_EXPAND_TIME * illsim.animation.scale, {
+			delay: NODE_EXPAND_DELAY * illsim.animation.scale,
 			size: options.nodes.size * NODE_EXPAND_SCALE,
 			ease: Power2.easeOut,
 			onUpdate: function() {
@@ -343,7 +291,7 @@ function infectAttempt() {
 				);
 
 				//Node retract animation
-				TweenMax.to(target, NODE_RETRACT_TIME * TIME_SCALE, {
+				TweenMax.to(target, NODE_RETRACT_TIME * illsim.animation.scale, {
 					size: options.nodes.size,
 					ease: Power3.easeOut,
 					onUpdate: function() {
@@ -356,9 +304,204 @@ function infectAttempt() {
 	}
 }
 
+function recoverAttempt(target) {
+
+	recover(target);
+
+	function recover(target) {
+		if (Math.random() < target.recover.rate) {
+			target.group = "r";
+			nodes.update(target);
+			recover_ani(target);
+		}
+	}
+
+	function recover_ani(target) {
+
+		const NODE_EXPAND_TIME = .4;
+		const NODE_EXPAND_SCALE = 1.3;
+		const NODE_RETRACT_TIME = 2;
+
+		target.size = options.nodes.size;
+
+		TweenMax.to(target, NODE_EXPAND_TIME * illsim.animation.scale, {
+			size: options.nodes.size * NODE_EXPAND_SCALE,
+			ease: Power2.easeOut,
+			onUpdate: function() {
+				nodes.update(target);
+			},
+			onComplete: function() {
+				TweenMax.to(target, NODE_RETRACT_TIME * illsim.animation.scale, {
+					size: options.nodes.size,
+					ease: Elastic.easeOut.config(1, 0.3),
+					onUpdate: function() {
+						nodes.update(target);
+					}
+				});
+			}
+		});
+	}
+}
+
+function killAttempt(target) {
+
+	kill(target);
+
+	function kill(target) {
+		var rate = target.death.rate;
+		if (target.group = "r")
+			rate = target.deathRecover.rate;
+
+		if (Math.random() < rate) {
+			target.group = "d";
+			nodes.update(target);
+			death_ani(target);
+		}
+	}
+
+	function death_ani(target) {
+
+		const NODE_RETRACT_SCALE = .6;
+		const NODE_RETRACT_TIME = 2.5;
+		const EDGE_RETRACT_TIME = 1;
+		const EDGE_RETRACT_SIZE = 0;
+		const EDGE_RETRACT_DELAY = 1;
+
+		target.size = options.nodes.size;
+
+		var edges_id = network.getConnectedEdges(target.id);
+
+		edges.get(edges_id).forEach(function(edge) {
+			TweenMax.to(edge, EDGE_RETRACT_TIME * illsim.animation.scale, {
+				width: EDGE_RETRACT_SIZE,
+				delay: EDGE_RETRACT_DELAY * illsim.animation.scale,
+				ease: Power1.easeOut,
+				onUpdate: function() {
+					edges.update(edge);
+				},
+				onComplete: function() {
+					edges.remove(edge);
+
+					var newNode = {
+						id: nodes.length,
+						group: "s",
+						infect: {
+							"rate": target.infect.rate
+						},
+						recover: {
+							"rate": target.recover.rate
+						},
+						death: {
+							"rate": target.death.rate
+						},
+						deathRecover: {
+							"rate": target.deathRecover.rate
+						}
+					}
+					nodes.add(newNode);
+
+					edges.add({
+						from: newNode.id,
+						to: _.sample(nodes.get({
+							filter: function(node) {
+								return node.group !== "d";
+							}
+						})).id,
+						infect: {
+							"rate": 0.1
+						}
+					});
+				}
+			});
+		});
+
+		TweenMax.to(target, NODE_RETRACT_TIME * illsim.animation.scale, {
+			size: options.nodes.size * NODE_RETRACT_SCALE,
+			ease: Power1.easeOut,
+			onUpdate: function() {
+				nodes.update(target);
+			}
+		});
+	}
+}
+
 /**
  * Factories
  */
+
+function factoryUniformFormat(config) {
+
+	createNetwork({
+		nodes: nodesFactory().get(),
+		edges: edgesFactory().get()
+	});
+
+	function nodesFactory() {
+		var nodeConfig = config.node;
+
+		for (var i = 0; i < Math.pow(config.level, 2); i++)
+			nodes.add({
+				id: i,
+				group: "s",
+				infect: {
+					"rate": nodeConfig.rate.infect
+				},
+				recover: {
+					"rate": nodeConfig.rate.recover
+				},
+				death: {
+					"rate": nodeConfig.rate.death
+				},
+				deathRecover: {
+					"rate": nodeConfig.rate.deathRecover
+				}
+			});
+
+		for (var i = 0; i < 5; i++) {
+			var node = _.sample(nodes.get());
+			node.group = "i";
+			nodes.update(node);
+		}
+
+		return nodes;
+	}
+
+	function edgesFactory() {
+		var edgesConfig = config.edge;
+		var row = config.level;
+		var line = config.level - 1;
+
+		for (var i = 0; i < row; i++)
+			for (var j = 0; j < line; j++) {
+				var node1 = nodes.get(i * row + j);
+				var node2 = nodes.get(i * row + (j + 1));
+
+				edges.add({
+					from: node1.id,
+					to: node2.id,
+					infect: {
+						"rate": edgesConfig.rate.infect
+					}
+				});
+			}
+
+		for (var i = 0; i < row; i++)
+			for (var j = 0; j < line; j++) {
+				var node1 = nodes.get(j * row + i);
+				var node2 = nodes.get((j + 1) * row + i);
+
+				edges.add({
+					from: node1.id,
+					to: node2.id,
+					infect: {
+						"rate": edgesConfig.rate.infect
+					}
+				});
+			}
+
+		return edges;
+	}
+}
 
 function factoryFullRandom(config) {
 
@@ -370,7 +513,7 @@ function factoryFullRandom(config) {
 	function nodesFactory() {
 
 		var nodeConfig = config.node;
-		nodes = new vis.DataSet();
+		//nodes = new vis.DataSet();
 
 		// Get the number of nodes that will be generate
 		var quant = Math.round(randomRange(nodeConfig.min, nodeConfig.max));
@@ -418,7 +561,7 @@ function factoryFullRandom(config) {
 	function edgesFactory() {
 
 		var edgesConfig = config.edge;
-		edges = new vis.DataSet();
+		//edges = new vis.DataSet();
 
 		var quant = Math.round(randomRange(edgesConfig.min, edgesConfig.max));
 
@@ -429,7 +572,7 @@ function factoryFullRandom(config) {
 				if (quant <= 0) return;
 				var pool = nodes.get();
 				do {
-					var node2 = _.sample(pool, node1); //get a random node
+					var node2 = _.sample(pool); //get a random node
 					pool = _.without(pool, node2); //pop node2 from the pool
 
 					if (addEdge(node1, node2)) {

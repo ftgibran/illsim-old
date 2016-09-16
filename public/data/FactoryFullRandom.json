@@ -1,7 +1,7 @@
 {
 	"node": {
-		"min": 30,
-		"max": 45,
+		"min": 100,
+		"max": 100,
 		"maxEdges": 4,
 		"groups": [{
 			"ref": "s"
@@ -12,28 +12,28 @@
 		}, {
 			"ref": "v",
 			"quantType": "percent",
-			"quant": 20
+			"quant": 0
 		}],
 		"recover": {
 			"rate": {
-				"min": 0.01,
-				"max": 0.05
+				"min": 0,
+				"max": 0
 			}
 		},
 		"death": {
 			"rate": {
 				"min": 0.01,
-				"max": 0.03
+				"max": 0.1
 			}
 		}
 	},
 	"edge": {
-		"min": 45,
-		"max": 60,
+		"min": 150,
+		"max": 150,
 		"infect": {
 			"rate": {
-				"min": 0.01,
-				"max": 0.3
+				"min": 0.4,
+				"max": 0.6
 			}
 		}
 

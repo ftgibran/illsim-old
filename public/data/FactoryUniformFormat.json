@@ -1,0 +1,16 @@
+{
+	"level": 10,
+	"node": {
+		"rate": {
+			"infect": 0.2,
+			"recover": 0.05,
+			"death": 0.1,
+			"deathRecover": 0.01
+		}
+	},
+	"edge": {
+		"rate": {
+			"infect": 0.1
+		}
+	}
+}
