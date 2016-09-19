@@ -2,12 +2,13 @@
 // Fonts
 @import 'https://fonts.googleapis.com/css?family=Raleway:300,400,600';
 @import 'https://fonts.googleapis.com/css?family=Fredericka+the+Great';
+@import 'https://fonts.googleapis.com/icon?family=Material+Icons';
 
 // Variables
-@import "variables";
+//@import "variables";
 
 // Bootstrap
-@import "node_modules/bootstrap-sass/assets/stylesheets/bootstrap";
+//@import "node_modules/bootstrap-sass/assets/stylesheets/bootstrap";
 
 //Font Awesome
 @import "bower_components/font-awesome/scss/font-awesome";
@@ -17,6 +18,57 @@
 
 //Css-Utils
 @import "vendor/css-utils/utils.css";
+
+//Keen-UI
+@import "vendor/keen-ui/keen-ui.min.css";
+
+// Materialize
+@import "node_modules/materialize-css/sass/materialize";
+
+@media #{$small-and-down} {
+
+}
+
+@media #{$medium-and-up} {
+
+}
+
+@media #{$medium-and-down} {
+
+}
+
+@media #{$large-and-up} {
+
+}
+
+html {
+    font-family: 'Raleway', sans-serif;  
+}
+
+body {
+	background: #f5f8fa;
+	font-size: 120%;
+}
+
+nav {
+	color: black !important; 
+}
+
+h1, h2, h3, h4, h5, h6 {
+  
+}
+
+h1 { font-size: 2em; }
+h2 { font-size: 1.5em; }
+h3 { font-size: 1.17em; }
+h4 { font-size: 1.12em; }
+h5 { font-size: .83em; }
+h6 { font-size: .75em; }
+
+p {
+  line-height: 1.5;
+  font-weight: lighter;
+}
 
 .centered {
   position: absolute;
@@ -28,4 +80,15 @@
 
 .illsim {
 	font-family: 'Fredericka the Great', cursive;
+}
+
+.panel {
+  overflow-y: auto;
+  position: absolute;
+  margin: 0;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 30%;
+  z-index: 100;
 }

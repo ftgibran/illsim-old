@@ -1,0 +1,12 @@
+{
+	"animation": {
+		"time": true,
+		"scale": 0.5,
+		"shakeRadius": 15
+	},
+	"simulation": {
+		"step": 400,
+		"infectBy": "node",
+		"birthWhenDie": false
+	}
+}

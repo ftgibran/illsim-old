@@ -1,0 +1,68 @@
+{
+	"nodes": {
+		"borderWidth": 0,
+		"borderWidthSelected": 0,
+		"shape": "dot",
+		"size": 15
+	},
+	"edges": {
+		"color": "#666666",
+		"width": 3,
+		"smooth": false
+	},
+	"interaction": {
+		"hover": true,
+		"selectConnectedEdges": false
+	},
+	"physics": {
+		"minVelocity": 0.05,
+		"solver": "hierarchicalRepulsion"
+	},
+	"groups": {
+		"i": {
+			"color": "#D46A6A",
+			"rateBase": {
+				"infect": 1,
+				"resist": 1,
+				"recover": 1,
+				"death": 1
+			}
+		},
+		"r": {
+			"color": "#ECC13E",
+			"rateBase": {
+				"infect": 0,
+				"resist": 0.9,
+				"recover": 0,
+				"death": 0
+			}
+		},
+		"s": {
+			"color": "#b0bec5",
+			"rateBase": {
+				"infect": 0,
+				"resist": 0,
+				"recover": 0,
+				"death": 0
+			}
+		},
+		"v": {
+			"color": "#85BC5E",
+			"rateBase": {
+				"infect": 0,
+				"resist": 0.995,
+				"recover": 0,
+				"death": 0
+			}
+		},
+		"d": {
+			"color": "#666666",
+			"rateBase": {
+				"infect": 0,
+				"resist": 1,
+				"recover": 0,
+				"death": 0
+			}
+		}
+	}
+}

@@ -15,6 +15,11 @@ require('laravel-elixir-vue');
 
 elixir(function(mix) {
 
+    //Materialize
+    mix.copy('node_modules/materialize-css/dist/js/materialize.min.js',
+        'public/js/vendor/materialize/materialize.min.js'
+    );
+
     //Vis
     mix.copy(
         'node_modules/vis/dist/vis.min.css',
@@ -32,6 +37,11 @@ elixir(function(mix) {
     //Font Awesome
     mix.copy('bower_components/font-awesome/fonts',
         'public/fonts'
+    );
+
+    //Keen UI
+    mix.copy('node_modules/keen-ui/dist/min/keen-ui.min.css',
+        'public/css/vendor/keen-ui/keen-ui.min.css'
     );
 
     //CSS Utils

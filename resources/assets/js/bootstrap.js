@@ -7,7 +7,7 @@ window._ = require('lodash');
  */
 
 window.$ = window.jQuery = require('jquery');
-require('bootstrap-sass');
+//require('bootstrap-sass');
 
 /**
  * Vue is a modern JavaScript library for building interactive web interfaces
@@ -17,6 +17,9 @@ require('bootstrap-sass');
 
 window.Vue = require('vue');
 require('vue-resource');
+
+var Keen = require('keen-ui');
+Vue.use(Keen);
 
 /**
  * We'll register a HTTP interceptor to attach the "CSRF" header to each of

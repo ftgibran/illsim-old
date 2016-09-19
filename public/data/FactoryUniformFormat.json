@@ -1,11 +1,18 @@
 {
 	"level": 10,
 	"node": {
+		"groups": [{
+			"ref": "i",
+			"quant": 3
+		}, {
+			"ref": "v",
+			"quant": 0
+		}],
 		"rate": {
-			"infect": 0.2,
-			"recover": 0.05,
-			"death": 0.1,
-			"deathRecover": 0.01
+			"infect": 0.5,
+			"resist": 0,
+			"recover": 0.1,
+			"death": 0.3
 		}
 	},
 	"edge": {
