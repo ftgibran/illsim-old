@@ -16,6 +16,10 @@
 //Vis
 @import "vendor/vis/vis.min.css";
 
+//NoUiSlider
+@import "vendor/nouislider/nouislider.min.css";
+@import "./nouislider.scss";
+
 //Css-Utils
 @import "vendor/css-utils/utils.css";
 
@@ -82,7 +86,7 @@ p {
 	font-family: 'Fredericka the Great', cursive;
 }
 
-.panel {
+#left-nav {
   overflow-y: auto;
   position: absolute;
   margin: 0;

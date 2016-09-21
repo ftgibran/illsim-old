@@ -44,10 +44,18 @@ elixir(function(mix) {
         'public/css/vendor/keen-ui/keen-ui.min.css'
     );
 
+    //NoUISlider
+    mix.copy(
+        'node_modules/nouislider/distribute/nouislider.min.css',
+        'public/css/vendor/nouislider/nouislider.min.css'
+    );
+
     //CSS Utils
     mix.copy('bower_components/css-utils/utils.css',
         'public/css/vendor/css-utils/utils.css'
     );
+
+    mix.scripts('resources/assets/js/extra/**.js', 'public/js/extra.js');
 
     mix.sass('app.scss')
         .webpack('app.js');

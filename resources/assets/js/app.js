@@ -41,6 +41,38 @@ var options;
 $(function() {
 	//init();
 
+	$('.ui-slider').each(function() {
+		noUiSlider.create(this, {
+			start: $(this).attr('start'),
+			connect: 'lower',
+			step: Number($(this).attr('step')),
+			range: {
+				'min': Number($(this).attr('min')),
+				'max': Number($(this).attr('max'))
+			},
+			format: wNumb({
+				decimals: Number($(this).attr('decimals')),
+				postfix: $(this).attr('postfix')
+			})
+		});
+	});
+
+	$('.ui-ranger').each(function() {
+		noUiSlider.create(this, {
+			start: $(this).attr('start').split(","),
+			connect: true,
+			step: 1,
+			range: {
+				'min': 0,
+				'max': 100
+			},
+			format: wNumb({
+				decimals: 0,
+				postfix: '%'
+			})
+		});
+	});
+
 	$('select').material_select();
 });
 
@@ -54,7 +86,7 @@ function init() {
 
 	$.when(
 		$.getJSON("/data/Illsim.json", function(data) {
-			illsim = data
+			illsim = data;
 		}),
 		$.getJSON("/data/Settings.json", function(data) {
 			options = data;
@@ -622,7 +654,6 @@ function factoryFullRandom(config) {
 
 		var edgeConfig = config.edge;
 		var rate = edgeConfig.rate;
-		//edges = new vis.DataSet();
 
 		var quant = Math.round(random(edgeConfig.min, edgeConfig.max));
 
