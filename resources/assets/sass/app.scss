@@ -23,9 +23,6 @@
 //Css-Utils
 @import "vendor/css-utils/utils.css";
 
-//Keen-UI
-@import "vendor/keen-ui/keen-ui.min.css";
-
 // Materialize
 @import "node_modules/materialize-css/sass/materialize";
 
@@ -46,7 +43,7 @@
 }
 
 html {
-    font-family: 'Raleway', sans-serif;  
+    font-family: 'Raleway', sans-serif;
 }
 
 body {
@@ -55,11 +52,11 @@ body {
 }
 
 nav {
-	color: black !important; 
+	color: black !important;
 }
 
 h1, h2, h3, h4, h5, h6 {
-  
+
 }
 
 h1 { font-size: 2em; }

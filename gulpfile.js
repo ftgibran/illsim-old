@@ -39,11 +39,6 @@ elixir(function(mix) {
         'public/fonts'
     );
 
-    //Keen UI
-    mix.copy('node_modules/keen-ui/dist/min/keen-ui.min.css',
-        'public/css/vendor/keen-ui/keen-ui.min.css'
-    );
-
     //NoUISlider
     mix.copy(
         'node_modules/nouislider/distribute/nouislider.min.css',

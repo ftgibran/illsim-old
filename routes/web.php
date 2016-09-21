@@ -11,6 +11,13 @@
 |
 */
 
+use Illuminate\Http\Request;
+
 Route::get('/', function () {
+    return view('home');
+});
+
+Route::get('/submit', function (Request $request) {
+	dd($request->all());
     return view('home');
 });

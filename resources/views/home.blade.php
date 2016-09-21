@@ -15,20 +15,44 @@
 	<div id="left-nav" class="card-panel grey lighten-5 pt-xs pb-xs pl-s pr-s">
 
 		<div class="card-panel grey darken-1 white-text pt-xs pb-xs pl-s pr-s">
-			<ui-icon icon="settings"></ui-icon> 
-			Ajustes
+			<i class="left material-icons">settings</i>
+			Configurações
 		</div>
 
-		<form action="/">
-	  		
+		<form action="/submit" class="ta-c">
+
 			<div class="row">
-				<div class="input-field s12 col">
-					<div class="ui-slider" start="0.5" min="0" max="1" step="0.1" decimals="1"></div>
+				<h4>Animação</h4>
+
+				<div class="s12 col">
+					<ui-slider></ui-slider>
 				</div>
-				<div class="input-field s12 col">
-					<div class="ui-slider" start="15" min="0" max="30" step="1" decimals="0"></div>
+
+				<div class="s12 col">
+					<ui-slider></ui-slider>
+				</div>
+
+				<div class="input-field col s12 mt-0">
+				    <select>
+						<option value="node">Nó</option>
+						<option value="edge">Aresta</option>
+						<option value="both">Nó e Aresta</option>
+						<option value="special">Fórmula</option>
+				    </select>
+			    	<label>Tipo de infecção</label>
+				</div>
+
+			</div>
+
+			<div class="row">
+				<h4>Simulação</h4>
+
+				<div class="s12 col">
+					<ui-ranger></ui-ranger>
 				</div>
 			</div>
+
+			<button type="submit" class="btn-large">Gerar rede</button>
 
 	  	</form>
 

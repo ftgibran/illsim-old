@@ -17,7 +17,6 @@ window.$ = window.jQuery = require('jquery');
 
 window.Vue = require('vue');
 require('vue-resource');
-Vue.use(require('keen-ui'));
 
 /**
  * We'll register a HTTP interceptor to attach the "CSRF" header to each of
@@ -47,4 +46,3 @@ Vue.http.interceptors.push((request, next) => {
 require('gsap');
 
 window.noUiSlider = require('nouislider');
-//require('underscore');

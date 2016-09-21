@@ -12,11 +12,11 @@ require('./bootstrap');
  * the application, or feel free to tweak this setup for your needs.
  */
 
+Vue.component('ui-slider', require('./components/Slider.vue'));
+Vue.component('ui-ranger', require('./components/Ranger.vue'));
+
 const app = new Vue({
-	el: 'body',
-	components: {
-		// all components already registered
-	}
+	el: 'body'
 });
 
 /**
@@ -41,37 +41,61 @@ var options;
 $(function() {
 	//init();
 
-	$('.ui-slider').each(function() {
-		noUiSlider.create(this, {
-			start: $(this).attr('start'),
-			connect: 'lower',
-			step: Number($(this).attr('step')),
-			range: {
-				'min': Number($(this).attr('min')),
-				'max': Number($(this).attr('max'))
-			},
-			format: wNumb({
-				decimals: Number($(this).attr('decimals')),
-				postfix: $(this).attr('postfix')
-			})
-		});
-	});
+	var slider_init = function() {
 
-	$('.ui-ranger').each(function() {
-		noUiSlider.create(this, {
-			start: $(this).attr('start').split(","),
-			connect: true,
-			step: 1,
+		var ranger = this.className === 'ui-ranger';
+
+		var slider = this;
+		var field = $(slider).parent();
+		var input = field.find('input');
+		var label = field.find('label');
+
+		var start = $(slider).attr('start');
+		var step = $(slider).attr('step');
+		var min = $(slider).attr('min');
+		var max = $(slider).attr('max');
+		var decimals = $(slider).attr('decimals');
+		var postfix = $(slider).attr('postfix');
+
+		var start_ranger = start.split(",");
+
+		label.css('top', 0);
+		label.css('font-size', '14px');
+		input.css('border', 'none');
+
+		noUiSlider.create(slider, {
+			start: ranger ? start_ranger : (start ? Number(start) : 0),
+			connect: ranger ? true : 'lower',
+			step: step ? Number(step) : 1,
 			range: {
-				'min': 0,
-				'max': 100
+				'min': min ? Number(min) : 0,
+				'max': max ? Number(max) : 100
 			},
 			format: wNumb({
-				decimals: 0,
-				postfix: '%'
+				decimals: decimals ? Number(decimals) : 0,
+				postfix: postfix ? postfix : ""
 			})
 		});
-	});
+
+		slider.noUiSlider.on('update', function(values, handle) {
+			input.each(function(index) {
+				$(this).val(values[index]);
+			});
+		});
+
+		input.each(function(index) {
+			$(this).on('change', function() {
+				if (index)
+					slider.noUiSlider.set([null, this.value]);
+				else
+					slider.noUiSlider.set([this.value, null]);
+			});
+		});
+
+	}
+
+	$('.ui-slider').each(slider_init);
+	$('.ui-ranger').each(slider_init);
 
 	$('select').material_select();
 });
