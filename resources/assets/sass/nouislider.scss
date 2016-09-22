@@ -189,7 +189,7 @@
 .noUi-connect {
   height: 3px;
   top: 6px;
-  background-color: #26A69A;
+  background-color: $secondary-color;
   box-shadow: none;
 }
 
@@ -199,7 +199,7 @@
   height: 15px;
   border-radius: 50%;
   box-shadow: none;
-  background-color: #26A69A;
+  background-color: $secondary-color;
   border: none;
   left: -5px;
   top: -6px;
@@ -230,7 +230,7 @@
   width: 30px;
   top: -17px;
   left: -2px;
-  background-color: #26A69A;
+  background-color: $secondary-color;
   border-radius: 50%;
   transition: border-radius .25s cubic-bezier(0.215, 0.610, 0.355, 1.000),
               transform .25s cubic-bezier(0.215, 0.610, 0.355, 1.000);

@@ -5,10 +5,8 @@
 @import 'https://fonts.googleapis.com/icon?family=Material+Icons';
 
 // Variables
-//@import "variables";
-
-// Bootstrap
-//@import "node_modules/bootstrap-sass/assets/stylesheets/bootstrap";
+@import "node_modules/materialize-css/sass/components/color";
+@import "variables";
 
 //Font Awesome
 @import "bower_components/font-awesome/scss/font-awesome";
@@ -85,6 +83,7 @@ p {
 
 #left-nav {
   overflow-y: auto;
+  overflow-x: hidden;
   position: absolute;
   margin: 0;
   left: 0;

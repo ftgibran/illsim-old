@@ -17,7 +17,43 @@ Route::get('/', function () {
     return view('home');
 });
 
-Route::get('/submit', function (Request $request) {
-	dd($request->all());
-    return view('home');
+Route::get('api/network', function (Request $request) {
+
+	$data = $request->all();
+	$data['illsim']['simulation']['step'] *= 1;
+
+	$collection = collect($data['factory']['node']['groups']);
+
+	$data['factory']['node']['groups'] = $collection->transform(function($item, $key) {
+		if(isset($item['percent']))
+			$item['quantType'] = 'percent';
+		else
+			$item['quantType'] = 'number';
+
+		return $item;
+	})->toArray();
+
+	//
+
+	$collection = collect($data['factory']['node']['rate']);
+
+	$data['factory']['node']['rate'] = $collection->transform(function($item, $key) {
+		return [
+			"min"=> $item["min"]/100,
+			"max"=> $item["max"]/100
+		];
+	})->toArray();
+
+	//
+
+	$collection = collect($data['factory']['edge']['rate']);
+
+	$data['factory']['edge']['rate'] = $collection->transform(function($item, $key) {
+		return [
+			"min"=> $item["min"]/100,
+			"max"=> $item["max"]/100
+		];
+	})->toArray();
+
+    return $data;
 });

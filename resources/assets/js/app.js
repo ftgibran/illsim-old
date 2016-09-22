@@ -12,13 +12,6 @@ require('./bootstrap');
  * the application, or feel free to tweak this setup for your needs.
  */
 
-Vue.component('ui-slider', require('./components/Slider.vue'));
-Vue.component('ui-ranger', require('./components/Ranger.vue'));
-
-const app = new Vue({
-	el: 'body'
-});
-
 /**
  * Initial Configuration
  */
@@ -27,6 +20,7 @@ var canvas;
 var context;
 
 var network;
+var interval;
 
 var nodes;
 var edges;
@@ -39,87 +33,69 @@ var options;
  */
 
 $(function() {
-	//init();
 
-	var slider_init = function() {
+	$('.loading').hide();
 
-		var ranger = this.className === 'ui-ranger';
+	Vue.component('ui-slider', require('./components/Slider.vue'));
 
-		var slider = this;
-		var field = $(slider).parent();
-		var input = field.find('input');
-		var label = field.find('label');
+	const app = new Vue({
+		el: 'body'
+	});
 
-		var start = $(slider).attr('start');
-		var step = $(slider).attr('step');
-		var min = $(slider).attr('min');
-		var max = $(slider).attr('max');
-		var decimals = $(slider).attr('decimals');
-		var postfix = $(slider).attr('postfix');
+	$('#illForm').submit(function(e) {
+		e.preventDefault();
 
-		var start_ranger = start.split(",");
+		var form = $(this);
 
-		label.css('top', 0);
-		label.css('font-size', '14px');
-		input.css('border', 'none');
-
-		noUiSlider.create(slider, {
-			start: ranger ? start_ranger : (start ? Number(start) : 0),
-			connect: ranger ? true : 'lower',
-			step: step ? Number(step) : 1,
-			range: {
-				'min': min ? Number(min) : 0,
-				'max': max ? Number(max) : 100
-			},
-			format: wNumb({
-				decimals: decimals ? Number(decimals) : 0,
-				postfix: postfix ? postfix : ""
-			})
+		TweenMax.to($('#left-nav'), 1, {
+			x: -screen.width / 3,
+			ease: Power3.easeOut,
+			onComplete() {
+				$('.loading').show();
+				$.getJSON('api/network', form.serialize(), init);
+			}
 		});
 
-		slider.noUiSlider.on('update', function(values, handle) {
-			input.each(function(index) {
-				$(this).val(values[index]);
-			});
-		});
-
-		input.each(function(index) {
-			$(this).on('change', function() {
-				if (index)
-					slider.noUiSlider.set([null, this.value]);
-				else
-					slider.noUiSlider.set([this.value, null]);
-			});
-		});
-
-	}
-
-	$('.ui-slider').each(slider_init);
-	$('.ui-ranger').each(slider_init);
+	});
 
 	$('select').material_select();
+
 });
 
 /**
  *  Main Functions
  */
 
-function init() {
+function init(data) {
 	nodes = new vis.DataSet();
 	edges = new vis.DataSet();
 
 	$.when(
-		$.getJSON("/data/Illsim.json", function(data) {
+		/*$.getJSON("/data/Illsim.json", function(data) {
 			illsim = data;
-		}),
+		}),*/
 		$.getJSON("/data/Settings.json", function(data) {
 			options = data;
 		})
 	).then(function() {
-		$.getJSON("/data/FactoryFullRandom.json", factoryFullRandom);
+
+		illsim = data.illsim;
+
+		resetNetwork();
+
+		factoryFullRandom(data.factory);
+
+		//$.getJSON("/data/FactoryFullRandom.json", factoryFullRandom);
 		//$.getJSON("/data/FactoryUniformFormat.json", factoryUniformFormat);
 	});
 
+}
+
+function resetNetwork() {
+	if (network) {
+		clearInterval(interval);
+		network.destroy();
+	}
 }
 
 function createNetwork(data) {
@@ -135,7 +111,7 @@ function createNetwork(data) {
 
 	network.once('afterDrawing', function() {
 		$('.loading').hide();
-		setInterval(attempt, illsim.simulation.step);
+		interval = setInterval(attempt, illsim.simulation.step * illsim.animation.scale);
 	});
 
 	function normalize(data) {
@@ -632,10 +608,12 @@ function factoryFullRandom(config) {
 		var rate = nodeConfig.rate;
 
 		// Get the number of nodes that will be generate
-		var quant = Math.round(random(nodeConfig.min, nodeConfig.max));
+		var quant = _.random(nodeConfig.min, nodeConfig.max);
 
 		//Get a random group left to avoid undefined
-		var groupLeft = nodeConfig.groups[Math.floor(Math.random() * nodeConfig.groups.length)];
+		var groupLeft = {
+			"ref": "s"
+		};
 
 		//Scan each node group and apply the quantity
 		$.each(nodeConfig.groups, function(index, group) {
@@ -679,7 +657,7 @@ function factoryFullRandom(config) {
 		var edgeConfig = config.edge;
 		var rate = edgeConfig.rate;
 
-		var quant = Math.round(random(edgeConfig.min, edgeConfig.max));
+		var quant = _.random(edgeConfig.min, edgeConfig.max);
 
 		//Adds edges
 		while (quant > 0) {
