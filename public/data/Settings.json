@@ -50,7 +50,7 @@
 			"color": "#85BC5E",
 			"rateBase": {
 				"infect": 0,
-				"resist": 0.995,
+				"resist": 0.999,
 				"recover": 0,
 				"death": 0
 			}

@@ -25,8 +25,8 @@ var interval;
 var nodes;
 var edges;
 
-var illsim;
-var options;
+var config;
+var vis;
 
 /**
  * Initialization
@@ -37,6 +37,11 @@ $(function() {
 	$('.loading').hide();
 
 	Vue.component('ui-slider', require('./components/Slider.vue'));
+	Vue.component('checkbox', require('./components/Checkbox.vue'));
+	Vue.component('form-config', require('./components/config/FormConfig.vue'));
+	Vue.component('form-config-animation', require('./components/config/FormConfigAnimation.vue'));
+	Vue.component('form-config-simulation', require('./components/config/FormConfigSimulation.vue'));
+	Vue.component('form-config-full-random', require('./components/config/FormConfigFullRandom.vue'));
 
 	const app = new Vue({
 		el: 'body'
@@ -59,6 +64,9 @@ $(function() {
 	});
 
 	$('select').material_select();
+	$('.collapsible').collapsible({
+		accordion: false
+	});
 
 });
 
@@ -71,15 +79,12 @@ function init(data) {
 	edges = new vis.DataSet();
 
 	$.when(
-		/*$.getJSON("/data/Illsim.json", function(data) {
-			illsim = data;
-		}),*/
-		$.getJSON("/data/Settings.json", function(data) {
-			options = data;
+		$.getJSON("/data/config.json", function(data) {
+			config = data;
+			vis = data.vis;
 		})
 	).then(function() {
-
-		illsim = data.illsim;
+		config = data;
 
 		resetNetwork();
 
@@ -100,7 +105,7 @@ function resetNetwork() {
 
 function createNetwork(data) {
 
-	network = new vis.Network(container, normalize(data), options);
+	network = new vis.Network(container, normalize(data), vis);
 
 	canvas = document.getElementsByTagName("canvas")[0];
 	context = canvas.getContext("2d");
@@ -111,7 +116,7 @@ function createNetwork(data) {
 
 	network.once('afterDrawing', function() {
 		$('.loading').hide();
-		interval = setInterval(attempt, illsim.simulation.step * illsim.animation.scale);
+		interval = setInterval(attempt, config.simulation.step * config.animation.scale);
 	});
 
 	function normalize(data) {
@@ -121,22 +126,22 @@ function createNetwork(data) {
 		const EDGE_WIDTH_SCALE = 10;
 
 		$.each(data.nodes, function(index, node) {
-			node.base = node.size = options.nodes.size;
+			node.base = node.size = vis.nodes.size;
 			node.neighbors = getNeighbors(node);
 
-			node.borderWidth = node.borderWidthSelected = options.nodes.borderWidth;
+			node.borderWidth = node.borderWidthSelected = vis.nodes.borderWidth;
 			node.borderWidth = node.borderWidthSelected += node.rate.resist * BORDER_WIDTH_SCALE;
 
-			if (illsim.simulation.infectBy === 'node' || illsim.simulation.infectBy === "both") {
+			if (config.simulation.infectBy === 'node' || config.simulation.infectBy === "both") {
 				node.label = (Math.round(node.rate.infect * 1000) / 10) + "%";
 				node.base = node.size += node.rate.infect * NODE_SIZE_SCALE;
 			}
 		});
 
 		$.each(data.edges, function(index, edge) {
-			edge.width = options.edges.width;
+			edge.width = vis.edges.width;
 
-			if (illsim.simulation.infectBy === 'edge' || illsim.simulation.infectBy === "both") {
+			if (config.simulation.infectBy === 'edge' || config.simulation.infectBy === "both") {
 				edge.label = (Math.round(edge.rate.infect * 1000) / 10) + "%";
 				edge.width += edge.rate.infect * EDGE_WIDTH_SCALE;
 			}
@@ -190,14 +195,14 @@ function setAnimation(target, time) {
 	target.animating = true;
 	nodes.update(target);
 
-	TweenMax.delayedCall(time * illsim.animation.scale, function() {
+	TweenMax.delayedCall(time * config.animation.scale, function() {
 		target.animating = false;
 		nodes.update(target);
 	});
 }
 
 function group(node) {
-	return eval("options.groups." + node.group + ";");
+	return eval("simulation." + node.group + ";");
 }
 
 /**
@@ -223,7 +228,7 @@ function infectAttempt(infected) {
 	function eachNeighbors(target) {
 
 		if (allowed())
-			switch (illsim.simulation.infectBy) {
+			switch (config.simulation.infectBy) {
 				case "node":
 					infectByNode();
 					break;
@@ -252,9 +257,9 @@ function infectAttempt(infected) {
 
 		function infectByNode() {
 
-			if (Math.random() > group(target).rateBase.resist)
+			if (Math.random() > group(target).base.resist)
 				if (Math.random() > target.rate.resist)
-					if (Math.random() < infected.rate.infect * group(infected).rateBase.infect)
+					if (Math.random() < infected.rate.infect * group(infected).base.infect)
 						infect_ani();
 		}
 
@@ -263,9 +268,9 @@ function infectAttempt(infected) {
 			var edge = getEdge(infected, target)[0];
 			if (edge == undefined) return;
 
-			if (Math.random() > group(target).rateBase.resist)
+			if (Math.random() > group(target).base.resist)
 				if (Math.random() > target.rate.resist)
-					if (Math.random() < edge.rate.infect * group(infected).rateBase.infect)
+					if (Math.random() < edge.rate.infect * group(infected).base.infect)
 						infect_ani();
 		}
 
@@ -274,9 +279,9 @@ function infectAttempt(infected) {
 			var edge = getEdge(infected, target)[0];
 			if (edge == undefined) return;
 
-			if (Math.random() > group(target).rateBase.resist)
+			if (Math.random() > group(target).base.resist)
 				if (Math.random() > target.rate.resist)
-					if (Math.random() < infected.rate.infect * edge.rate.infect * group(infected).rateBase.infect)
+					if (Math.random() < infected.rate.infect * edge.rate.infect * group(infected).base.infect)
 						infect_ani();
 		}
 
@@ -290,6 +295,7 @@ function infectAttempt(infected) {
 			const INFECT_EXPAND_SCALE = 1.5;
 			const INFECT_RETRACT_TIME = .4;
 			const INFECT_ACTIVE_DELAY = 2;
+			const SHAKE_RADIUS = 15;
 
 			setAnimation(infected, REST_TIME);
 			setAnimation(target, REST_TIME);
@@ -313,7 +319,7 @@ function infectAttempt(infected) {
 			network.on('afterDrawing', dot.draw);
 
 			//Dot moviment animation
-			TweenMax.to(dot, DOT_MOVIMENT_TIME * illsim.animation.scale, {
+			TweenMax.to(dot, DOT_MOVIMENT_TIME * config.animation.scale, {
 				x: target_pos.x,
 				y: target_pos.y,
 				ease: Power2.easeOut,
@@ -323,8 +329,8 @@ function infectAttempt(infected) {
 			});
 
 			//Node expand animation
-			TweenMax.to(target, INFECT_EXPAND_TIME * illsim.animation.scale, {
-				delay: INFECT_EXPAND_DELAY * illsim.animation.scale,
+			TweenMax.to(target, INFECT_EXPAND_TIME * config.animation.scale, {
+				delay: INFECT_EXPAND_DELAY * config.animation.scale,
 				size: target.base * INFECT_EXPAND_SCALE,
 				ease: Power2.easeOut,
 				onUpdate: function() {
@@ -337,7 +343,7 @@ function infectAttempt(infected) {
 					nodes.update(target);
 
 					//Shake it!
-					var hip = illsim.animation.shakeRadius;
+					var hip = SHAKE_RADIUS;
 					var angle = Math.atan2(target_pos.y - infected_pos.y, target_pos.x - infected_pos.x);
 					network.moveNode(
 						target.id,
@@ -346,7 +352,7 @@ function infectAttempt(infected) {
 					);
 
 					//Node retract animation
-					TweenMax.to(target, INFECT_RETRACT_TIME * illsim.animation.scale, {
+					TweenMax.to(target, INFECT_RETRACT_TIME * config.animation.scale, {
 						size: target.base,
 						ease: Power3.easeOut,
 						onUpdate: function() {
@@ -381,7 +387,7 @@ function recoverAttempt(target) {
 	}
 
 	function recover() {
-		if (Math.random() < target.rate.recover * group(target).rateBase.recover)
+		if (Math.random() < target.rate.recover * group(target).base.recover)
 			recover_ani();
 	}
 
@@ -397,14 +403,14 @@ function recoverAttempt(target) {
 
 		target.group = "r";
 
-		TweenMax.to(target, RECOVER_EXPAND_TIME * illsim.animation.scale, {
+		TweenMax.to(target, RECOVER_EXPAND_TIME * config.animation.scale, {
 			size: target.base * RECOVER_EXPAND_SCALE,
 			ease: Power2.easeOut,
 			onUpdate: function() {
 				nodes.update(target);
 			},
 			onComplete: function() {
-				TweenMax.to(target, RECOVER_RETRACT_TIME * illsim.animation.scale, {
+				TweenMax.to(target, RECOVER_RETRACT_TIME * config.animation.scale, {
 					size: target.base,
 					ease: Elastic.easeOut.config(1, 0.3),
 					onUpdate: function() {
@@ -432,7 +438,7 @@ function killAttempt(target) {
 	}
 
 	function kill() {
-		if (Math.random() < target.rate.death * group(target).rateBase.death) {
+		if (Math.random() < target.rate.death * group(target).base.death) {
 			death_ani();
 		}
 	}
@@ -459,7 +465,7 @@ function killAttempt(target) {
 		var edges_id = network.getConnectedEdges(target.id);
 
 		//Removing edge animation
-		if (!illsim.simulation.birthWhenDie)
+		if (!config.simulation.birthWhenDie)
 			edges.get(edges_id, {
 				filter: function(edge) {
 					return !edge.removing;
@@ -467,30 +473,30 @@ function killAttempt(target) {
 			}).forEach(edge_ani)
 
 		//Node death animation
-		TweenMax.to(target, DEATH_RETRACT_TIME * illsim.animation.scale, {
-			size: options.nodes.size * DEATH_RETRACT_SCALE,
+		TweenMax.to(target, DEATH_RETRACT_TIME * config.animation.scale, {
+			size: vis.nodes.size * DEATH_RETRACT_SCALE,
 			ease: Power1.easeOut,
 			onUpdate: function() {
 				nodes.update(target);
 			},
 			onComplete: function() {
 				//Birth animation
-				if (illsim.simulation.birthWhenDie)
+				if (config.simulation.birthWhenDie)
 					birth_ani();
 			}
 		});
 
 		function birth_ani() {
 			target.group = "s";
-			TweenMax.to(target, BIRTH_EXPAND_TIME * illsim.animation.scale, {
+			TweenMax.to(target, BIRTH_EXPAND_TIME * config.animation.scale, {
 				size: target.base * BIRTH_EXPAND_SCALE,
 				ease: Power2.easeOut,
-				delay: BIRTH_EXPAND_DELAY * illsim.animation.scale,
+				delay: BIRTH_EXPAND_DELAY * config.animation.scale,
 				onUpdate: function() {
 					nodes.update(target);
 				},
 				onComplete: function() {
-					TweenMax.to(target, BIRTH_RETRACT_TIME * illsim.animation.scale, {
+					TweenMax.to(target, BIRTH_RETRACT_TIME * config.animation.scale, {
 						size: target.base,
 						ease: Elastic.easeOut.config(1, 0.3),
 						onUpdate: function() {
@@ -506,9 +512,9 @@ function killAttempt(target) {
 			edge.removing = true;
 			edges.update(edge);
 
-			TweenMax.to(edge, EDGE_RETRACT_TIME * illsim.animation.scale, {
+			TweenMax.to(edge, EDGE_RETRACT_TIME * config.animation.scale, {
 				width: EDGE_RETRACT_SIZE,
-				delay: EDGE_RETRACT_DELAY * illsim.animation.scale,
+				delay: EDGE_RETRACT_DELAY * config.animation.scale,
 				ease: Power1.easeOut,
 				onUpdate: function() {
 					edges.update(edge);

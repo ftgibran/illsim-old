@@ -1,86 +1,10 @@
-@extends('tpl.main')
+<template>
 
-@section('title', 'IllSim')
+	<ul class="collapsible popout" data-collapsible="accordion">
 
-@section('content')
-
-	<nav class="blue-grey lighten-5 pos-a z-depth-0">
-		<div class="nav-wrapper">
-		  <div class="brand-logo right grey-text">
-			<span class="illsim">IllSim</span> <small>by Felipe Gibran</small>
-		  </div>
-		</div>
-	</nav>
-
-	<div id="left-nav" class="card-panel blue-grey lighten-4 pt-0 pb-0 pl-0 pr-0 z-depth-3">
-
-		<form-config></form-config>
-
-		<!--form id="illForm" action="api/network" method="post" class="ta-c">
-
-			<ul class="collapsible mt-0" data-collapsible="accordion">
-				<li class="card-panel blue-grey darken-2 white-text mt-0 mb-0 ta-l">
-					<i class="left material-icons">settings</i>
-					Configurações
-				</li>
-				<li class="grey lighten-5">
-				<div class="collapsible-header">Animação</div>
-				<div class="collapsible-body pl pr">
-					<ui-slider
-						name="illsim[animation][scale]"
-						label="Escala de tempo"
-						start="0.5"
-						step="0.1"
-						min="0"
-						max="2"
-						decimals="1"
-					></ui-slider>
-					<ui-slider
-						name="illsim[animation][shakeRadius]"
-						label="Força de impacto"
-						start="15"
-						step="1"
-						min="0"
-						max="30"
-						decimals="0"
-					></ui-slider>
-				</div>
-				</li>
-				<li class="grey lighten-5">
-				<div class="collapsible-header">Simulação</div>
-				<div class="collapsible-body pl pr">
-
-			<ui-slider
-				name="illsim[simulation][step]"
-				label="Intervalo de tempo"
-				start="400"
-				step="50"
-				min="0"
-				max="2000"
-				decimals="0"
-				postfix="ms"
-			></ui-slider>
-
-			<div class="input-field ta-l" id="infectBy">
-				<select name="illsim[simulation][infectBy]">
-					<option value="node">Nó</option>
-					<option value="edge">Aresta</option>
-					<option value="both">Nó e Aresta</option>
-					<option value="special">Fórmula [1-exp(-n)]</option>
-				</select>
-				<label>Tipo de infecção</label>
-			</div>
-
-			<div class="ta-l mb-l">
-				<input type="checkbox" class="filled-in" id="birthWhenDie" name="illsim[simulation][birthWhenDie]" checked="checked" />
-				<label for="birthWhenDie">Nascimento após morte</label>
-			</div>
-
-				</div>
-				</li>
-				<li class="grey lighten-5">
-				<div class="collapsible-header">Nós</div>
-				<div class="collapsible-body pl pr">
+		<li class="grey lighten-5">
+		<div class="collapsible-header">Nós</div>
+		<div class="collapsible-body pl pr">
 
 			<ui-slider
 				name="factory[node]"
@@ -184,11 +108,12 @@
 				postfix="%"
 			></ui-slider>
 
-				</div>
-				</li>
-				<li class="grey lighten-5">
-				<div class="collapsible-header">Arestas</div>
-				<div class="collapsible-body pl pr">
+		</div>
+		</li>
+
+		<li class="grey lighten-5">
+		<div class="collapsible-header">Arestas</div>
+		<div class="collapsible-body pl pr">
 
 			<ui-slider
 				name="factory[edge]"
@@ -212,21 +137,17 @@
 				postfix="%"
 			></ui-slider>
 
-				</div>
-				</li>
-			</ul>
+		</div>
+		</li>
+	</ul>
 
-			<button type="submit" class="btn-large mt mb">Gerar rede</button>
+</template>
 
-	  	</form-->
+<script>
+    export default {
+        ready() {
 
-    </div>
-
-	<div class="centered loading">
-		<i class="fa fa-spinner fa-spin fa-5x fa-fw"></i>
-		<span class="sr-only">Loading...</span>
-	</div>
-
-	<div id="network" style="height:100vh;"><div>
-
-@stop
+			
+        }
+    }
+</script>
