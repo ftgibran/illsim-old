@@ -10586,6 +10586,9 @@ h5 {
 h6 {
   font-size: .75em; }
 
+small {
+  font-size: .5em !important; }
+
 p {
   line-height: 1.5;
   font-weight: lighter; }
@@ -10601,15 +10604,19 @@ p {
 .illsim {
   font-family: 'Fredericka the Great', cursive; }
 
-#left-nav {
+#config-nav {
   overflow-y: auto;
   overflow-x: hidden;
   position: absolute;
   margin: 0;
+  padding: 0;
   left: 0;
   top: 0;
   bottom: 0;
   width: 40%;
   z-index: 100; }
+
+.collection-header {
+  border-bottom: 1px solid #ccc; }
 
 /*# sourceMappingURL=app.css.map */

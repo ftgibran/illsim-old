@@ -2,6 +2,10 @@
 
 	<ul class="collapsible popout" data-collapsible="accordion">
 
+		<li class="card-panel blue-grey darken-2 white-text mt-0 mb-0 pt-s pb-s ta-l">
+			Full Random
+		</li>
+
 		<li class="grey lighten-5">
 		<div class="collapsible-header">Nós</div>
 		<div class="collapsible-body pl pr">

@@ -4,13 +4,12 @@
 
 		<ui-slider
 			name="simulation[step]"
-			label="Intervalo de tempo"
+			label="Intervalo de tempo (ms)"
 			start="400"
 			step="50"
 			min="0"
 			max="2000"
 			decimals="0"
-			postfix="ms"
 		></ui-slider>
 
 		<div class="input-field ta-l">
@@ -29,7 +28,8 @@
 			</li>
 
 			<li class="collection-item">
-				<checkbox label='Podem infectar' name='simulation[r][mayInfect]' :checked='false' ></checkbox>
+				<checkbox label='Podem infectar' name='simulation[r][mayInfect]' :checked='false' >
+				</checkbox>				
 			</li>
 			<li class="collection-item">
 				<checkbox label='Podem ser infectados' name='simulation[r][mayBeInfected]' :checked='false' ></checkbox>
@@ -48,7 +48,15 @@
 			</li>
 
 			<li class="collection-item">
+				<checkbox label='Podem infectar' name='simulation[v][mayInfect]' :checked='false' ></checkbox>
+			</li>
+
+			<li class="collection-item">
 				<checkbox label='Podem ser infectados' name='simulation[v][mayBeInfected]' :checked='false' ></checkbox>
+			</li>
+
+			<li class="collection-item">
+				<checkbox label='Podem se tornar suscetíveis' name='simulation[v][mayGetSusceptible]' :checked='false' ></checkbox>
 			</li>
 
 			<li class="collection-item">
@@ -66,13 +74,12 @@
 			</li>
 	    </ul>
 
-		<form-config-full-random></form-config-full-random>
-			
 	</div>
 </template>
 
 <script>
     export default {
+  
         ready() {
 
 			

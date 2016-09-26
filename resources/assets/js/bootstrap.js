@@ -44,5 +44,3 @@ Vue.http.interceptors.push((request, next) => {
 // });
 
 require('gsap');
-
-window.noUiSlider = require('nouislider');

@@ -1,0 +1,43 @@
+{
+	"node": {
+		"min": 100,
+		"max": 100,
+		"maxEdges": 4,
+		"groups": [{
+			"ref": "s"
+		}, {
+			"ref": "i",
+			"percent": false,
+			"quant": 5
+		}],
+		"rate": {
+			"infect": {
+				"min": 0.5,
+				"max": 1
+			},
+			"resist": {
+				"min": 0,
+				"max": 0.5
+			},
+			"recover": {
+				"min": 0.01,
+				"max": 0.05
+			},
+			"death": {
+				"min": 0.01,
+				"max": 0.05
+			}
+		}
+	},
+	"edge": {
+		"min": 100,
+		"max": 150,
+		"rate": {
+			"infect": {
+				"min": 0.2,
+				"max": 0.6
+			}
+		}
+
+	}
+}

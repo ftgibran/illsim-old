@@ -5,6 +5,11 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="description" content="IllSim">
+        <meta name="csrf-token" content="{{ csrf_token() }}">
+
+        <script>
+            window.Laravel = { csrfToken: '{{ csrf_token() }}' };
+        </script>
 
         <title>@yield('title')</title>
 
@@ -18,7 +23,6 @@
 
     <!-- Scripts -->
     <script src="/js/app.js"></script>
-    <script src="/js/extra.js"></script>
     <script src="/js/vendor/vis/vis.min.js"></script>
     <script src="/js/vendor/materialize/materialize.min.js"></script>
 </html>

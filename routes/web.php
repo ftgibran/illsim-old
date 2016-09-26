@@ -17,43 +17,22 @@ Route::get('/', function () {
     return view('home');
 });
 
-Route::get('api/network', function (Request $request) {
+Route::get('api/config', function (Request $request) {
 
-	$data = $request->all();
-	$data['illsim']['simulation']['step'] *= 1;
+	$config = File::get("../database/data/Config.json");
+	$factory = File::get("../database/data/FactoryFullRandom.json");
+	
+	$default = json_decode($config, true);
+	$default['factory'] = json_decode($factory, true);
 
-	$collection = collect($data['factory']['node']['groups']);
+	$union = array_replace_recursive($default, $request->all());
 
-	$data['factory']['node']['groups'] = $collection->transform(function($item, $key) {
-		if(isset($item['percent']))
-			$item['quantType'] = 'percent';
-		else
-			$item['quantType'] = 'number';
+	array_walk_recursive($union, function (&$item, $key)
+	{
+		if(str_contains($item, '%'))
+			$item = str_replace('%', '', $item) / 100;
+	});
 
-		return $item;
-	})->toArray();
+	return $union;
 
-	//
-
-	$collection = collect($data['factory']['node']['rate']);
-
-	$data['factory']['node']['rate'] = $collection->transform(function($item, $key) {
-		return [
-			"min"=> $item["min"]/100,
-			"max"=> $item["max"]/100
-		];
-	})->toArray();
-
-	//
-
-	$collection = collect($data['factory']['edge']['rate']);
-
-	$data['factory']['edge']['rate'] = $collection->transform(function($item, $key) {
-		return [
-			"min"=> $item["min"]/100,
-			"max"=> $item["max"]/100
-		];
-	})->toArray();
-
-    return $data;
 });

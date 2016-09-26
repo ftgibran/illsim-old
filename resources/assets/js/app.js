@@ -12,6 +12,8 @@ require('./bootstrap');
  * the application, or feel free to tweak this setup for your needs.
  */
 
+require('./functions/nouislider.js');
+
 /**
  * Initial Configuration
  */
@@ -26,47 +28,52 @@ var nodes;
 var edges;
 
 var config;
-var vis;
+var loading = $('.loading');
 
 /**
  * Initialization
  */
 
+Vue.component('ui-slider', require('./components/Slider.vue'));
+Vue.component('checkbox', require('./components/Checkbox.vue'));
+Vue.component('form-config', require('./components/config/FormConfig.vue'));
+Vue.component('form-config-animation', require('./components/config/FormConfigAnimation.vue'));
+Vue.component('form-config-simulation', require('./components/config/FormConfigSimulation.vue'));
+Vue.component('form-config-factory', require('./components/config/FormConfigFactory.vue'));
+Vue.component('form-config-full-random', require('./components/config/FormConfigFullRandom.vue'));
+
+const app = new Vue({
+	el: 'body',
+
+	methods: {
+		sideNav(mode) {
+			switch (mode) {
+				case 'show':
+					TweenMax.to($('#config-nav'), 1, {
+						x: 0,
+						ease: Power3.easeOut
+					});
+					break;
+				case 'hide':
+					TweenMax.to($('#config-nav'), 1, {
+						x: -$('#config-nav').width(),
+						ease: Power3.easeOut
+					});
+					break;
+			}
+		}
+	},
+
+	ready() {
+		this.$refs.config.$watch('data', init);
+	}
+});
+
 $(function() {
 
-	$('.loading').hide();
-
-	Vue.component('ui-slider', require('./components/Slider.vue'));
-	Vue.component('checkbox', require('./components/Checkbox.vue'));
-	Vue.component('form-config', require('./components/config/FormConfig.vue'));
-	Vue.component('form-config-animation', require('./components/config/FormConfigAnimation.vue'));
-	Vue.component('form-config-simulation', require('./components/config/FormConfigSimulation.vue'));
-	Vue.component('form-config-full-random', require('./components/config/FormConfigFullRandom.vue'));
-
-	const app = new Vue({
-		el: 'body'
-	});
-
-	$('#illForm').submit(function(e) {
-		e.preventDefault();
-
-		var form = $(this);
-
-		TweenMax.to($('#left-nav'), 1, {
-			x: -screen.width / 3,
-			ease: Power3.easeOut,
-			onComplete() {
-				$('.loading').show();
-				$.getJSON('api/network', form.serialize(), init);
-			}
-		});
-
-	});
-
+	loading.hide();
 	$('select').material_select();
-	$('.collapsible').collapsible({
-		accordion: false
-	});
+	$('.collapsible').collapsible();
 
 });
 
@@ -75,23 +82,21 @@ $(function() {
  */
 
 function init(data) {
+
+	config = data;
 	nodes = new vis.DataSet();
 	edges = new vis.DataSet();
 
-	$.when(
-		$.getJSON("/data/config.json", function(data) {
-			config = data;
-			vis = data.vis;
-		})
-	).then(function() {
-		config = data;
+	loading.show();
 
-		resetNetwork();
+	resetNetwork();
 
-		factoryFullRandom(data.factory);
-
-		//$.getJSON("/data/FactoryFullRandom.json", factoryFullRandom);
-		//$.getJSON("/data/FactoryUniformFormat.json", factoryUniformFormat);
+	TweenMax.to($('#config-nav'), 1, {
+		x: -$('#config-nav').width(),
+		ease: Power3.easeOut,
+		onComplete: function() {
+			factoryFullRandom(config.factory);
+		}
 	});
 
 }
@@ -99,13 +104,14 @@ function init(data) {
 function resetNetwork() {
 	if (network) {
 		clearInterval(interval);
+		TweenMax.killAll();
 		network.destroy();
 	}
 }
 
 function createNetwork(data) {
 
-	network = new vis.Network(container, normalize(data), vis);
+	network = new vis.Network(container, normalize(data), config.vis);
 
 	canvas = document.getElementsByTagName("canvas")[0];
 	context = canvas.getContext("2d");
@@ -116,34 +122,34 @@ function createNetwork(data) {
 
 	network.once('afterDrawing', function() {
 		$('.loading').hide();
-		interval = setInterval(attempt, config.simulation.step * config.animation.scale);
+		interval = setInterval(attempt, config.simulation.step); //* config.animation.scale);
 	});
 
 	function normalize(data) {
 
-		const BORDER_WIDTH_SCALE = 8;
-		const NODE_SIZE_SCALE = 15;
-		const EDGE_WIDTH_SCALE = 10;
+		const BORDER_WIDTH_FACTOR = 8;
+		const NODE_SIZE_FACTOR = 15;
+		const EDGE_WIDTH_FACTOR = 10;
 
 		$.each(data.nodes, function(index, node) {
-			node.base = node.size = vis.nodes.size;
+			node.base = node.size = config.vis.nodes.size;
 			node.neighbors = getNeighbors(node);
 
-			node.borderWidth = node.borderWidthSelected = vis.nodes.borderWidth;
-			node.borderWidth = node.borderWidthSelected += node.rate.resist * BORDER_WIDTH_SCALE;
+			node.borderWidth = node.borderWidthSelected = config.vis.nodes.borderWidth;
+			node.borderWidth = node.borderWidthSelected += node.rate.resist * BORDER_WIDTH_FACTOR;
 
 			if (config.simulation.infectBy === 'node' || config.simulation.infectBy === "both") {
 				node.label = (Math.round(node.rate.infect * 1000) / 10) + "%";
-				node.base = node.size += node.rate.infect * NODE_SIZE_SCALE;
+				node.base = node.size += node.rate.infect * NODE_SIZE_FACTOR;
 			}
 		});
 
 		$.each(data.edges, function(index, edge) {
-			edge.width = vis.edges.width;
+			edge.width = config.vis.edges.width;
 
 			if (config.simulation.infectBy === 'edge' || config.simulation.infectBy === "both") {
 				edge.label = (Math.round(edge.rate.infect * 1000) / 10) + "%";
-				edge.width += edge.rate.infect * EDGE_WIDTH_SCALE;
+				edge.width += edge.rate.infect * EDGE_WIDTH_FACTOR;
 			}
 		});
 
@@ -202,7 +208,8 @@ function setAnimation(target, time) {
 }
 
 function group(node) {
-	return eval("simulation." + node.group + ";");
+
+	return eval("config.simulation." + node.group + ";");
 }
 
 /**
@@ -287,15 +294,13 @@ function infectAttempt(infected) {
 
 		function infect_ani() {
 
-			const REST_TIME = 2.45;
-			//
-			const DOT_MOVIMENT_TIME = .6;
-			const INFECT_EXPAND_TIME = .6;
-			const INFECT_EXPAND_DELAY = .5;
-			const INFECT_EXPAND_SCALE = 1.5;
-			const INFECT_RETRACT_TIME = .4;
-			const INFECT_ACTIVE_DELAY = 2;
-			const SHAKE_RADIUS = 15;
+			const REST_TIME = 1.5 + Number(config.animation.infect.restTime);
+			const DOT_MOVIMENT_TIME = Number(config.animation.infect.dotMovimentTime);
+			const INFECT_EXPAND_TIME = Number(config.animation.infect.expandTime);
+			const INFECT_EXPAND_DELAY = Number(config.animation.infect.expandDelay);
+			const INFECT_EXPAND_SCALE = Number(config.animation.infect.expandScale);
+			const INFECT_RETRACT_TIME = Number(config.animation.infect.retractTime);
+			const SHAKE_RADIUS = Number(config.animation.infect.shakeRadius);
 
 			setAnimation(infected, REST_TIME);
 			setAnimation(target, REST_TIME);
@@ -393,11 +398,10 @@ function recoverAttempt(target) {
 
 	function recover_ani() {
 
-		const REST_TIME = 2.35;
-		//
-		const RECOVER_EXPAND_TIME = .4;
-		const RECOVER_EXPAND_SCALE = 1.3;
-		const RECOVER_RETRACT_TIME = 2;
+		const REST_TIME = 2.4 + Number(config.animation.recover.restTime);
+		const RECOVER_EXPAND_TIME = Number(config.animation.recover.expandTime);
+		const RECOVER_EXPAND_SCALE = Number(config.animation.recover.expandScale);
+		const RECOVER_RETRACT_TIME = Number(config.animation.recover.retractTime);
 
 		setAnimation(target, REST_TIME);
 
@@ -445,18 +449,16 @@ function killAttempt(target) {
 
 	function death_ani() {
 
-		const REST_TIME = 8;
-		//
-		const DEATH_RETRACT_SCALE = .6;
-		const DEATH_RETRACT_TIME = 2.5;
-		const EDGE_RETRACT_TIME = 1;
-		const EDGE_RETRACT_SIZE = 0;
-		const EDGE_RETRACT_DELAY = 1;
-		//Birth
-		const BIRTH_EXPAND_TIME = .4;
-		const BIRTH_EXPAND_DELAY = 2;
-		const BIRTH_EXPAND_SCALE = 1.3;
-		const BIRTH_RETRACT_TIME = 2;
+		const REST_TIME = 6.9 + Number(config.animation.death.restTime);
+		const DEATH_RETRACT_SCALE = Number(config.animation.death.retractScale);
+		const DEATH_RETRACT_TIME = Number(config.animation.death.retractTime);
+		const EDGE_RETRACT_TIME = Number(config.animation.death.edgeRetractTime);
+		const EDGE_RETRACT_SIZE = Number(config.animation.death.edgeRetractSize);
+		const EDGE_RETRACT_DELAY = Number(config.animation.death.edgeRetractDelay);
+		const BIRTH_EXPAND_TIME = Number(config.animation.death.birthExpandTime);
+		const BIRTH_EXPAND_DELAY = Number(config.animation.death.birthExpandDelay);
+		const BIRTH_EXPAND_SCALE = Number(config.animation.death.birthExpandScale);
+		const BIRTH_RETRACT_TIME = Number(config.animation.death.birthRetractTime);
 
 		setAnimation(target, REST_TIME);
 
@@ -474,7 +476,7 @@ function killAttempt(target) {
 
 		//Node death animation
 		TweenMax.to(target, DEATH_RETRACT_TIME * config.animation.scale, {
-			size: vis.nodes.size * DEATH_RETRACT_SCALE,
+			size: config.vis.nodes.size * DEATH_RETRACT_SCALE,
 			ease: Power1.easeOut,
 			onUpdate: function() {
 				nodes.update(target);
@@ -627,15 +629,11 @@ function factoryFullRandom(config) {
 				groupLeft = group;
 				return;
 			}
-			switch (group.quantType) {
-				case "percent":
-					addNode(group, group.quant / 100 * quant);
-					break;
+			if (group.percent)
+				addNode(group, group.quant / 100 * quant);
+			else
+				addNode(group, group.quant);
 
-				default:
-					addNode(group, group.quant);
-					break;
-			}
 		});
 
 		//Add what is left
@@ -647,10 +645,10 @@ function factoryFullRandom(config) {
 					id: nodes.length,
 					group: group.ref,
 					rate: {
-						infect: random(rate.infect.min, rate.infect.max),
-						resist: random(rate.resist.min, rate.resist.max),
-						recover: random(rate.recover.min, rate.recover.max),
-						death: random(rate.death.min, rate.death.max)
+						infect: _.random(rate.infect.min, rate.infect.max),
+						resist: _.random(rate.resist.min, rate.resist.max),
+						recover: _.random(rate.recover.min, rate.recover.max),
+						death: _.random(rate.death.min, rate.death.max)
 					}
 				});
 		}
@@ -699,7 +697,7 @@ function factoryFullRandom(config) {
 						from: node1.id,
 						to: node2.id,
 						rate: {
-							infect: random(rate.infect.min, rate.infect.max)
+							infect: _.random(rate.infect.min, rate.infect.max)
 						}
 					});
 					return true;
@@ -719,10 +717,6 @@ function factoryFullRandom(config) {
 		}
 
 		return edges;
-	}
-
-	function random(min, max) {
-		return Math.random() * (max - min) + min;
 	}
 
 }
