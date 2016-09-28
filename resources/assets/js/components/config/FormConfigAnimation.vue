@@ -92,7 +92,7 @@
 						name="animation[infect][shakeRadius]"
 						label="Raio de vibração"
 						start="15"
-						step="0.1"
+						step="1"
 						min="0"
 						max="30"
 						decimals="1"
@@ -290,8 +290,7 @@
     export default {
 
         ready() {
-
-			
+			$(this.$el).find('.collapsible').collapsible();
         }
     }
 </script>

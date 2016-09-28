@@ -38,10 +38,10 @@
 						<label for="i-percent">%</label>
 					</div>
 					<div style="overflow: hidden;">
-						<label class="truncate" for="i-quant">
+						<label class="active truncate" for="i-quant">
 						<i class="fa fa-square red-text" aria-hidden="true"></i>
 						Quantidade de infectados</label>
-						<input type="text" id="i-quant" name="factory[node][groups][0][quant]" value="5">
+						<input type="number" id="i-quant" name="factory[node][groups][0][quant]" value="5" required>
 					</div>
 					
 					<div class="cl-b"></div>
@@ -54,10 +54,10 @@
 						<label for="v-percent">%</label>
 					</div>
 					<div style="overflow: hidden;">
-	          			<label class="truncate" for="v-quant">
+	          			<label class="active truncate" for="v-quant">
 						<i class="fa fa-square green-text" aria-hidden="true"></i>
 	          			Quantidade de vacinados</label>
-						<input type="text" id="v-quant" name="factory[node][groups][1][quant]" value="20">
+						<input type="number" id="v-quant" name="factory[node][groups][1][quant]" value="10" required>
 					</div>
 
 					<div class="cl-b"></div>
@@ -150,8 +150,7 @@
 <script>
     export default {
         ready() {
-
-			
+        	$(this.$el).collapsible();
         }
     }
 </script>

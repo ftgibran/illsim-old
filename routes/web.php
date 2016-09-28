@@ -20,7 +20,16 @@ Route::get('/', function () {
 Route::get('api/config', function (Request $request) {
 
 	$config = File::get("../database/data/Config.json");
-	$factory = File::get("../database/data/FactoryFullRandom.json");
+
+	switch ($request['factory.method']) {
+		case 'uniform-format':
+			$factory = File::get("../database/data/FactoryUniformFormat.json");
+			break;
+		
+		default:
+			$factory = File::get("../database/data/FactoryFullRandom.json");
+			break;
+	}
 	
 	$default = json_decode($config, true);
 	$default['factory'] = json_decode($factory, true);

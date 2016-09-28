@@ -5,6 +5,8 @@
 		<label class="truncate" for="{{name}}">{{label}}</label>
 	</div>
 
+    <slot v-if="checked"></slot>
+
 </template>
 
 <script>

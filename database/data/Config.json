@@ -32,7 +32,7 @@
 	"simulation": {
 		"step": 200,
 		"infectBy": "node",
-
+		"k": 0.5,
 		"i": {
 			"base": {
 				"infect": 1,
@@ -47,10 +47,10 @@
 			"mayGetSusceptible": false,
 			"mayDie": false,
 			"base": {
-				"infect": 0,
+				"infect": 0.15,
 				"resist": 0.9,
-				"recover": 0,
-				"death": 0
+				"recover": 0.1,
+				"death": 0.05
 			}
 		},
 		"s": {
@@ -62,12 +62,14 @@
 			}
 		},
 		"v": {
+			"mayInfect": false,
 			"mayBeInfected": false,
+			"mayGetSusceptible": false,
 			"mayDie": false,
 			"base": {
 				"infect": 0,
-				"resist": 0.999,
-				"recover": 0,
+				"resist": 0.995,
+				"recover": 0.01,
 				"death": 0
 			}
 		},
@@ -100,7 +102,10 @@
 		},
 		"physics": {
 			"minVelocity": 0.05,
-			"solver": "hierarchicalRepulsion"
+			"forceAtlas2Based": {
+				"centralGravity": 0.007
+			},
+			"solver": "forceAtlas2Based"
 		},
 		"groups": {
 			"i": {

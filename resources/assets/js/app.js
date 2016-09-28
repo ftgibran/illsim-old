@@ -34,46 +34,53 @@ var loading = $('.loading');
  * Initialization
  */
 
-Vue.component('ui-slider', require('./components/Slider.vue'));
-Vue.component('checkbox', require('./components/Checkbox.vue'));
-Vue.component('form-config', require('./components/config/FormConfig.vue'));
-Vue.component('form-config-animation', require('./components/config/FormConfigAnimation.vue'));
-Vue.component('form-config-simulation', require('./components/config/FormConfigSimulation.vue'));
-Vue.component('form-config-factory', require('./components/config/FormConfigFactory.vue'));
-Vue.component('form-config-full-random', require('./components/config/FormConfigFullRandom.vue'));
-
-const app = new Vue({
-	el: 'body',
-
-	methods: {
-		sideNav(mode) {
-			switch (mode) {
-				case 'show':
-					TweenMax.to($('#config-nav'), 1, {
-						x: 0,
-						ease: Power3.easeOut
-					});
-					break;
-				case 'hide':
-					TweenMax.to($('#config-nav'), 1, {
-						x: -$('#config-nav').width(),
-						ease: Power3.easeOut
-					});
-					break;
-			}
-		}
-	},
-
-	ready() {
-		this.$refs.config.$watch('data', init);
-	}
-});
-
 $(function() {
+
+	Vue.component('ui-slider', require('./components/Slider.vue'));
+	Vue.component('checkbox', require('./components/Checkbox.vue'));
+	Vue.component('form-config', require('./components/config/FormConfig.vue'));
+	Vue.component('form-config-animation', require('./components/config/FormConfigAnimation.vue'));
+	Vue.component('form-config-simulation', require('./components/config/FormConfigSimulation.vue'));
+	Vue.component('form-config-factory', require('./components/config/FormConfigFactory.vue'));
+	Vue.component('form-config-uniform-format', require('./components/config/FormConfigUniformFormat.vue'));
+	Vue.component('form-config-full-random', require('./components/config/FormConfigFullRandom.vue'));
+
+	const app = new Vue({
+		el: 'body',
+
+		methods: {
+			sideNav(mode) {
+				switch (mode) {
+					case 'show':
+						TweenMax.to($('#config-nav'), 1, {
+							x: 0,
+							ease: Power3.easeOut
+						});
+						break;
+					case 'hide':
+						TweenMax.to($('#config-nav'), 1, {
+							x: -$('#config-nav').width(),
+							ease: Power3.easeOut
+						});
+						break;
+				}
+			}
+		},
+
+		ready() {
+			var self = this;
+
+			self.$refs.config.$watch('data', function(value) {
+				self.sideNav('hide');
+				TweenMax.delayedCall(1, function() {
+					init(value)
+				});
+			});
+		}
+	});
 
 	loading.hide();
 	$('select').material_select();
-	$('.collapsible').collapsible();
 
 });
 
@@ -91,13 +98,16 @@ function init(data) {
 
 	resetNetwork();
 
-	TweenMax.to($('#config-nav'), 1, {
-		x: -$('#config-nav').width(),
-		ease: Power3.easeOut,
-		onComplete: function() {
+	switch (data.factory.method) {
+		case 'uniform-format':
+			config.vis.physics.forceAtlas2Based.centralGravity = 0.001;
+			factoryUniformFormat(config.factory);
+			break;
+
+		default:
 			factoryFullRandom(config.factory);
-		}
-	});
+			break;
+	}
 
 }
 
@@ -207,9 +217,15 @@ function setAnimation(target, time) {
 	});
 }
 
-function group(node) {
-
+function simulationGroup(node) {
 	return eval("config.simulation." + node.group + ";");
+}
+
+function group(node, ref) {
+	if (node.group === ref)
+		return true;
+
+	return false;
 }
 
 /**
@@ -226,148 +242,240 @@ function attempt() {
 
 function infectAttempt(infected) {
 
-	if (infected.animating)
-		return false;
+	if (config.simulation.infectBy === 'special')
+		specialInfect();
+	else
+		standardInfect();
 
-	var neighbors = nodes.get(infected.neighbors);
-	neighbors.forEach(eachNeighbors);
-
-	function eachNeighbors(target) {
+	function specialInfect() {
+		var target = infected;
 
 		if (allowed())
-			switch (config.simulation.infectBy) {
-				case "node":
-					infectByNode();
-					break;
-				case "edge":
-					infectByEdge();
-					break;
-				case "both":
-					infectByBoth();
-					break;
-				default:
-					infectByEdge();
-			}
+			infect();
 
 		function allowed() {
+
 			if (target.animating)
 				return false;
 
-			if (target.group === "i")
-				return false;
+			if (group(target, "s"))
+				return true;
 
-			if (target.group === "d")
-				return false;
+			if (group(target, "r") && config.simulation.r.mayBetarget)
+				return true;
 
-			return true;
+			if (group(target, "v") && config.simulation.v.mayBeInfected)
+				return true;
+
+			return false;
 		}
 
-		function infectByNode() {
+		function infect() {
 
-			if (Math.random() > group(target).base.resist)
-				if (Math.random() > target.rate.resist)
-					if (Math.random() < infected.rate.infect * group(infected).base.infect)
-						infect_ani();
-		}
+			const K = config.simulation.k;
 
-		function infectByEdge() {
+			var neighbors = nodes.get(target.neighbors, {
+				filter: function(node) {
+					if (node.animating)
+						return false;
 
-			var edge = getEdge(infected, target)[0];
-			if (edge == undefined) return;
+					if (group(node, "i"))
+						return true;
 
-			if (Math.random() > group(target).base.resist)
-				if (Math.random() > target.rate.resist)
-					if (Math.random() < edge.rate.infect * group(infected).base.infect)
-						infect_ani();
-		}
+					if (group(node, "r") && config.simulation.r.mayInfect)
+						return true;
 
-		function infectByBoth() {
+					if (group(node, "v") && config.simulation.v.mayInfect)
+						return true;
 
-			var edge = getEdge(infected, target)[0];
-			if (edge == undefined) return;
-
-			if (Math.random() > group(target).base.resist)
-				if (Math.random() > target.rate.resist)
-					if (Math.random() < infected.rate.infect * edge.rate.infect * group(infected).base.infect)
-						infect_ani();
-		}
-
-		function infect_ani() {
-
-			const REST_TIME = 1.5 + Number(config.animation.infect.restTime);
-			const DOT_MOVIMENT_TIME = Number(config.animation.infect.dotMovimentTime);
-			const INFECT_EXPAND_TIME = Number(config.animation.infect.expandTime);
-			const INFECT_EXPAND_DELAY = Number(config.animation.infect.expandDelay);
-			const INFECT_EXPAND_SCALE = Number(config.animation.infect.expandScale);
-			const INFECT_RETRACT_TIME = Number(config.animation.infect.retractTime);
-			const SHAKE_RADIUS = Number(config.animation.infect.shakeRadius);
-
-			setAnimation(infected, REST_TIME);
-			setAnimation(target, REST_TIME);
-
-			var infected_pos = network.getPositions([infected.id])[infected.id];
-			var target_pos = network.getPositions([target.id])[target.id];
-
-			var dot = {
-				x: infected_pos.x,
-				y: infected_pos.y,
-				draw: function() {
-					context.beginPath();
-					context.arc(this.x, this.y, 6, 0, 2 * Math.PI, false);
-					context.fillStyle = 'black';
-					context.fill();
-				}
-			};
-
-			_.bindAll(dot, 'draw');
-
-			network.on('afterDrawing', dot.draw);
-
-			//Dot moviment animation
-			TweenMax.to(dot, DOT_MOVIMENT_TIME * config.animation.scale, {
-				x: target_pos.x,
-				y: target_pos.y,
-				ease: Power2.easeOut,
-				onUpdate: function() {
-					network.redraw();
+					return false;
 				}
 			});
 
-			//Node expand animation
-			TweenMax.to(target, INFECT_EXPAND_TIME * config.animation.scale, {
-				delay: INFECT_EXPAND_DELAY * config.animation.scale,
-				size: target.base * INFECT_EXPAND_SCALE,
-				ease: Power2.easeOut,
-				onUpdate: function() {
-					nodes.update(target);
-				},
-				onComplete: function() {
-					network.off('afterDrawing', dot.draw);
+			if (neighbors.length == 0) return;
 
-					target.group = "i";
-					nodes.update(target);
+			infected = _.sample(neighbors);
 
-					//Shake it!
-					var hip = SHAKE_RADIUS;
-					var angle = Math.atan2(target_pos.y - infected_pos.y, target_pos.x - infected_pos.x);
-					network.moveNode(
-						target.id,
-						target_pos.x + Math.cos(angle) * hip,
-						target_pos.y + Math.sin(angle) * hip
-					);
+			var equation = (1 - Math.exp(-K * neighbors.length)) * simulationGroup(infected).base.infect;
 
-					//Node retract animation
-					TweenMax.to(target, INFECT_RETRACT_TIME * config.animation.scale, {
-						size: target.base,
-						ease: Power3.easeOut,
-						onUpdate: function() {
-							nodes.update(target);
-						}
-					});
+			if (Math.random() > simulationGroup(target).base.resist)
+				if (Math.random() > target.rate.resist)
+					if (Math.random() < equation)
+						infect_ani(target);
+		}
+
+	}
+
+	function standardInfect() {
+
+		if (allowed())
+			infect();
+
+		function allowed() {
+
+			if (infected.animating)
+				return false;
+
+			if (group(infected, "i"))
+				return true;
+
+			if (group(infected, "r") && config.simulation.r.mayInfect)
+				return true;
+
+			if (group(infected, "v") && config.simulation.v.mayInfect)
+				return true;
+
+			return false;
+		}
+
+		function infect() {
+			var neighbors = nodes.get(infected.neighbors);
+			neighbors.forEach(eachNeighbors);
+		}
+
+		function eachNeighbors(target) {
+
+			if (allowed())
+				switch (config.simulation.infectBy) {
+					case "node":
+						infectByNode();
+						break;
+					case "edge":
+						infectByEdge();
+						break;
+					case "both":
+						infectByBoth();
+						break;
+					default:
+						infectByEdge();
 				}
-			});
+
+			function allowed() {
+
+				if (target.animating)
+					return false;
+
+				if (group(target, "s"))
+					return true;
+
+				if (group(target, "r") && config.simulation.r.mayBeInfected)
+					return true;
+
+				if (group(target, "v") && config.simulation.v.mayBeInfected)
+					return true;
+
+				return false;
+			}
+
+			function infectByNode() {
+
+				if (Math.random() > simulationGroup(target).base.resist)
+					if (Math.random() > target.rate.resist)
+						if (Math.random() < infected.rate.infect * simulationGroup(infected).base.infect)
+							infect_ani(target);
+			}
+
+			function infectByEdge() {
+
+				var edge = getEdge(infected, target)[0];
+				if (edge == undefined) return;
+
+				if (Math.random() > simulationGroup(target).base.resist)
+					if (Math.random() > target.rate.resist)
+						if (Math.random() < edge.rate.infect * simulationGroup(infected).base.infect)
+							infect_ani(target);
+			}
+
+			function infectByBoth() {
+
+				var edge = getEdge(infected, target)[0];
+				if (edge == undefined) return;
+
+				if (Math.random() > simulationGroup(target).base.resist)
+					if (Math.random() > target.rate.resist)
+						if (Math.random() < infected.rate.infect * edge.rate.infect * simulationGroup(infected).base.infect)
+							infect_ani(target);
+			}
 
 		}
+
+	}
+
+	function infect_ani(target) {
+
+		const DOT_MOVIMENT_TIME = Number(config.animation.infect.dotMovimentTime);
+		const INFECT_EXPAND_TIME = Number(config.animation.infect.expandTime);
+		const INFECT_EXPAND_DELAY = Number(config.animation.infect.expandDelay);
+		const INFECT_EXPAND_SCALE = Number(config.animation.infect.expandScale);
+		const INFECT_RETRACT_TIME = Number(config.animation.infect.retractTime);
+		const SHAKE_RADIUS = Number(config.animation.infect.shakeRadius);
+		const REST_TIME = INFECT_EXPAND_TIME +
+			INFECT_EXPAND_DELAY + INFECT_RETRACT_TIME + Number(config.animation.infect.restTime); //1.5
+
+		setAnimation(infected, REST_TIME);
+		setAnimation(target, REST_TIME);
+
+		var infected_pos = network.getPositions([infected.id])[infected.id];
+		var target_pos = network.getPositions([target.id])[target.id];
+
+		var dot = {
+			x: infected_pos.x,
+			y: infected_pos.y,
+			draw: function() {
+				context.beginPath();
+				context.arc(this.x, this.y, 6, 0, 2 * Math.PI, false);
+				context.fillStyle = 'black';
+				context.fill();
+			}
+		};
+
+		_.bindAll(dot, 'draw');
+
+		network.on('afterDrawing', dot.draw);
+
+		//Dot moviment animation
+		TweenMax.to(dot, DOT_MOVIMENT_TIME * config.animation.scale, {
+			x: target_pos.x,
+			y: target_pos.y,
+			ease: Power2.easeOut,
+			onUpdate: function() {
+				network.redraw();
+			}
+		});
+
+		//Node expand animation
+		TweenMax.to(target, INFECT_EXPAND_TIME * config.animation.scale, {
+			delay: INFECT_EXPAND_DELAY * config.animation.scale,
+			size: target.base * INFECT_EXPAND_SCALE,
+			ease: Power2.easeOut,
+			onUpdate: function() {
+				nodes.update(target);
+			},
+			onComplete: function() {
+				network.off('afterDrawing', dot.draw);
+
+				target.group = "i";
+				nodes.update(target);
+
+				//Shake it!
+				var hip = SHAKE_RADIUS;
+				var angle = Math.atan2(target_pos.y - infected_pos.y, target_pos.x - infected_pos.x);
+				network.moveNode(
+					target.id,
+					target_pos.x + Math.cos(angle) * hip,
+					target_pos.y + Math.sin(angle) * hip
+				);
+
+				//Node retract animation
+				TweenMax.to(target, INFECT_RETRACT_TIME * config.animation.scale, {
+					size: target.base,
+					ease: Power3.easeOut,
+					onUpdate: function() {
+						nodes.update(target);
+					}
+				});
+			}
+		});
 
 	}
 
@@ -379,33 +487,41 @@ function recoverAttempt(target) {
 		recover();
 
 	function allowed() {
+
 		if (target.animating)
 			return false;
 
-		if (target.group === "r")
-			return false;
+		if (group(target, "i"))
+			return true;
 
-		if (target.group === "d")
-			return false;
+		if (group(target, "r") && config.simulation.r.mayGetSusceptible)
+			return true;
 
-		return true;
+		if (group(target, "v") && config.simulation.v.mayGetSusceptible)
+			return true;
+
+		return false;
 	}
 
 	function recover() {
-		if (Math.random() < target.rate.recover * group(target).base.recover)
+		if (Math.random() < target.rate.recover * simulationGroup(target).base.recover)
 			recover_ani();
 	}
 
 	function recover_ani() {
 
-		const REST_TIME = 2.4 + Number(config.animation.recover.restTime);
 		const RECOVER_EXPAND_TIME = Number(config.animation.recover.expandTime);
 		const RECOVER_EXPAND_SCALE = Number(config.animation.recover.expandScale);
 		const RECOVER_RETRACT_TIME = Number(config.animation.recover.retractTime);
+		const REST_TIME = RECOVER_EXPAND_TIME + RECOVER_RETRACT_TIME +
+			Number(config.animation.recover.restTime); //2.4
 
 		setAnimation(target, REST_TIME);
 
-		target.group = "r";
+		if (group(target, "i"))
+			target.group = "r";
+		else
+			target.group = "s";
 
 		TweenMax.to(target, RECOVER_EXPAND_TIME * config.animation.scale, {
 			size: target.base * RECOVER_EXPAND_SCALE,
@@ -432,24 +548,30 @@ function killAttempt(target) {
 		kill();
 
 	function allowed() {
+
 		if (target.animating)
 			return false;
 
-		if (target.group === "d")
-			return false;
+		if (group(target, "i"))
+			return true;
 
-		return true;
+		if (group(target, "r") && config.simulation.r.mayDie)
+			return true;
+
+		if (group(target, "v") && config.simulation.v.mayDie)
+			return true;
+
+		return false;
 	}
 
 	function kill() {
-		if (Math.random() < target.rate.death * group(target).base.death) {
+		if (Math.random() < target.rate.death * simulationGroup(target).base.death) {
 			death_ani();
 		}
 	}
 
 	function death_ani() {
 
-		const REST_TIME = 6.9 + Number(config.animation.death.restTime);
 		const DEATH_RETRACT_SCALE = Number(config.animation.death.retractScale);
 		const DEATH_RETRACT_TIME = Number(config.animation.death.retractTime);
 		const EDGE_RETRACT_TIME = Number(config.animation.death.edgeRetractTime);
@@ -459,6 +581,8 @@ function killAttempt(target) {
 		const BIRTH_EXPAND_DELAY = Number(config.animation.death.birthExpandDelay);
 		const BIRTH_EXPAND_SCALE = Number(config.animation.death.birthExpandScale);
 		const BIRTH_RETRACT_TIME = Number(config.animation.death.birthRetractTime);
+		const REST_TIME = DEATH_RETRACT_TIME + BIRTH_EXPAND_TIME +
+			BIRTH_EXPAND_DELAY + BIRTH_RETRACT_TIME + Number(config.animation.death.restTime); //6.9
 
 		setAnimation(target, REST_TIME);
 
@@ -645,10 +769,10 @@ function factoryFullRandom(config) {
 					id: nodes.length,
 					group: group.ref,
 					rate: {
-						infect: _.random(rate.infect.min, rate.infect.max),
-						resist: _.random(rate.resist.min, rate.resist.max),
-						recover: _.random(rate.recover.min, rate.recover.max),
-						death: _.random(rate.death.min, rate.death.max)
+						infect: _.random(rate.infect.min, rate.infect.max, true),
+						resist: _.random(rate.resist.min, rate.resist.max, true),
+						recover: _.random(rate.recover.min, rate.recover.max, true),
+						death: _.random(rate.death.min, rate.death.max, true)
 					}
 				});
 		}
@@ -697,7 +821,7 @@ function factoryFullRandom(config) {
 						from: node1.id,
 						to: node2.id,
 						rate: {
-							infect: _.random(rate.infect.min, rate.infect.max)
+							infect: _.random(rate.infect.min, rate.infect.max, true)
 						}
 					});
 					return true;
