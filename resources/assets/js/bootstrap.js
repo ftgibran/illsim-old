@@ -46,5 +46,4 @@ Vue.http.interceptors.push((request, next) => {
 require('gsap');
 require('materialize-css');
 require('./functions/nouislider.js');
-require('./functions/factoryUniformFormat.js');
 window.vis = require('vis');

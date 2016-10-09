@@ -17,6 +17,7 @@ Vue.component('ui-nav', require('./components/Nav.vue'));
 Vue.component('ui-sidenav', require('./components/SideNav.vue'));
 Vue.component('ui-slider', require('./components/Slider.vue'));
 Vue.component('ui-checkbox', require('./components/Checkbox.vue'));
+Vue.component('ui-stats', require('./components/Stats.vue'));
 Vue.component('form-config', require('./components/config/FormConfig.vue'));
 Vue.component('form-config-animation', require('./components/config/FormConfigAnimation.vue'));
 Vue.component('form-config-simulation', require('./components/config/FormConfigSimulation.vue'));
@@ -66,6 +67,52 @@ const app = new Vue({
         this.$refs.config.$on('submit', this.init);
     },
 
+    data() {
+        return {
+            susceptible: 0,
+            infected: 0,
+            recovered: 0,
+            vaccinated: 0,
+            death: 0,
+            population: 0,
+        }
+    },
+
+    events: {
+        statusChange: function(target, group) {
+            var $self = this;
+
+            if ($self.isGroup(target, Data.const.status.SUSCEPTIBLE))
+                $self.susceptible--;
+
+            if ($self.isGroup(target, Data.const.status.DEATH))
+                if (group === Data.const.status.SUSCEPTIBLE)
+                    $self.population++;
+
+            switch (group) {
+                case Data.const.status.SUSCEPTIBLE:
+                    $self.susceptible++;
+                    break;
+                case Data.const.status.INFECTED:
+                    $self.infected++;
+                    break;
+                case Data.const.status.RECOVERED:
+                    $self.recovered++;
+                    break;
+                case Data.const.status.VACCINATED:
+                    $self.vaccinated++;
+                    break;
+                case Data.const.status.DEATH:
+                    $self.death++;
+                    $self.population--;
+                    break;
+            }
+
+            target.group = group;
+            Data.nodes.update(target);
+        }
+    },
+
     methods: {
 
         /**
@@ -102,6 +149,8 @@ const app = new Vue({
             var container = document.getElementById('network');
             var data = $self.normalize($self.factory());
 
+            $self.setStats();
+
             Data.network = new vis.Network(container, data, Data.config.vis);
 
             var canvas = document.getElementsByTagName("canvas")[0];
@@ -119,6 +168,13 @@ const app = new Vue({
             Data.edges = null;
             Data.config = null;
             Data.context = null;
+
+            this.susceptible = 0;
+            this.infected = 0;
+            this.recovered = 0;
+            this.vaccinated = 0;
+            this.death = 0;
+            this.population = 0;
         },
 
         normalize: function(data) {
@@ -223,6 +279,37 @@ const app = new Vue({
             return Data.nodes.get({
                 filter: function(node) {
                     return node.group === group;
+                }
+            });
+        },
+
+        setStats: function() {
+            var $self = this;
+
+            $self.population = Data.nodes.length;
+
+            _.forEach(Data.nodes.get(), function(node) {
+                switch (node.group) {
+                    case Data.const.status.SUSCEPTIBLE:
+                        $self.susceptible++;
+                        break;
+
+                    case Data.const.status.INFECTED:
+                        $self.infected++;
+                        break;
+
+                    case Data.const.status.RECOVERED:
+                        $self.recovered++;
+                        break;
+
+                    case Data.const.status.VACCINATED:
+                        $self.vaccinated++;
+                        break;
+
+                    case Data.const.status.DEATH:
+                        $self.death++;
+                        break;
+
                 }
             });
         },
@@ -457,8 +544,7 @@ const app = new Vue({
                     onComplete: function() {
                         Data.network.off('afterDrawing', dot.draw);
 
-                        target.group = Data.const.status.INFECTED;
-                        Data.nodes.update(target);
+                        $self.$emit('statusChange', target, Data.const.status.INFECTED);
 
                         //Shake it!
                         var hip = SHAKE_RADIUS;
@@ -522,11 +608,6 @@ const app = new Vue({
 
                 $self.rest(target, REST_TIME);
 
-                if ($self.isGroup(target, Data.const.status.INFECTED))
-                    target.group = Data.const.status.RECOVERED;
-                else
-                    target.group = Data.const.status.SUSCEPTIBLE;
-
                 TweenMax.to(target, RECOVER_EXPAND_TIME * Data.config.animation.scale, {
                     size: target.base * RECOVER_EXPAND_SCALE,
                     ease: Power2.easeOut,
@@ -534,6 +615,12 @@ const app = new Vue({
                         Data.nodes.update(target);
                     },
                     onComplete: function() {
+
+                        if ($self.isGroup(target, Data.const.status.INFECTED))
+                            $self.$emit('statusChange', target, Data.const.status.RECOVERED);
+                        else
+                            $self.$emit('statusChange', target, Data.const.status.SUSCEPTIBLE);
+
                         TweenMax.to(target, RECOVER_RETRACT_TIME * Data.config.animation.scale, {
                             size: target.base,
                             ease: Elastic.easeOut.config(1, 0.3),
@@ -591,7 +678,7 @@ const app = new Vue({
 
                 $self.rest(target, REST_TIME);
 
-                target.group = Data.const.status.DEATH;
+                $self.$emit('statusChange', target, Data.const.status.DEATH);
 
                 var edges_id = Data.network.getConnectedEdges(target.id);
 
@@ -618,7 +705,6 @@ const app = new Vue({
                 });
 
                 function birth_ani() {
-                    target.group = Data.const.status.SUSCEPTIBLE;
                     TweenMax.to(target, BIRTH_EXPAND_TIME * Data.config.animation.scale, {
                         size: target.base * BIRTH_EXPAND_SCALE,
                         ease: Power2.easeOut,
@@ -627,9 +713,12 @@ const app = new Vue({
                             Data.nodes.update(target);
                         },
                         onComplete: function() {
+
+                            $self.$emit('statusChange', target, Data.const.status.SUSCEPTIBLE);
+
                             TweenMax.to(target, BIRTH_RETRACT_TIME * Data.config.animation.scale, {
                                 size: target.base,
-                                ease: Elastic.easeOut.Data.config(1, 0.3),
+                                ease: Elastic.easeOut.config(1, 0.3),
                                 onUpdate: function() {
                                     Data.nodes.update(target);
                                 }
@@ -699,8 +788,9 @@ const app = new Vue({
 
             function nodesFactory() {
                 var nodeConfig = Data.config.factory.node;
+                var quant = Math.pow(Data.config.factory.level, 2);
 
-                for (var i = 0; i < Math.pow(Data.config.factory.level, 2); i++)
+                for (var i = 0; i < quant; i++)
                     Data.nodes.add({
                         id: i,
                         group: Data.const.status.SUSCEPTIBLE,

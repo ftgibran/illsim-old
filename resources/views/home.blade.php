@@ -8,6 +8,8 @@
         <form-config v-ref:config></form-config>
     </ui-sidenav>
 
+    <ui-stats></ui-stats>
+
     <ui-loader v-ref:loader></ui-loader>
 
     <div @click="this.$refs.sidenav.hide()" id="network" style="height:100vh;"></div>
