@@ -25,9 +25,9 @@ require('vue-resource');
  */
 
 Vue.http.interceptors.push((request, next) => {
-	request.headers['X-CSRF-TOKEN'] = Laravel.csrfToken;
+    request.headers['X-CSRF-TOKEN'] = Laravel.csrfToken;
 
-	next();
+    next();
 });
 
 /**
@@ -44,3 +44,7 @@ Vue.http.interceptors.push((request, next) => {
 // });
 
 require('gsap');
+require('materialize-css');
+require('./functions/nouislider.js');
+require('./functions/factoryUniformFormat.js');
+window.vis = require('vis');

@@ -23,6 +23,5 @@
 
     <!-- Scripts -->
     <script src="/js/app.js"></script>
-    <script src="/js/vendor/vis/vis.min.js"></script>
-    <script src="/js/vendor/materialize/materialize.min.js"></script>
+
 </html>
