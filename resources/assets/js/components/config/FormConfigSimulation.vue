@@ -38,7 +38,7 @@
 			</li>
 
 			<li class="collection-item">
-				<checkbox label='Podem infectar' name='simulation[r][mayInfect]'>
+				<ui-checkbox label='Podem infectar' name='simulation[r][mayInfect]'>
 					<ui-slider	
 						name="simulation[r][base][infected]"
 						label="Taxa de infecção base"
@@ -50,10 +50,10 @@
 						decimals="1"
 						postfix="%"
 					></ui-slider>
-				</checkbox>				
+				</ui-checkbox>				
 			</li>
 			<li class="collection-item">
-				<checkbox label='Podem ser infectados' name='simulation[r][mayBeInfected]'>
+				<ui-checkbox label='Podem ser infectados' name='simulation[r][mayBeInfected]'>
 					<ui-slider	
 						name="simulation[r][base][resist]"
 						label="Taxa de resistência base"
@@ -65,10 +65,10 @@
 						decimals="1"
 						postfix="%"
 					></ui-slider>
-				</checkbox>
+				</ui-checkbox>
 			</li>
 			<li class="collection-item">
-				<checkbox label='Podem se tornar suscetíveis' name='simulation[r][mayGetSusceptible]'>
+				<ui-checkbox label='Podem se tornar suscetíveis' name='simulation[r][mayGetSusceptible]'>
 					<ui-slider	
 						name="simulation[r][base][recover]"
 						label="Taxa de suscetibilidade base"
@@ -80,10 +80,10 @@
 						decimals="1"
 						postfix="%"
 					></ui-slider>
-				</checkbox>
+				</ui-checkbox>
 			</li>
 			<li class="collection-item">
-				<checkbox label='Podem falecer' name='simulation[r][mayDie]'>
+				<ui-checkbox label='Podem falecer' name='simulation[r][mayDie]'>
 					<ui-slider	
 						name="simulation[r][base][death]"
 						label="Taxa de mortalidade base"
@@ -95,7 +95,7 @@
 						decimals="1"
 						postfix="%"
 					></ui-slider>
-				</checkbox>
+				</ui-checkbox>
 			</li>
 	    </ul>
 
@@ -105,7 +105,7 @@
 			</li>
 
 			<li class="collection-item">
-				<checkbox label='Podem infectar' name='simulation[v][mayInfect]'>
+				<ui-checkbox label='Podem infectar' name='simulation[v][mayInfect]'>
 					<ui-slider	
 						name="simulation[v][base][infect]"
 						label="Taxa de infecção base"
@@ -117,11 +117,11 @@
 						decimals="1"
 						postfix="%"
 					></ui-slider>
-				</checkbox>
+				</ui-checkbox>
 			</li>
 
 			<li class="collection-item">
-				<checkbox label='Podem ser infectados' name='simulation[v][mayBeInfected]'>
+				<ui-checkbox label='Podem ser infectados' name='simulation[v][mayBeInfected]'>
 					<ui-slider	
 						name="simulation[v][base][resist]"
 						label="Taxa de resistência base"
@@ -133,11 +133,11 @@
 						decimals="1"
 						postfix="%"
 					></ui-slider>
-				</checkbox>
+				</ui-checkbox>
 			</li>
 
 			<li class="collection-item">
-				<checkbox label='Podem se tornar suscetíveis' name='simulation[v][mayGetSusceptible]'>
+				<ui-checkbox label='Podem se tornar suscetíveis' name='simulation[v][mayGetSusceptible]'>
 					<ui-slider	
 						name="simulation[v][base][recover]"
 						label="Taxa de suscetibilidade base"
@@ -149,11 +149,11 @@
 						decimals="1"
 						postfix="%"
 					></ui-slider>
-				</checkbox>
+				</ui-checkbox>
 			</li>
 
 			<li class="collection-item">
-				<checkbox label='Podem falecer' name='simulation[v][mayDie]'>
+				<ui-checkbox label='Podem falecer' name='simulation[v][mayDie]'>
 					<ui-slider	
 						name="simulation[v][base][death]"
 						label="Taxa de mortalidade base"
@@ -165,7 +165,7 @@
 						decimals="1"
 						postfix="%"
 					></ui-slider>
-				</checkbox>
+				</ui-checkbox>
 			</li>
 	    </ul>
 
@@ -175,7 +175,7 @@
 			</li>
 
 			<li class="collection-item">
-				<checkbox label='Nascimento após morte' name='simulation[birthWhenDie]' :checked='false' ></checkbox>
+				<ui-checkbox label='Nascimento após morte' name='simulation[birthWhenDie]' :checked='false' ></ui-checkbox>
 			</li>
 	    </ul>
 

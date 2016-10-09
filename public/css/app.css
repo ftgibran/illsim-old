@@ -10593,28 +10593,8 @@ p {
   line-height: 1.5;
   font-weight: lighter; }
 
-.centered {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  /* bring your own prefixes */
-  -webkit-transform: translate(-50%, -50%);
-  transform: translate(-50%, -50%); }
-
 .illsim {
   font-family: 'Fredericka the Great', cursive; }
-
-#config-nav {
-  overflow-y: auto;
-  overflow-x: hidden;
-  position: absolute;
-  margin: 0;
-  padding: 0;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 40%;
-  z-index: 100; }
 
 .collection-header {
   border-bottom: 1px solid #ccc; }

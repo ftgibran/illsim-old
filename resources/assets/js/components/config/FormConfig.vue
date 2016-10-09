@@ -38,7 +38,7 @@
 <script>
     export default {
 
-    	data() {
+    	data() { 
     		return {
     			action: 'api/config',
     			default: '',
@@ -49,9 +49,16 @@
     	methods: {
 			api() {
 				var $self = this;
+
 				$.getJSON(this.action, $(this.$el).serialize(), function (data) {
-					$self.$set('data', data);
+					$self.$emit('submit', data);
 				});
+			}
+		},
+
+		events: {
+			submit(data) {
+				
 			}
 		},
 
