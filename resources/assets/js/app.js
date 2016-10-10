@@ -82,12 +82,27 @@ const app = new Vue({
         statusChange: function(target, group) {
             var $self = this;
 
-            if ($self.isGroup(target, Data.const.status.SUSCEPTIBLE))
-                $self.susceptible--;
-
             if ($self.isGroup(target, Data.const.status.DEATH))
                 if (group === Data.const.status.SUSCEPTIBLE)
                     $self.population++;
+
+            switch (target.group) {
+                case Data.const.status.SUSCEPTIBLE:
+                    $self.susceptible--;
+                    break;
+                case Data.const.status.INFECTED:
+                    $self.infected--;
+                    break;
+                case Data.const.status.RECOVERED:
+                    $self.recovered--;
+                    break;
+                case Data.const.status.VACCINATED:
+                    $self.vaccinated--;
+                    break;
+                case Data.const.status.DEATH:
+                    $self.death--;
+                    break;
+            }
 
             switch (group) {
                 case Data.const.status.SUSCEPTIBLE:
