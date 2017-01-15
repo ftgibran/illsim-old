@@ -17,7 +17,11 @@ Route::get('/', function () {
     return view('home');
 });
 
-Route::get('api/config', function (Request $request) {
+Route::get('api/getConfig', function () {
+	return File::get("../database/data/Config.json");
+});
+
+Route::get('api/persistConfig', function (Request $request) {
 
 	$config = File::get("../database/data/Config.json");
 
@@ -45,3 +49,4 @@ Route::get('api/config', function (Request $request) {
 	return $union;
 
 });
+

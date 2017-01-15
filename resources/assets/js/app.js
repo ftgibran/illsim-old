@@ -17,6 +17,7 @@ Vue.component('ui-nav', require('./components/Nav.vue'));
 Vue.component('ui-sidenav', require('./components/SideNav.vue'));
 Vue.component('ui-slider', require('./components/Slider.vue'));
 Vue.component('ui-checkbox', require('./components/Checkbox.vue'));
+Vue.component('ui-select', require('./components/Select.vue'));
 Vue.component('ui-stats', require('./components/Stats.vue'));
 Vue.component('form-config', require('./components/config/FormConfig.vue'));
 Vue.component('form-config-animation', require('./components/config/FormConfigAnimation.vue'));
@@ -61,7 +62,7 @@ const app = new Vue({
     ready() {
         var $self = this;
 
-        $('select').material_select();
+        // $('select').material_select();
         $self.$refs.loader.hide();
 
         this.$refs.config.$on('submit', this.init);
@@ -365,7 +366,7 @@ const app = new Vue({
                     if ($self.isGroup(target, Data.const.status.SUSCEPTIBLE))
                         return true;
 
-                    if ($self.isGroup(target, Data.const.status.RECOVERED) && Data.config.simulation.r.mayBetarget)
+                    if ($self.isGroup(target, Data.const.status.RECOVERED) && Data.config.simulation.r.mayBeInfected)
                         return true;
 
                     if ($self.isGroup(target, Data.const.status.VACCINATED) && Data.config.simulation.v.mayBeInfected)

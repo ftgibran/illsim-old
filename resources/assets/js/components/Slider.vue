@@ -7,10 +7,10 @@
 
 		<div class="row mb-0">
 			<div class="input-field mt-0 s6 col">
-				<input type="text" name="{{name}}[min]" class="ta-l">
+				<input type="text" v-model="value1" class="ta-l">
 			</div>
 			<div class="input-field mt-0 s6 col" v-show="range">
-				<input type="text" name="{{name}}[max]" class="ta-r">
+				<input type="text" v-model="value2" class="ta-r">
 			</div>
 		</div>
 	</div>
@@ -22,7 +22,8 @@
 
     	data() {
     		return {
-    			range: false
+    			value1: '',
+    			value2: ''
     		};
     	},
 
@@ -31,18 +32,15 @@
         		type: String,
         		default: ''
         	},
-        	name: {
-        		type: String,
-        		required: true
-        	},
         	label: {
         		type: String,
         		default: ''
         	},
-        	start: {
-        		type: String,
-        		default: '0'
+        	range: {
+        		type: Boolean,
+        		default: false 
         	},
+        	val: {},
         	step: {
         		type: String,
         		default: '1'
@@ -69,16 +67,59 @@
         	}
         },
 
-        ready() {
+        watch: {
+        	value1(newVal,oldVal) {
+        		if(this.range) {
+        			this.val[0] = this.postfix == '%' ? this.per2num(newVal) : this.str2num(newVal);
+        		} else {
+        			this.val = this.postfix == '%' ? this.per2num(newVal) : this.str2num(newVal);
+        		}
+        	},
+        	value2(newVal,oldVal) {
+        		if(this.range) {
+        			this.val[1] = this.postfix == '%' ? this.per2num(newVal) : this.str2num(newVal);
+        		} 
+        	},
+        	val(newVal,oldVal) {
+        		if(this.range) {
+        			this.value1 = this.postfix == '%' ? this.num2per(newVal[0]) : this.num2str(newVal[0]);
+        			this.value2 = this.postfix == '%' ? this.num2per(newVal[1]) : this.num2str(newVal[1]);
+        		} else {
+        			this.value1 = this.postfix == '%' ? this.num2per(newVal) : this.num2str(newVal);
+        		}
+        	}
+        },
 
+        methods: {
+        	num2per(value) {
+        		return new String (value * 100).replace(',','.') + '%';
+        	},
+        	per2num(value) {
+        		return Number(value.replace('%','').replace(',','.')) / 100;
+        	},
+        	str2num(value) {
+        		return Number(value.replace(',','.'));
+        	},
+        	num2str(value) {
+        		return new String (value).replace(',','.');
+        	}
+        },
+
+        ready() {
 			var el = this.$el;
 
 			var input = $(el).find('input');
 			var label = $(el).find('label');
 			var slider = $(el).find('.nouislider')[0];
 
-			var start = this.start.split(",");
-			this.$set('range', start.length > 1);
+			var start = [];
+
+    		if(this.range) {
+    			start[0] = this.val[0] * (this.postfix == '%' ? 100 : 1);
+    			start[1] = this.val[1] * (this.postfix == '%' ? 100 : 1);
+    		} else {
+    			start[0] = this.val * (this.postfix == '%' ? 100 : 1);
+    		}
 
 			$(el).css('margin-top', '2em');
 			label.css('top', '-2em');
@@ -110,10 +151,13 @@
 			});
 
 			slider.noUiSlider.on('update', function(values, handle) {
-				input.each(function(index) {
-					$(this).val(values[index]);
-				});
-			});
+        		if(this.range) {
+					this.value1 = values[0];
+					this.value2 = values[1];
+        		} else {
+					this.value1 = values[0];
+        		}
+			}.bind(this));
 
 			input.each(function(index) {
 				$(this).on('change', function() {

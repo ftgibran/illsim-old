@@ -31,13 +31,17 @@
 	},
 	"simulation": {
 		"step": 200,
-		"infectBy": "node",
+		"infectBy": "special",
 		"k": 0.5,
 		"i": {
+			"mayInfect": true,
+			"mayRecover": true,
+			"mayGetSusceptible": false,
+			"mayDie": true,
 			"base": {
 				"infect": 1,
-				"resist": 1,
 				"recover": 1,
+				"susceptible": 1,
 				"death": 1
 			}
 		},
@@ -49,11 +53,15 @@
 			"base": {
 				"infect": 0.15,
 				"resist": 0.9,
-				"recover": 0.1,
+				"susceptible": 0.1,
 				"death": 0.05
 			}
 		},
 		"s": {
+			"mayInfect": false,
+			"mayBeInfected": false,
+			"mayRecover": false,
+			"mayDie": false,
 			"base": {
 				"infect": 0,
 				"resist": 0,
@@ -64,17 +72,19 @@
 		"v": {
 			"mayInfect": false,
 			"mayBeInfected": false,
+			"mayRecover": false,
 			"mayGetSusceptible": false,
 			"mayDie": false,
 			"base": {
 				"infect": 0,
 				"resist": 0.995,
-				"recover": 0.01,
+				"recover": 0,
+				"susceptible": 0.01,
 				"death": 0
 			}
 		},
 		"d": {
-			"birthWhenDie": true,
+			"birthWhenDie": false,
 			"base": {
 				"infect": 0,
 				"resist": 1,
@@ -83,6 +93,9 @@
 			}
 		}
 
+	},
+	"generator": {
+		"method": "fullRandom"
 	},
 	"vis": {
 		"nodes": {

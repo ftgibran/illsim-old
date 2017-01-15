@@ -1,7 +1,7 @@
 <template>
-    <form @submit.prevent="api" method="post" class="ta-c">
+    <form @submit.prevent="persistConfig" method="post" class="ta-c">
 
-		<ul class="collapsible mt-0" data-collapsible="accordion">
+		<ul v-if="config" class="collapsible mt-0" data-collapsible="accordion">
 			<li class="mt-0 mb-0 ta-l" style="padding: 0;">
 				
 				<nav class="blue-grey darken-2 white-text pl pr">
@@ -24,14 +24,14 @@
 			</li>
 
 			<li class="grey lighten-5">
-				<form-config-simulation></form-config-simulation>
+				<form-config-simulation :config="config.simulation"></form-config-simulation>
 			</li>
 
 			<li class="grey lighten-5">
 				<form-config-factory></form-config-factory>
 			</li>
 		</ul>
-		
+
   	</form>
 </template>
 
@@ -40,19 +40,16 @@
 
     	data() { 
     		return {
-    			action: 'api/config',
-    			default: '',
-    			data: ''
+    			config: {},
+    			data: {}
     		};
     	},
 
     	methods: {
-			api() {
-				var $self = this;
-
-				$.getJSON(this.action, $(this.$el).serialize(), function (data) {
+			persistConfig() {
+				$.getJSON('api/persistConfig', $(this.$el).serialize(), function (data) {
 					$self.$emit('submit', data);
-				});
+				}).bind(this);
 			}
 		},
 
@@ -64,6 +61,7 @@
 
         ready() {	
         	$(this.$el).find('.collapsible').collapsible();
+			$.getJSON('api/getConfig', (data) => this.config = data);
         }
     }
 </script>
