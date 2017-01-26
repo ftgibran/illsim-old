@@ -21,6 +21,14 @@ Route::get('api/getConfig', function () {
 	return File::get("../database/data/Config.json");
 });
 
+Route::get('api/getFactoryFullRandom', function () {
+    return File::get("../database/data/factoryFullRandom.json");
+});
+
+Route::get('api/getFactoryUniformFormat', function () {
+    return File::get("../database/data/factoryUniformFormat.json");
+});
+
 Route::get('api/persistConfig', function (Request $request) {
 
 	$config = File::get("../database/data/Config.json");

@@ -1,23 +1,26 @@
 {
-	"level": 6,
-	"node": {
-		"groups": [{
-			"ref": "i",
-			"quant": 3
-		}, {
-			"ref": "v",
-			"quant": 0
-		}],
-		"rate": {
-			"infect": 0.5,
-			"resist": 0,
-			"recover": 0.1,
-			"death": 0.3
-		}
-	},
-	"edge": {
-		"rate": {
-			"infect": 0.1
-		}
-	}
+  "level": 6,
+  "node": {
+    "groups": [
+      {
+        "ref": "i",
+        "quant": 3
+      },
+      {
+        "ref": "v",
+        "quant": 0
+      }
+    ],
+    "rate": {
+      "infect": 0.5,
+      "resist": 0,
+      "recover": 0.1,
+      "death": 0.3
+    }
+  },
+  "edge": {
+    "rate": {
+      "infect": 0.1
+    }
+  }
 }

@@ -95,7 +95,8 @@
 
 	},
 	"generator": {
-		"method": "fullRandom"
+		"method": "fullRandom",
+		"factory": {}
 	},
 	"vis": {
 		"nodes": {

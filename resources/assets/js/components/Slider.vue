@@ -2,7 +2,7 @@
 <template>
     <div class="input-field">
 		<label class="truncate"><i class="fa {{icon}}" aria-hidden="true"></i> {{label}}</label>
-		
+
 		<div class="nouislider"></div>
 
 		<div class="row mb-0">
@@ -38,9 +38,11 @@
         	},
         	range: {
         		type: Boolean,
-        		default: false 
+        		default: false
         	},
         	val: {},
+            valMin: {},
+			valMax: {},
         	step: {
         		type: String,
         		default: '1'
@@ -70,15 +72,15 @@
         watch: {
         	value1(newVal,oldVal) {
         		if(this.range) {
-        			this.val[0] = this.postfix == '%' ? this.per2num(newVal) : this.str2num(newVal);
+        			this.valMin = this.postfix == '%' ? this.per2num(newVal) : this.str2num(newVal);
         		} else {
         			this.val = this.postfix == '%' ? this.per2num(newVal) : this.str2num(newVal);
         		}
         	},
         	value2(newVal,oldVal) {
         		if(this.range) {
-        			this.val[1] = this.postfix == '%' ? this.per2num(newVal) : this.str2num(newVal);
-        		} 
+        			this.valMax = this.postfix == '%' ? this.per2num(newVal) : this.str2num(newVal);
+        		}
         	},
         	val(newVal,oldVal) {
         		if(this.range) {
@@ -115,8 +117,8 @@
 			var start = [];
 
     		if(this.range) {
-    			start[0] = this.val[0] * (this.postfix == '%' ? 100 : 1);
-    			start[1] = this.val[1] * (this.postfix == '%' ? 100 : 1);
+    			start[0] = this.valMin * (this.postfix == '%' ? 100 : 1);
+    			start[1] = this.valMax * (this.postfix == '%' ? 100 : 1);
     		} else {
     			start[0] = this.val * (this.postfix == '%' ? 100 : 1);
     		}

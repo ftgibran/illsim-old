@@ -1,156 +1,200 @@
 <template>
 
-	<ul class="collapsible popout" data-collapsible="accordion">
+    <ul class="collapsible popout" data-collapsible="accordion">
 
-		<li class="card-panel blue-grey darken-2 white-text mt-0 mb-0 pt-s pb-s ta-l">
-			Full Random
-		</li>
+        <li class="card-panel blue-grey darken-2 white-text mt-0 mb-0 pt-s pb-s ta-l">
+            Full Random
+        </li>
 
-		<li class="grey lighten-5">
-		<div class="collapsible-header">Nós</div>
-		<div class="collapsible-body pl pr">
+        <li class="grey lighten-5">
+            <div class="collapsible-header">Nós</div>
+            <div class="collapsible-body pl pr">
 
-			<ui-slider
-				name="factory[node]"
-				label="Quantidade (mínimo e máximo)"
-				start="80,100"
-				step="1"
-				min="0"
-				max="200"
-				decimals="0"
-			></ui-slider>
+                <ui-slider
+                        v-if="factory.node"
+                        label="Quantidade (mínimo e máximo)"
+                        :val-min.sync="factory.node.min"
+                        :val-max.sync="factory.node.max"
+                        step="1"
+                        min="0"
+                        max="200"
+                        decimals="0"
+                        :range="true"
+                ></ui-slider>
 
-			<ui-slider
-				name="factory[node][maxEdges]"
-				label="Máximo de arestas por nó"
-				start="4"
-				step="1"
-				min="0"
-				max="8"
-				decimals="0"
-			></ui-slider>
+                <ui-slider
+                        v-if="factory.node"
+                        label="Máximo de arestas por nó"
+                        :val.sync="factory.node.maxEdges"
+                        step="1"
+                        min="0"
+                        max="8"
+                        decimals="0"
+                ></ui-slider>
 
-			<div class="row">
-				<div class="input-field s12 m6 col">
-	          		<input type="hidden" name="factory[node][groups][0][ref]" value="i"/>
-					<div class="fl-r">
-	          			<input type="checkbox" class="filled-in" id="i-percent" name="factory[node][groups][0][percent]" />
-						<label for="i-percent">%</label>
-					</div>
-					<div style="overflow: hidden;">
-						<label class="active truncate" for="i-quant">
-						<i class="fa fa-square red-text" aria-hidden="true"></i>
-						Quantidade de infectados</label>
-						<input type="number" id="i-quant" name="factory[node][groups][0][quant]" value="5" required>
-					</div>
-					
-					<div class="cl-b"></div>
-				</div>
-					
-				<div class="input-field s12 m6 col">
-					<input type="hidden" name="factory[node][groups][1][ref]" value="v"/>
-					<div class="fl-r">
-	          			<input type="checkbox" class="filled-in" id="v-percent" name="factory[node][groups][1][percent]" checked="checked" />
-						<label for="v-percent">%</label>
-					</div>
-					<div style="overflow: hidden;">
-	          			<label class="active truncate" for="v-quant">
-						<i class="fa fa-square green-text" aria-hidden="true"></i>
-	          			Quantidade de vacinados</label>
-						<input type="number" id="v-quant" name="factory[node][groups][1][quant]" value="10" required>
-					</div>
+                <div v-if="factory.node" class="row">
+                    <div class="input-field s12 m6 col">
+                        <div class="fl-r">
+                            <input type="checkbox" class="filled-in" id="i-percent"
+                                   v-model="groupInfect.percent"/>
+                            <label for="i-percent">%</label>
+                        </div>
+                        <div style="overflow: hidden;">
+                            <label class="active truncate" for="i-quant">
+                                <i class="fa fa-square red-text" aria-hidden="true"></i>
+                                Quantidade de infectados</label>
+                            <input type="number" id="i-quant"
+                                   v-model="groupInfect.quant" required>
+                        </div>
 
-					<div class="cl-b"></div>
-				</div>
-			</div>
+                        <div class="cl-b"></div>
+                    </div>
 
-			<ui-slider
-				icon="fa-square red-text"
-				name="factory[node][rate][infect]"
-				label="Taxa de infecção"
-				start="50,100"
-				step="0.5"
-				min="0"
-				max="100"
-				decimals="1"
-				postfix="%"
-			></ui-slider>
+                    <div class="input-field s12 m6 col">
+                        <div class="fl-r">
+                            <input type="checkbox" class="filled-in" id="v-percent"
+                                   v-model="groupVacinated.percent" checked="checked"/>
+                            <label for="v-percent">%</label>
+                        </div>
+                        <div style="overflow: hidden;">
+                            <label class="active truncate" for="v-quant">
+                                <i class="fa fa-square green-text" aria-hidden="true"></i>
+                                Quantidade de vacinados</label>
+                            <input type="number" id="v-quant"
+                                   v-model="groupVacinated.quant" value="10"
+                                   required>
+                        </div>
 
-			<ui-slider
-				icon="fa-square-o green-text"
-				name="factory[node][rate][resist]"
-				label="Taxa de resistência"
-				start="0,50"
-				step="0.5"
-				min="0"
-				max="100"
-				decimals="1"
-				postfix="%"
-			></ui-slider>
+                        <div class="cl-b"></div>
+                    </div>
+                </div>
 
-			<ui-slider
-				icon="fa-square yellow-text"
-				name="factory[node][rate][recover]"
-				label="Taxa de recuperação"
-				start="1,5"
-				step="0.5"
-				min="0"
-				max="100"
-				decimals="1"
-				postfix="%"
-			></ui-slider>
+                <ui-slider
+                        v-if="factory.node"
+                        icon="fa-square red-text"
+                        label="Taxa de infecção"
+                        :val-min.sync="factory.node.rate.infect.min"
+                        :val-max.sync="factory.node.rate.infect.max"
+                        step="0.5"
+                        min="0"
+                        max="100"
+                        decimals="1"
+                        postfix="%"
+                        :range="true"
+                ></ui-slider>
 
-			<ui-slider
-				icon="fa-square black-text"
-				name="factory[node][rate][death]"
-				label="Taxa de morte"
-				start="1,5"
-				step="0.5"
-				min="0"
-				max="100"
-				decimals="1"
-				postfix="%"
-			></ui-slider>
+                <ui-slider
+                        v-if="factory.node"
+                        icon="fa-square-o green-text"
+                        label="Taxa de resistência"
+                        :val-min.sync="factory.node.rate.resist.min"
+                        :val-max.sync="factory.node.rate.resist.max"
+                        step="0.5"
+                        min="0"
+                        max="100"
+                        decimals="1"
+                        postfix="%"
+                        :range="true"
+                ></ui-slider>
 
-		</div>
-		</li>
+                <ui-slider
+                        v-if="factory.node"
+                        icon="fa-square yellow-text"
+                        label="Taxa de recuperação"
+                        :val-min.sync="factory.node.rate.recover.min"
+                        :val-max.sync="factory.node.rate.recover.max"
+                        step="0.5"
+                        min="0"
+                        max="100"
+                        decimals="1"
+                        postfix="%"
+                        :range="true"
+                ></ui-slider>
 
-		<li class="grey lighten-5">
-		<div class="collapsible-header">Arestas</div>
-		<div class="collapsible-body pl pr">
+                <ui-slider
+                        v-if="factory.node"
+                        icon="fa-square black-text"
+                        label="Taxa de morte"
+                        :val-min.sync="factory.node.rate.death.min"
+                        :val-max.sync="factory.node.rate.death.max"
+                        step="0.5"
+                        min="0"
+                        max="100"
+                        decimals="1"
+                        postfix="%"
+                        :range="true"
+                ></ui-slider>
 
-			<ui-slider
-				name="factory[edge]"
-				label="Quantidade (mínimo e máximo)"
-				start="120,150"
-				step="3"
-				min="0"
-				max="300"
-				decimals="0"
-			></ui-slider>
+            </div>
+        </li>
 
-			<ui-slider
-				icon="fa-square red-text"
-				name="factory[edge][rate][infect]"
-				label="Taxa de infecção"
-				start="50,100"
-				step="0.5"
-				min="0"
-				max="100"
-				decimals="1"
-				postfix="%"
-			></ui-slider>
+        <li class="grey lighten-5">
+            <div class="collapsible-header">Arestas</div>
+            <div class="collapsible-body pl pr">
 
-		</div>
-		</li>
-	</ul>
+                <ui-slider
+                        v-if="factory.edge"
+                        name="factory[edge]"
+                        label="Quantidade (mínimo e máximo)"
+                        :val-min.sync="factory.edge.min"
+                        :val-max.sync="factory.edge.max"
+                        step="1"
+                        min="0"
+                        max="400"
+                        decimals="0"
+                        :range="true"
+                ></ui-slider>
+
+                <ui-slider
+                        v-if="factory.edge"
+                        icon="fa-square red-text"
+                        name="factory[edge][rate][infect]"
+                        label="Taxa de infecção"
+                        :val-min.sync="factory.edge.rate.infect.min"
+                        :val-max.sync="factory.edge.rate.infect.max"
+                        step="0.5"
+                        min="0"
+                        max="100"
+                        decimals="1"
+                        postfix="%"
+                        :range="true"
+                ></ui-slider>
+
+            </div>
+        </li>
+    </ul>
 
 </template>
 
 <script>
     export default {
+        props: ['factory'],
+
+        computed: {
+            groupInfect() {
+                if(!this.factory.node) return {};
+
+                for(var i in this.factory.node.groups)
+                {
+                    var group = this.factory.node.groups[i];
+                    if(group.ref == 'i') return group;
+                }
+            },
+
+            groupVacinated() {
+                if(!this.factory.node) return {};
+
+                for(var i in this.factory.node.groups)
+                {
+                    var group = this.factory.node.groups[i];
+                    if(group.ref == 'v') return group;
+                }
+            }
+
+        },
+
         ready() {
-        	$(this.$el).collapsible();
+            $(this.$el).collapsible();
         }
     }
 </script>
