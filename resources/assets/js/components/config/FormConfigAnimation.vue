@@ -1,7 +1,5 @@
 <template>
-
-    <div class="collapsible-header">Animação</div>
-    <div class="collapsible-body pl pr">
+    <div>
         <ui-slider
                 v-if="config"
                 label="Escala de tempo"

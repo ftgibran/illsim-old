@@ -1,9 +1,11 @@
 <template>
 
-    <select :name="name" v-select="val">
-        <option v-for="opt in options" :value="opt.val">{{opt.label}}</option>
-    </select>
-    <label>{{label}}</label>
+    <div>
+        <select :name="name" v-select="val">
+            <option v-for="opt in options" :value="opt.val">{{opt.label}}</option>
+        </select>
+        <label class="mt-s mb">{{label}}</label>
+    </div>
 
 </template>
 

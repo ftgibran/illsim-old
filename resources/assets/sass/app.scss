@@ -16,7 +16,11 @@
 @import "vendor/css-utils/utils.css";
 // Materialize
 @import "node_modules/materialize-css/sass/materialize";
-@media #{$small-and-down} {}
+@media #{$small-and-down} {
+    .sidenav {
+        width: 100% !important;
+    }
+}
 
 @media #{$medium-and-up} {}
 

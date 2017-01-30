@@ -98,6 +98,9 @@
 		"method": "fullRandom",
 		"factory": {}
 	},
+	"inoculation": {
+		"method": 1
+	},
 	"vis": {
 		"nodes": {
 			"borderWidth": 0,

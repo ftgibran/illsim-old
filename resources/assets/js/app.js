@@ -22,7 +22,7 @@ Vue.component('ui-stats', require('./components/Stats.vue'));
 Vue.component('form-config', require('./components/config/FormConfig.vue'));
 Vue.component('form-config-animation', require('./components/config/FormConfigAnimation.vue'));
 Vue.component('form-config-simulation', require('./components/config/FormConfigSimulation.vue'));
-Vue.component('form-config-factory', require('./components/config/FormConfigFactory.vue'));
+Vue.component('form-config-generator', require('./components/config/FormConfigGenerator.vue'));
 Vue.component('form-config-uniform-format', require('./components/config/FormConfigUniformFormat.vue'));
 Vue.component('form-config-full-random', require('./components/config/FormConfigFullRandom.vue'));
 
