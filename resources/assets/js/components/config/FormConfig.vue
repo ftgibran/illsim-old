@@ -73,9 +73,8 @@
             },
 
             onReaderLoad(event){
-                console.log(event.target.result);
                 this.config = JSON.parse(event.target.result);
-                console.log(this.config);
+                $('select').material_select();
             },
 
             load() {
