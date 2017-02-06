@@ -22,10 +22,10 @@ Route::get('api/getConfig', function () {
 });
 
 Route::get('api/getFactoryFullRandom', function () {
-    return File::get(database_path("data/factoryFullRandom.json"));
+    return File::get(database_path("data/FactoryFullRandom.json"));
 });
 
 Route::get('api/getFactoryUniformFormat', function () {
-    return File::get(database_path("data/factoryUniformFormat.json"));
+    return File::get(database_path("data/FactoryUniformFormat.json"));
 });
 
