@@ -270,6 +270,16 @@ const app = new Vue({
             });
         },
 
+        allowed: function (target, action) {
+            if (target.animating)
+                return false;
+
+            if (Data.config.simulation[target.group][action])
+                return true;
+
+            return false;
+        },
+
         isGroup: function (node, ref) {
             if (node.group === ref)
                 return true;
@@ -330,20 +340,6 @@ const app = new Vue({
         },
 
         /**
-         * Conditions
-         */
-
-        allowed: function (target, action) {
-            if (target.animating)
-                return false;
-
-            if (Data.config.simulation[target.group][action])
-                return true;
-
-            return false;
-        },
-
-        /**
          * Attempts
          */
 
@@ -392,34 +388,12 @@ const app = new Vue({
 
             function standardInfect() {
 
-                if (allowed())
-                    infect();
-
-                function allowed() {
-
-                    if (infected.animating)
-                        return false;
-
-                    if ($self.isGroup(infected, Data.const.status.INFECTED))
-                        return true;
-
-                    if ($self.isGroup(infected, Data.const.status.RECOVERED) && Data.config.simulation.r.mayInfect)
-                        return true;
-
-                    if ($self.isGroup(infected, Data.const.status.VACCINATED) && Data.config.simulation.v.mayInfect)
-                        return true;
-
-                    return false;
-                }
-
-                function infect() {
-                    var neighbors = Data.nodes.get(infected.neighbors);
-                    neighbors.forEach(eachNeighbors);
-                }
+                var neighbors = Data.nodes.get(infected.neighbors);
+                neighbors.forEach(eachNeighbors);
 
                 function eachNeighbors(target) {
 
-                    if (allowed())
+                    if ($self.allowed(target, "mayBeInfected")) {
                         switch (Data.config.simulation.infectBy) {
                             case "node":
                                 infectByNode();
@@ -434,51 +408,36 @@ const app = new Vue({
                                 infectByEdge();
                         }
 
-                    function allowed() {
+                        function infectByNode() {
 
-                        if (target.animating)
-                            return false;
+                            if (Math.random() > Data.config.simulation[target.group].base.resist)
+                                if (Math.random() > target.rate.resist)
+                                    if (Math.random() < infected.rate.infect * Data.config.simulation[infected.group].base.infect)
+                                        infect_ani(target);
+                        }
 
-                        if ($self.isGroup(target, Data.const.status.SUSCEPTIBLE))
-                            return true;
+                        function infectByEdge() {
 
-                        if ($self.isGroup(target, Data.const.status.RECOVERED) && Data.config.simulation.r.mayBeInfected)
-                            return true;
+                            var edge = $self.filterEdgesByNodes(infected, target)[0];
+                            if (edge == undefined) return;
 
-                        if ($self.isGroup(target, Data.const.status.VACCINATED) && Data.config.simulation.v.mayBeInfected)
-                            return true;
+                            if (Math.random() > Data.config.simulation[target.group].base.resist)
+                                if (Math.random() > target.rate.resist)
+                                    if (Math.random() < edge.rate.infect * Data.config.simulation[infected.group].base.infect)
+                                        infect_ani(target);
+                        }
 
-                        return false;
-                    }
+                        function infectByBoth() {
 
-                    function infectByNode() {
+                            var edge = $self.filterEdgesByNodes(infected, target)[0];
+                            if (edge == undefined) return;
 
-                        if (Math.random() > $self.groupConfig(target.group).base.resist)
-                            if (Math.random() > target.rate.resist)
-                                if (Math.random() < infected.rate.infect * $self.groupConfig(infected.group).base.infect)
-                                    infect_ani(target);
-                    }
+                            if (Math.random() > Data.config.simulation[target.group].base.resist)
+                                if (Math.random() > target.rate.resist)
+                                    if (Math.random() < infected.rate.infect * edge.rate.infect * Data.config.simulation[infected.group].base.infect)
+                                        infect_ani(target);
+                        }
 
-                    function infectByEdge() {
-
-                        var edge = $self.filterEdgesByNodes(infected, target)[0];
-                        if (edge == undefined) return;
-
-                        if (Math.random() > $self.groupConfig(target.group).base.resist)
-                            if (Math.random() > target.rate.resist)
-                                if (Math.random() < edge.rate.infect * $self.groupConfig(infected.group).base.infect)
-                                    infect_ani(target);
-                    }
-
-                    function infectByBoth() {
-
-                        var edge = $self.filterEdgesByNodes(infected, target)[0];
-                        if (edge == undefined) return;
-
-                        if (Math.random() > $self.groupConfig(target.group).base.resist)
-                            if (Math.random() > target.rate.resist)
-                                if (Math.random() < infected.rate.infect * edge.rate.infect * $self.groupConfig(infected.group).base.infect)
-                                    infect_ani(target);
                     }
 
                 }
@@ -614,7 +573,8 @@ const app = new Vue({
                     }
                 });
             }
-        },
+        }
+        ,
 
         killAttempt: function (target) {
             var $self = this;
@@ -719,7 +679,8 @@ const app = new Vue({
                 }
             }
 
-        },
+        }
+        ,
 
         /**
          * Factories
@@ -740,7 +701,8 @@ const app = new Vue({
             }
 
             return false;
-        },
+        }
+        ,
 
         factoryUniformFormat: function () {
             var $self = this;
@@ -806,7 +768,8 @@ const app = new Vue({
 
                 return Data.edges.get();
             }
-        },
+        }
+        ,
 
         factoryFullRandom: function () {
             var $self = this;

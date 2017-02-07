@@ -16,7 +16,7 @@
                 </li>
             </ul>
             <div class="brand-logo right grey-text">
-                <span class="illsim">Illness Simulation</span>
+                <span class="illsim">ILLSIM</span>
             </div>
         </div>
     </nav>

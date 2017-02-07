@@ -1,5 +1,5 @@
 @extends('tpl.main')
-@section('title', 'Illness Simulation')
+@section('title', 'Illness Simulator')
 @section('content')
     <ui-nav></ui-nav>
 
@@ -11,5 +11,5 @@
 
     <ui-loader v-ref:loader></ui-loader>
 
-    <div @click="this.$refs.sidenav.hide()" id="network" style="height:100vh;"></div>
+    <div id="network" style="height: 100vh;" @click="this.$refs.sidenav.hide()"></div>
 @stop

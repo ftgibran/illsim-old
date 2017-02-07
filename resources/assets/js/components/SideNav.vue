@@ -54,7 +54,23 @@
         },
 
         ready() {
+            var el = $(this.$el);
+            var $self = this;
 
+            $(el).hover(
+                    function () {
+                        TweenMax.to(el, $self.time, {
+                            opacity: 1,
+                            ease: Power3.easeOut
+                        });
+                    },
+                    function () {
+                        TweenMax.to(el, $self.time, {
+                            opacity: 0.4,
+                            ease: Power3.easeOut
+                        });
+                    }
+            )
         }
     }
 </script>
