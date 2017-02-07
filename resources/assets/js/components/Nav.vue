@@ -16,7 +16,7 @@
                 </li>
             </ul>
             <div class="brand-logo right grey-text">
-                <span class="illsim">IllSim</span>            <small>by Felipe Gibran</small>
+                <span class="illsim">Illness Simulation</span>
             </div>
         </div>
     </nav>

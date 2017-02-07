@@ -29,13 +29,16 @@
                 </li>
 
                 <li class="collection-item">
-                    <ui-checkbox :checked.sync="config.s.mayInfect" name="config.s.mayInfect"
+                    <ui-checkbox :checked.sync="config.inoculation.active" name="config.inoculation.active"
                                  label='Ativar Inoculação'>
                         <div style="position: relative;">
-                            <ui-select label="Tipo de vacinação" :options="inoculationBy" :val="random"></ui-select>
+                            <ui-select label="Tipo de vacinação"
+                                       :options="inoculationBy"
+                                       :val.sync="config.inoculation.by">
+                            </ui-select>
                             <ui-slider
                                     label="Máximo de Vacinações / Passo de Tempo"
-                                    :val="10"
+                                    :val.sync="config.inoculation.rate"
                                     step="1"
                                     min="1"
                                     max="100"

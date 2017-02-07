@@ -1,6 +1,6 @@
 // Fonts
 @import 'https://fonts.googleapis.com/css?family=Raleway:300,400,600';
-@import 'https://fonts.googleapis.com/css?family=Fredericka+the+Great';
+@import 'https://fonts.googleapis.com/css?family=Sahitya';
 @import 'https://fonts.googleapis.com/icon?family=Material+Icons';
 // Variables
 @import "node_modules/materialize-css/sass/components/color";
@@ -16,6 +16,7 @@
 @import "vendor/css-utils/utils.css";
 // Materialize
 @import "node_modules/materialize-css/sass/materialize";
+
 @media #{$small-and-down} {
     .sidenav {
         width: 100% !important;
@@ -82,7 +83,7 @@ p {
 }
 
 .illsim {
-    font-family: 'Fredericka the Great', cursive;
+    font-family: 'Sahitya', serif;
 }
 
 .collection-header {

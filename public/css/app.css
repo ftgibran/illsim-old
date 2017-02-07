@@ -1,6 +1,6 @@
 @charset "UTF-8";
 @import 'https://fonts.googleapis.com/css?family=Raleway:300,400,600';
-@import 'https://fonts.googleapis.com/css?family=Fredericka+the+Great';
+@import 'https://fonts.googleapis.com/css?family=Sahitya';
 @import 'https://fonts.googleapis.com/icon?family=Material+Icons';
 @import url(vendor/vis/vis.min.css);
 @import url(vendor/nouislider/nouislider.min.css);
@@ -14122,7 +14122,7 @@ p {
 }
 
 .illsim {
-  font-family: 'Fredericka the Great', cursive;
+  font-family: 'Sahitya', serif;
 }
 
 .collection-header {

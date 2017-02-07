@@ -1,5 +1,5 @@
 @extends('tpl.main')
-@section('title', 'IllSim')
+@section('title', 'Illness Simulation')
 @section('content')
     <ui-nav></ui-nav>
 

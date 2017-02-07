@@ -79,7 +79,7 @@ const app = new Vue({
     },
 
     events: {
-        statusChange: function(target, group) {
+        statusChange: function (target, group) {
             var $self = this;
 
             if ($self.isGroup(target, Data.const.status.DEATH))
@@ -134,7 +134,7 @@ const app = new Vue({
          * Initialization
          */
 
-        init: function(config) {
+        init: function (config) {
             var $self = this;
 
             //Resets Data.network
@@ -143,14 +143,14 @@ const app = new Vue({
             $self.$refs.sidenav.hide();
             $self.$refs.loader.show();
 
-            _.delay(function() {
+            _.delay(function () {
                 Data.config = config;
 
                 //Creates Data.network
                 $self.create();
 
                 //Set attempts interval loop
-                Data.network.once('afterDrawing', function() {
+                Data.network.once('afterDrawing', function () {
                     $self.$refs.loader.hide();
                     Data.loop = setInterval($self.attempt, Data.config.simulation.step);
                 });
@@ -158,7 +158,7 @@ const app = new Vue({
 
         },
 
-        create: function() {
+        create: function () {
             var $self = this;
 
             var container = document.getElementById('network');
@@ -172,7 +172,7 @@ const app = new Vue({
             Data.context = canvas.getContext("2d");
         },
 
-        reset: function() {
+        reset: function () {
             if (_.isNull(Data.network)) return;
 
             clearInterval(Data.loop);
@@ -192,19 +192,19 @@ const app = new Vue({
             this.population = 0;
         },
 
-        normalize: function(data) {
+        normalize: function (data) {
             var $self = this;
 
             var $set = {
                 node: {
-                    size: function(node) {
+                    size: function (node) {
                         node.base = node.size = Data.config.vis.nodes.size;
                         if (Data.config.simulation.infectBy === 'node' || Data.config.simulation.infectBy === "both")
                             node.base = node.size += node.rate.infect * Data.const.node.sizeFactor;
                     },
-                    neighbors: function(node) {
+                    neighbors: function (node) {
                         var neighbors = [];
-                        $.each(data.edges, function(index, edge) {
+                        $.each(data.edges, function (index, edge) {
                             if (edge.from === node.id)
                                 neighbors.push(edge.to);
                             else if (edge.to === node.id)
@@ -212,36 +212,36 @@ const app = new Vue({
                         });
                         node.neighbors = neighbors;
                     },
-                    borderWidth: function(node) {
+                    borderWidth: function (node) {
                         node.borderWidth = node.borderWidthSelected = Data.config.vis.nodes.borderWidth + node.rate.resist * Data.const.node.widthFactor;
                     },
-                    label: function(node) {
+                    label: function (node) {
                         if (Data.config.simulation.infectBy === 'node' || Data.config.simulation.infectBy === "both")
                             node.label = _.round(node.rate.infect * 100, Data.const.node.ratePrecision) + "%";
                     }
                 },
 
                 edge: {
-                    width: function(edge) {
+                    width: function (edge) {
                         edge.width = Data.config.vis.edges.width;
                         if (Data.config.simulation.infectBy === 'edge' || Data.config.simulation.infectBy === "both")
                             edge.width += edge.rate.infect * Data.const.edge.widthFactor;
                     },
-                    label: function(edge) {
+                    label: function (edge) {
                         if (Data.config.simulation.infectBy === 'edge' || Data.config.simulation.infectBy === "both")
                             edge.label = _.round(edge.rate.infect * 100, Data.const.edge.ratePrecision) + "%";
                     }
                 }
             };
 
-            _.forEach(data.nodes, function(node) {
+            _.forEach(data.nodes, function (node) {
                 $set.node.size(node);
                 $set.node.neighbors(node);
                 $set.node.borderWidth(node);
                 $set.node.label(node);
             });
 
-            _.forEach(data.edges, function(edge) {
+            _.forEach(data.edges, function (edge) {
                 $set.edge.width(edge);
                 $set.edge.label(edge);
             });
@@ -260,50 +260,50 @@ const app = new Vue({
          * Utils
          */
 
-        rest: function(target, time) {
+        rest: function (target, time) {
             target.animating = true;
             Data.nodes.update(target);
 
-            TweenMax.delayedCall(time * Data.config.animation.scale, function() {
+            TweenMax.delayedCall(time * Data.config.animation.scale, function () {
                 target.animating = false;
                 Data.nodes.update(target);
             });
         },
 
-        isGroup: function(node, ref) {
+        isGroup: function (node, ref) {
             if (node.group === ref)
                 return true;
 
             return false;
         },
 
-        groupConfig: function(ref) {
+        groupConfig: function (ref) {
 
             return eval("Data.config.simulation." + ref + ";");
         },
 
-        filterEdgesByNodes: function(node1, node2) {
+        filterEdgesByNodes: function (node1, node2) {
             return Data.edges.get({
-                filter: function(edge) {
+                filter: function (edge) {
                     return (edge.from === node1.id && edge.to === node2.id) || (edge.from === node2.id && edge.to === node1.id);
                 }
             });
         },
 
-        filterNodesByGroup: function(group) {
+        filterNodesByGroup: function (group) {
             return Data.nodes.get({
-                filter: function(node) {
+                filter: function (node) {
                     return node.group === group;
                 }
             });
         },
 
-        setStats: function() {
+        setStats: function () {
             var $self = this;
 
             $self.population = Data.nodes.length;
 
-            _.forEach(Data.nodes.get(), function(node) {
+            _.forEach(Data.nodes.get(), function (node) {
                 switch (node.group) {
                     case Data.const.status.SUSCEPTIBLE:
                         $self.susceptible++;
@@ -330,83 +330,63 @@ const app = new Vue({
         },
 
         /**
+         * Conditions
+         */
+
+        allowed: function (target, action) {
+            if (target.animating)
+                return false;
+
+            if (Data.config.simulation[target.group][action])
+                return true;
+
+            return false;
+        },
+
+        /**
          * Attempts
          */
 
-        attempt: function() {
+        attempt: function () {
             var $self = this;
 
-            Data.nodes.forEach(function(node) {
+            Data.nodes.forEach(function (node) {
                 $self.infectAttempt(node);
                 $self.recoverAttempt(node);
                 $self.killAttempt(node);
             });
         },
 
-        infectAttempt: function(infected) {
+        infectAttempt: function (infected) {
             var $self = this;
 
-            if (Data.config.simulation.infectBy === 'special')
-                specialInfect();
-            else
-                standardInfect();
+            if ($self.allowed(infected, "mayInfect")) {
+                if (Data.config.simulation.infectBy === 'special')
+                    specialInfect();
+                else
+                    standardInfect();
+            }
 
             function specialInfect() {
-                var target = infected;
 
-                if (allowed())
-                    infect();
+                const K = Data.config.simulation.k;
 
-                function allowed() {
+                var neighbors = Data.nodes.get(infected.neighbors, {
+                    filter: function (node) {
+                        return $self.allowed(node, "mayBeInfected");
+                    }
+                });
 
-                    if (target.animating)
-                        return false;
+                if (neighbors.length == 0) return;
 
-                    if ($self.isGroup(target, Data.const.status.SUSCEPTIBLE))
-                        return true;
+                var target = _.sample(neighbors);
 
-                    if ($self.isGroup(target, Data.const.status.RECOVERED) && Data.config.simulation.r.mayBeInfected)
-                        return true;
+                var equation = (1 - Math.exp(-K * neighbors.length));
 
-                    if ($self.isGroup(target, Data.const.status.VACCINATED) && Data.config.simulation.v.mayBeInfected)
-                        return true;
-
-                    return false;
-                }
-
-                function infect() {
-
-                    const K = Data.config.simulation.k;
-
-                    var neighbors = Data.nodes.get(target.neighbors, {
-                        filter: function(node) {
-                            if (node.animating)
-                                return false;
-
-                            if ($self.isGroup(node, Data.const.status.INFECTED))
-                                return true;
-
-                            if ($self.isGroup(node, Data.const.status.RECOVERED) && Data.config.simulation.r.mayInfect)
-                                return true;
-
-                            if ($self.isGroup(node, Data.const.status.VACCINATED) && Data.config.simulation.v.mayInfect)
-                                return true;
-
-                            return false;
-                        }
-                    });
-
-                    if (neighbors.length == 0) return;
-
-                    infected = _.sample(neighbors);
-
-                    var equation = (1 - Math.exp(-K * neighbors.length)) * $self.groupConfig(infected.group).base.infect;
-
-                    if (Math.random() > $self.groupConfig(target.group).base.resist)
-                        if (Math.random() > target.rate.resist)
-                            if (Math.random() < equation)
-                                infect_ani(target);
-                }
+                if (Math.random() > Data.config.simulation[target.group].base.resist)
+                    if (Math.random() > target.rate.resist)
+                        if (Math.random() < equation * Data.config.simulation[infected.group].base.infect)
+                            infect_ani(target);
 
             }
 
@@ -526,7 +506,7 @@ const app = new Vue({
                     x: infectedPos.x,
                     y: infectedPos.y,
                     size: Data.const.dot.size,
-                    draw: function() {
+                    draw: function () {
                         Data.context.beginPath();
                         Data.context.arc(this.x, this.y, this.size, 0, 2 * Math.PI, false);
                         Data.context.fillStyle = 'black';
@@ -543,7 +523,7 @@ const app = new Vue({
                     x: targetPos.x,
                     y: targetPos.y,
                     ease: Power2.easeOut,
-                    onUpdate: function() {
+                    onUpdate: function () {
                         Data.network.redraw();
                     }
                 });
@@ -553,10 +533,10 @@ const app = new Vue({
                     delay: INFECT_EXPAND_DELAY * Data.config.animation.scale,
                     size: target.base * INFECT_EXPAND_SCALE,
                     ease: Power2.easeOut,
-                    onUpdate: function() {
+                    onUpdate: function () {
                         Data.nodes.update(target);
                     },
-                    onComplete: function() {
+                    onComplete: function () {
                         Data.network.off('afterDrawing', dot.draw);
 
                         $self.$emit('statusChange', target, Data.const.status.INFECTED);
@@ -574,7 +554,7 @@ const app = new Vue({
                         TweenMax.to(target, INFECT_RETRACT_TIME * Data.config.animation.scale, {
                             size: target.base,
                             ease: Power3.easeOut,
-                            onUpdate: function() {
+                            onUpdate: function () {
                                 Data.nodes.update(target);
                             }
                         });
@@ -585,35 +565,26 @@ const app = new Vue({
 
         },
 
-        recoverAttempt: function(target) {
+        recoverAttempt: function (target) {
             var $self = this;
 
-            if (allowed())
-                recover();
+            if ($self.allowed(target, "mayRecover"))
+                doRecover();
 
-            function allowed() {
+            if ($self.allowed(target, "mayGetSusceptible"))
+                getSusceptible();
 
-                if (target.animating)
-                    return false;
-
-                if ($self.isGroup(target, Data.const.status.INFECTED))
-                    return true;
-
-                if ($self.isGroup(target, Data.const.status.RECOVERED) && Data.config.simulation.r.mayGetSusceptible)
-                    return true;
-
-                if ($self.isGroup(target, Data.const.status.VACCINATED) && Data.config.simulation.v.mayGetSusceptible)
-                    return true;
-
-                return false;
+            function doRecover() {
+                if (Math.random() < target.rate.recover * Data.config.simulation[target.group].base.recover)
+                    recover_ani(Data.const.status.RECOVERED);
             }
 
-            function recover() {
-                if (Math.random() < target.rate.recover * $self.groupConfig(target.group).base.recover)
-                    recover_ani();
+            function getSusceptible() {
+                if (Math.random() < Data.config.simulation[target.group].base.susceptible)
+                    recover_ani(Data.const.status.SUSCEPTIBLE);
             }
 
-            function recover_ani() {
+            function recover_ani(status) {
 
                 const RECOVER_EXPAND_TIME = Number(Data.config.animation.recover.expandTime);
                 const RECOVER_EXPAND_SCALE = Number(Data.config.animation.recover.expandScale);
@@ -626,20 +597,17 @@ const app = new Vue({
                 TweenMax.to(target, RECOVER_EXPAND_TIME * Data.config.animation.scale, {
                     size: target.base * RECOVER_EXPAND_SCALE,
                     ease: Power2.easeOut,
-                    onUpdate: function() {
+                    onUpdate: function () {
                         Data.nodes.update(target);
                     },
-                    onComplete: function() {
+                    onComplete: function () {
 
-                        if ($self.isGroup(target, Data.const.status.INFECTED))
-                            $self.$emit('statusChange', target, Data.const.status.RECOVERED);
-                        else
-                            $self.$emit('statusChange', target, Data.const.status.SUSCEPTIBLE);
+                        $self.$emit('statusChange', target, status);
 
                         TweenMax.to(target, RECOVER_RETRACT_TIME * Data.config.animation.scale, {
                             size: target.base,
                             ease: Elastic.easeOut.config(1, 0.3),
-                            onUpdate: function() {
+                            onUpdate: function () {
                                 Data.nodes.update(target);
                             }
                         });
@@ -648,31 +616,14 @@ const app = new Vue({
             }
         },
 
-        killAttempt: function(target) {
+        killAttempt: function (target) {
             var $self = this;
 
-            if (allowed())
+            if ($self.allowed(target, "mayDie"))
                 kill();
 
-            function allowed() {
-
-                if (target.animating)
-                    return false;
-
-                if ($self.isGroup(target, Data.const.status.INFECTED))
-                    return true;
-
-                if ($self.isGroup(target, Data.const.status.RECOVERED) && Data.config.simulation.r.mayDie)
-                    return true;
-
-                if ($self.isGroup(target, Data.const.status.VACCINATED) && Data.config.simulation.v.mayDie)
-                    return true;
-
-                return false;
-            }
-
             function kill() {
-                if (Math.random() < target.rate.death * $self.groupConfig(target.group).base.death) {
+                if (Math.random() < target.rate.death * Data.config.simulation[target.group].base.death) {
                     death_ani();
                 }
             }
@@ -698,23 +649,23 @@ const app = new Vue({
                 var edges_id = Data.network.getConnectedEdges(target.id);
 
                 //Removing edge animation
-                if (!Data.config.simulation.birthWhenDie)
+                if (!Data.config.simulation.d.birthWhenDie)
                     Data.edges.get(edges_id, {
-                        filter: function(edge) {
+                        filter: function (edge) {
                             return !edge.removing;
                         }
-                    }).forEach(edge_ani)
+                    }).forEach(edge_ani);
 
                 //Node death animation
                 TweenMax.to(target, DEATH_RETRACT_TIME * Data.config.animation.scale, {
                     size: Data.config.vis.nodes.size * DEATH_RETRACT_SCALE,
                     ease: Power1.easeOut,
-                    onUpdate: function() {
+                    onUpdate: function () {
                         Data.nodes.update(target);
                     },
-                    onComplete: function() {
+                    onComplete: function () {
                         //Birth animation
-                        if (Data.config.simulation.birthWhenDie)
+                        if (Data.config.simulation.d.birthWhenDie)
                             birth_ani();
                     }
                 });
@@ -724,17 +675,17 @@ const app = new Vue({
                         size: target.base * BIRTH_EXPAND_SCALE,
                         ease: Power2.easeOut,
                         delay: BIRTH_EXPAND_DELAY * Data.config.animation.scale,
-                        onUpdate: function() {
+                        onUpdate: function () {
                             Data.nodes.update(target);
                         },
-                        onComplete: function() {
+                        onComplete: function () {
 
                             $self.$emit('statusChange', target, Data.const.status.SUSCEPTIBLE);
 
                             TweenMax.to(target, BIRTH_RETRACT_TIME * Data.config.animation.scale, {
                                 size: target.base,
                                 ease: Elastic.easeOut.config(1, 0.3),
-                                onUpdate: function() {
+                                onUpdate: function () {
                                     Data.nodes.update(target);
                                 }
                             });
@@ -751,10 +702,10 @@ const app = new Vue({
                         width: EDGE_RETRACT_SIZE,
                         delay: EDGE_RETRACT_DELAY * Data.config.animation.scale,
                         ease: Power1.easeOut,
-                        onUpdate: function() {
+                        onUpdate: function () {
                             Data.edges.update(edge);
                         },
-                        onComplete: function() {
+                        onComplete: function () {
                             var node1 = Data.nodes.get(edge.from);
                             var node2 = Data.nodes.get(edge.to);
 
@@ -774,7 +725,7 @@ const app = new Vue({
          * Factories
          */
 
-        factory: function() {
+        factory: function () {
             var $self = this;
 
             Data.nodes = new vis.DataSet();
@@ -791,7 +742,7 @@ const app = new Vue({
             return false;
         },
 
-        factoryUniformFormat: function() {
+        factoryUniformFormat: function () {
             var $self = this;
 
             Data.config.vis.physics.forceAtlas2Based.centralGravity = 0.001;
@@ -813,7 +764,7 @@ const app = new Vue({
                     });
 
                 //Scan each node group and apply the quantity
-                _.forEach(nodeConfig.groups, function(group) {
+                _.forEach(nodeConfig.groups, function (group) {
                     for (var i = 0; i < group.quant; i++) {
                         var node = _.sample(Data.nodes.get());
                         node.group = group.ref;
@@ -857,7 +808,7 @@ const app = new Vue({
             }
         },
 
-        factoryFullRandom: function() {
+        factoryFullRandom: function () {
             var $self = this;
 
             return {
@@ -879,7 +830,7 @@ const app = new Vue({
                 };
 
                 //Scan each node group and apply the quantity
-                _.forEach(nodeConfig.groups, function(group) {
+                _.forEach(nodeConfig.groups, function (group) {
                     if (group.quant === undefined) {
                         groupLeft = group;
                         return;
@@ -921,7 +872,7 @@ const app = new Vue({
                 //Adds edges
                 while (quant > 0) {
                     var changed = false;
-                    Data.nodes.forEach(function(node1) {
+                    Data.nodes.forEach(function (node1) {
                         if (quant <= 0) return;
                         var pool = Data.nodes.get();
                         do {
@@ -962,7 +913,7 @@ const app = new Vue({
 
                 function getNeighbors(node) {
                     var neighbors = [];
-                    Data.edges.forEach(function(edge) {
+                    Data.edges.forEach(function (edge) {
                         if (edge.from === node.id)
                             neighbors.push(Data.nodes.get(edge.to));
                         else if (edge.to === node.id)
