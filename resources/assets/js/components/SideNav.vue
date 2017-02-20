@@ -67,7 +67,7 @@
                     function () {
                         TweenMax.to(el, $self.time, {
                             opacity: 0.4,
-                            ease: Power3.easeOut
+                            ease: Power1.easeOut
                         });
                     }
             )

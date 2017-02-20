@@ -2,7 +2,6 @@
   "node": {
     "min": 80,
     "max": 100,
-    "maxEdges": 4,
     "groups": [
       {
         "ref": "s"
@@ -14,8 +13,8 @@
       },
       {
         "ref": "v",
-        "percent": true,
-        "quant": 10
+        "percent": false,
+        "quant": 0
       }
     ],
     "rate": {
@@ -31,6 +30,10 @@
         "min": 0.01,
         "max": 0.05
       },
+      "susceptible": {
+        "min": 0.01,
+        "max": 0.05
+      },
       "death": {
         "min": 0.01,
         "max": 0.05
@@ -40,10 +43,11 @@
   "edge": {
     "min": 100,
     "max": 150,
+    "density": 4,
     "rate": {
       "infect": {
-        "min": 0.2,
-        "max": 0.6
+        "min": 0.01,
+        "max": 0.05
       }
     }
   }

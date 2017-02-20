@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div v-show="config">
 
         <div v-if="config">
             <ui-slider
@@ -31,18 +31,25 @@
                 <li class="collection-item">
                     <ui-checkbox :checked.sync="config.inoculation.active" name="config.inoculation.active"
                                  label='Ativar Inoculação'>
-                        <div style="position: relative;">
+                        <div style="position: relative; margin-top: 1em;">
                             <ui-select label="Tipo de vacinação"
                                        :options="inoculationBy"
                                        :val.sync="config.inoculation.by">
                             </ui-select>
                             <ui-slider
-                                    label="Máximo de Vacinações / Passo de Tempo"
+                                    label="Número de distribuição / Passo de Tempo"
                                     :val.sync="config.inoculation.rate"
                                     step="1"
                                     min="1"
                                     max="100"
                                     decimals="0"
+                            ></ui-slider>
+                            <ui-slider
+                                    label="Limite de distribuição"
+                                    :val.sync="config.inoculation.limit"
+                                    step="1"
+                                    min="0"
+                                    max="1000"
                             ></ui-slider>
                         </div>
                     </ui-checkbox>
@@ -108,6 +115,12 @@
                     </li>
 
                     <li class="collection-item">
+                        <ui-checkbox :checked.sync="config.i.mayBeVaccinated" name="config.i.mayBeVaccinated"
+                                     label='Podem ser vacinados'>
+                        </ui-checkbox>
+                    </li>
+
+                    <li class="collection-item">
                         <ui-checkbox :checked.sync="config.i.mayDie" name="config.i.mayDie"
                                      label='Podem falecer'>
                             <ui-slider
@@ -147,7 +160,7 @@
 
                     <li class="collection-item">
                         <ui-checkbox :checked.sync="config.r.mayBeInfected" name="config.r.mayBeInfected"
-                                     label='Podem ser infectado'>
+                                     label='Podem ser infectados'>
                             <ui-slider
                                     label="Taxa de resistência base"
                                     icon="fa-square-o green-text"
@@ -170,6 +183,12 @@
                                     decimals="1"
                                     postfix="%"
                             ></ui-slider>
+                        </ui-checkbox>
+                    </li>
+
+                    <li class="collection-item">
+                        <ui-checkbox :checked.sync="config.r.mayBeVaccinated" name="config.r.mayBeVaccinated"
+                                     label='Podem ser vacinados'>
                         </ui-checkbox>
                     </li>
 
@@ -213,7 +232,7 @@
 
                     <li class="collection-item">
                         <ui-checkbox :checked.sync="config.s.mayBeInfected" name="config.s.mayBeInfected"
-                                     label='Podem ser infectado'>
+                                     label='Podem ser infectados'>
                             <ui-slider
                                     label="Taxa de resistência base"
                                     icon="fa-square-o green-text"
@@ -236,6 +255,12 @@
                                     decimals="1"
                                     postfix="%"
                             ></ui-slider>
+                        </ui-checkbox>
+                    </li>
+
+                    <li class="collection-item">
+                        <ui-checkbox :checked.sync="config.s.mayBeVaccinated" name="config.s.mayBeVaccinated"
+                                     label='Podem ser vacinados'>
                         </ui-checkbox>
                     </li>
 

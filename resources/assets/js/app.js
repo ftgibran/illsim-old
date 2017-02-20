@@ -75,6 +75,7 @@ const app = new Vue({
             vaccinated: 0,
             death: 0,
             population: 0,
+            shots: 0
         }
     },
 
@@ -152,7 +153,7 @@ const app = new Vue({
                 //Set attempts interval loop
                 Data.network.once('afterDrawing', function () {
                     $self.$refs.loader.hide();
-                    Data.loop = setInterval($self.attempt, Data.config.simulation.step);
+                    Data.loop = setInterval($self.step, Data.config.simulation.step);
                 });
             }, $self.$refs.sidenav.time * 1000);
 
@@ -190,6 +191,7 @@ const app = new Vue({
             this.vaccinated = 0;
             this.death = 0;
             this.population = 0;
+            this.shots = 0;
         },
 
         normalize: function (data) {
@@ -256,58 +258,6 @@ const app = new Vue({
 
         },
 
-        /**
-         * Utils
-         */
-
-        rest: function (target, time) {
-            target.animating = true;
-            Data.nodes.update(target);
-
-            TweenMax.delayedCall(time * Data.config.animation.scale, function () {
-                target.animating = false;
-                Data.nodes.update(target);
-            });
-        },
-
-        allowed: function (target, action) {
-            if (target.animating)
-                return false;
-
-            if (Data.config.simulation[target.group][action])
-                return true;
-
-            return false;
-        },
-
-        isGroup: function (node, ref) {
-            if (node.group === ref)
-                return true;
-
-            return false;
-        },
-
-        groupConfig: function (ref) {
-
-            return eval("Data.config.simulation." + ref + ";");
-        },
-
-        filterEdgesByNodes: function (node1, node2) {
-            return Data.edges.get({
-                filter: function (edge) {
-                    return (edge.from === node1.id && edge.to === node2.id) || (edge.from === node2.id && edge.to === node1.id);
-                }
-            });
-        },
-
-        filterNodesByGroup: function (group) {
-            return Data.nodes.get({
-                filter: function (node) {
-                    return node.group === group;
-                }
-            });
-        },
-
         setStats: function () {
             var $self = this;
 
@@ -340,12 +290,64 @@ const app = new Vue({
         },
 
         /**
+         * Utils
+         */
+
+        rest: function (target, time) {
+            target.animating = true;
+            Data.nodes.update(target);
+
+            TweenMax.delayedCall(time * Data.config.animation.scale, function () {
+                target.animating = false;
+                Data.nodes.update(target);
+            });
+        },
+
+        allowed: function (target, action) {
+            if (target.animating)
+                return false;
+
+            if (Data.config.simulation[target.group][action])
+                return true;
+
+            return false;
+        },
+
+        isGroup: function (node, ref) {
+            if (node.group === ref)
+                return true;
+
+            return false;
+        },
+
+        filterEdgesByNodes: function (node1, node2) {
+            return Data.edges.get({
+                filter: function (edge) {
+                    return (edge.from === node1.id && edge.to === node2.id) || (edge.from === node2.id && edge.to === node1.id);
+                }
+            });
+        },
+
+        filterNodesByGroup: function (group) {
+            return Data.nodes.get({
+                filter: function (node) {
+                    return node.group === group;
+                }
+            });
+        },
+
+        /**
          * Attempts
          */
 
-        attempt: function () {
+        step: function () {
             var $self = this;
 
+            if (Data.config.simulation.inoculation.active) {
+                $self.inoculate();
+            }
+
+            //Each step do an attempt
             Data.nodes.forEach(function (node) {
                 $self.infectAttempt(node);
                 $self.recoverAttempt(node);
@@ -353,6 +355,7 @@ const app = new Vue({
             });
         },
 
+        //Infect Attempt
         infectAttempt: function (infected) {
             var $self = this;
 
@@ -524,6 +527,7 @@ const app = new Vue({
 
         },
 
+        //Recover Attempt
         recoverAttempt: function (target) {
             var $self = this;
 
@@ -531,15 +535,15 @@ const app = new Vue({
                 doRecover();
 
             if ($self.allowed(target, "mayGetSusceptible"))
-                getSusceptible();
+                doSusceptible();
 
             function doRecover() {
                 if (Math.random() < target.rate.recover * Data.config.simulation[target.group].base.recover)
                     recover_ani(Data.const.status.RECOVERED);
             }
 
-            function getSusceptible() {
-                if (Math.random() < Data.config.simulation[target.group].base.susceptible)
+            function doSusceptible() {
+                if (Math.random() < target.rate.susceptible * Data.config.simulation[target.group].base.susceptible)
                     recover_ani(Data.const.status.SUSCEPTIBLE);
             }
 
@@ -573,9 +577,9 @@ const app = new Vue({
                     }
                 });
             }
-        }
-        ,
+        },
 
+        //Kill Attempt
         killAttempt: function (target) {
             var $self = this;
 
@@ -679,8 +683,130 @@ const app = new Vue({
                 }
             }
 
-        }
-        ,
+        },
+
+        /**
+         * Inoculate
+         */
+
+        inoculate: function () {
+            var $self = this;
+
+            //Gets the number of vaccines remaining
+            var left = Data.config.simulation.inoculation.limit - $self.shots;
+            if (left <= 0) return;
+
+            var quant = _.min([Data.config.simulation.inoculation.rate, left]);
+
+            var nodes = Data.nodes.get({
+                filter: function (node) {
+                    return $self.allowed(node, "mayBeVaccinated");
+                }
+            });
+
+            switch (Data.config.simulation.inoculation.by) {
+                //Method 1 - Random
+                //Just get random nodes and inoculate them
+                case 'random':
+                    random();
+                    break;
+                //Method 2 - Grades
+                //Sort all nodes by grades (the number of infected neighbors) and inoculate them
+                case 'grade':
+                    grade();
+                    break;
+                //Method 3 - Neighbor
+                //Sort all nodes by grades and inoculates their neighbors
+                case 'neighbor':
+                    neighbor();
+                    break;
+            }
+
+            function random() {
+                var samples = _.sampleSize(nodes, quant);
+                samples.forEach(vaccinate_ani);
+            }
+
+            function grade() {
+                var nodesSorted = sort(nodes);
+
+                //Takes some nodes according by configuration
+                var neighbors = _.take(nodesSorted, quant);
+
+                neighbors.forEach(vaccinate_ani);
+            }
+
+            function neighbor() {
+                var nodesSorted = sort(nodes);
+
+                //Flats the sorted nodes by their neighbors
+                var ids = _.flatMap(nodesSorted, function (n) {
+                    return n.neighbors;
+                });
+
+                //Removes duplicates
+                ids = _.uniq(ids);
+
+                //Gets nodes by ids
+                var neighbors = Data.nodes.get(ids, {
+                    filter: function (node) {
+                        return $self.allowed(node, "mayBeVaccinated");
+                    }
+                });
+
+                //Takes some nodes according by configuration
+                neighbors = _.take(neighbors, quant);
+
+                neighbors.forEach(vaccinate_ani);
+            }
+
+            //Sort by nodes that have the most infected neighbors
+            function sort(nodes) {
+                return _.sortBy(nodes, [function (node) {
+                    var quant = 0;
+
+                    _.forEach(node.neighbors, function (id) {
+                        var item = Data.nodes.get(id);
+                        if ($self.isGroup(item, Data.const.status.INFECTED)) quant++;
+                    });
+
+                    return -quant;
+                }]);
+            }
+
+            function vaccinate_ani(target) {
+
+                const VACCINATE_EXPAND_TIME = Number(Data.config.animation.vaccinate.expandTime);
+                const VACCINATE_EXPAND_SCALE = Number(Data.config.animation.vaccinate.expandScale);
+                const VACCINATE_RETRACT_TIME = Number(Data.config.animation.vaccinate.retractTime);
+                const REST_TIME = VACCINATE_EXPAND_TIME + VACCINATE_RETRACT_TIME +
+                    Number(Data.config.animation.vaccinate.restTime); //2.4
+
+                $self.shots++;
+                $self.rest(target, REST_TIME);
+
+                TweenMax.to(target, VACCINATE_EXPAND_TIME * Data.config.animation.scale, {
+                    size: target.base * VACCINATE_EXPAND_SCALE,
+                    ease: Power2.easeOut,
+                    onUpdate: function () {
+                        Data.nodes.update(target);
+                    },
+                    onComplete: function () {
+
+                        $self.$emit('statusChange', target, Data.const.status.VACCINATED);
+
+                        TweenMax.to(target, VACCINATE_RETRACT_TIME * Data.config.animation.scale, {
+                            size: target.base,
+                            ease: Power2.easeOut,
+                            onUpdate: function () {
+                                Data.nodes.update(target);
+                            }
+                        });
+                    }
+                });
+            }
+
+        },
 
         /**
          * Factories
@@ -701,8 +827,7 @@ const app = new Vue({
             }
 
             return false;
-        }
-        ,
+        },
 
         factoryUniformFormat: function () {
             var $self = this;
@@ -768,8 +893,7 @@ const app = new Vue({
 
                 return Data.edges.get();
             }
-        }
-        ,
+        },
 
         factoryFullRandom: function () {
             var $self = this;
@@ -817,6 +941,7 @@ const app = new Vue({
                                 infect: _.random(rate.infect.min, rate.infect.max, true),
                                 resist: _.random(rate.resist.min, rate.resist.max, true),
                                 recover: _.random(rate.recover.min, rate.recover.max, true),
+                                susceptible: _.random(rate.susceptible.min, rate.susceptible.max, true),
                                 death: _.random(rate.death.min, rate.death.max, true)
                             }
                         });
@@ -860,7 +985,7 @@ const app = new Vue({
                     var edge = $self.filterEdgesByNodes(node1, node2);
 
                     //The nodes can't exceed the max edges setted
-                    if (neighbors1.length < Data.config.generator.factory.node.maxEdges && neighbors2.length < Data.config.generator.factory.node.maxEdges)
+                    if (neighbors1.length < Data.config.generator.factory.edge.density && neighbors2.length < Data.config.generator.factory.edge.density)
                         if (_.isEmpty(edge)) {
                             Data.edges.add({
                                 from: node1.id,

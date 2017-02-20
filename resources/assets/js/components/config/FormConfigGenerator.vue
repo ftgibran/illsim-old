@@ -2,7 +2,7 @@
 
     <div v-if="config">
 
-        <div class="input-field ta-l">
+        <div v-if="config.method" class="input-field ta-l">
             <ui-select label="Método de Geração" :options="method" :val.sync="config.method"></ui-select>
         </div>
 
@@ -41,7 +41,7 @@
                 "type": Object,
                 "default": function () {
                     return {
-                        method: "",
+                        method: null,
                         factory: {}
                     }
                 }

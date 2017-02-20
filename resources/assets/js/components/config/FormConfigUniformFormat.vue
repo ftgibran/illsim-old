@@ -20,16 +20,15 @@
                 ></ui-slider>
             </div>
         </li>
-        </li>
 
         <li class="grey lighten-5">
             <div class="collapsible-header">Nós</div>
             <div class="collapsible-body pl pr">
 
-                <div class="row">
+                <div v-if="factory.node" class="row">
                     <div class="input-field s12 m6 col">
                         <div class="fl-r">
-                            <input type="checkbox" class="filled-in" id="i-percent"
+                            <input type="checkbox" class="filled-in" id="i-percent" name="i-percent"
                                    v-model="groupInfect.percent"/>
                             <label for="i-percent">%</label>
                         </div>
@@ -46,8 +45,8 @@
 
                     <div class="input-field s12 m6 col">
                         <div class="fl-r">
-                            <input type="checkbox" class="filled-in" id="v-percent"
-                                   v-model="groupVacinated.percent" checked="checked"/>
+                            <input type="checkbox" class="filled-in" id="v-percent" name="v-percent"
+                                   v-model="groupVacinated.percent"/>
                             <label for="v-percent">%</label>
                         </div>
                         <div style="overflow: hidden;">
@@ -55,7 +54,7 @@
                                 <i class="fa fa-square green-text" aria-hidden="true"></i>
                                 Quantidade de vacinados</label>
                             <input type="number" id="v-quant"
-                                   v-model="groupVacinated.quant" value="10"
+                                   v-model="groupVacinated.quant"
                                    required>
                         </div>
 
@@ -101,8 +100,20 @@
 
                 <ui-slider
                         v-if="factory.node"
+                        icon="fa-square grey-text"
+                        label="Taxa de suscetibilidade"
+                        :val.sync="factory.node.rate.susceptible"
+                        step="0.5"
+                        min="0"
+                        max="100"
+                        decimals="1"
+                        postfix="%"
+                ></ui-slider>
+
+                <ui-slider
+                        v-if="factory.node"
                         icon="fa-square black-text"
-                        label="Taxa de mortalidade"
+                        label="Taxa de falecimento"
                         :val.sync="factory.node.rate.death"
                         step="0.5"
                         min="0"

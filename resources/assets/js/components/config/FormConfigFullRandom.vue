@@ -22,16 +22,6 @@
                         :range="true"
                 ></ui-slider>
 
-                <ui-slider
-                        v-if="factory.node"
-                        label="Máximo de arestas por nó"
-                        :val.sync="factory.node.maxEdges"
-                        step="1"
-                        min="0"
-                        max="8"
-                        decimals="0"
-                ></ui-slider>
-
                 <div v-if="factory.node" class="row">
                     <div class="input-field s12 m6 col">
                         <div class="fl-r">
@@ -53,7 +43,7 @@
                     <div class="input-field s12 m6 col">
                         <div class="fl-r">
                             <input type="checkbox" class="filled-in" id="v-percent"
-                                   v-model="groupVacinated.percent" checked="checked"/>
+                                   v-model="groupVacinated.percent"/>
                             <label for="v-percent">%</label>
                         </div>
                         <div style="overflow: hidden;">
@@ -61,7 +51,7 @@
                                 <i class="fa fa-square green-text" aria-hidden="true"></i>
                                 Quantidade de vacinados</label>
                             <input type="number" id="v-quant"
-                                   v-model="groupVacinated.quant" value="10"
+                                   v-model="groupVacinated.quant"
                                    required>
                         </div>
 
@@ -113,8 +103,22 @@
 
                 <ui-slider
                         v-if="factory.node"
+                        icon="fa-square grey-text"
+                        label="Taxa de suscetibilidade"
+                        :val-min.sync="factory.node.rate.susceptible.min"
+                        :val-max.sync="factory.node.rate.susceptible.max"
+                        step="0.5"
+                        min="0"
+                        max="100"
+                        decimals="1"
+                        postfix="%"
+                        :range="true"
+                ></ui-slider>
+
+                <ui-slider
+                        v-if="factory.node"
                         icon="fa-square black-text"
-                        label="Taxa de morte"
+                        label="Taxa de falecimento"
                         :val-min.sync="factory.node.rate.death.min"
                         :val-max.sync="factory.node.rate.death.max"
                         step="0.5"
@@ -144,6 +148,17 @@
                         decimals="0"
                         :range="true"
                 ></ui-slider>
+
+                <ui-slider
+                        v-if="factory.edge"
+                        label="Máximo de arestas por nó"
+                        :val.sync="factory.edge.density"
+                        step="1"
+                        min="0"
+                        max="20"
+                        decimals="0"
+                ></ui-slider>
+
 
                 <ui-slider
                         v-if="factory.edge"

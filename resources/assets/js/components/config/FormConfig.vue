@@ -67,6 +67,7 @@
             },
 
             onChange(event) {
+                this.config = {};
                 var reader = new FileReader();
                 reader.onload = this.onReaderLoad;
                 reader.readAsText(event.target.files[0]);
@@ -74,7 +75,6 @@
 
             onReaderLoad(event){
                 this.config = JSON.parse(event.target.result);
-                $('select').material_select();
             },
 
             load() {

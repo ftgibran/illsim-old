@@ -1,8 +1,8 @@
 {
   "animation": {
-    "scale": 1,
+    "scale": 0.5,
     "infect": {
-      "restTime": 0.5,
+      "restTime": 0.1,
       "dotMovimentTime": 0.6,
       "expandTime": 0.6,
       "expandDelay": 0.5,
@@ -11,13 +11,19 @@
       "shakeRadius": 15
     },
     "recover": {
-      "restTime": 0.5,
+      "restTime": 0.1,
       "expandTime": 0.4,
       "expandScale": 1.3,
       "retractTime": 2
     },
+    "vaccinate": {
+      "restTime": 0.1,
+      "expandTime": 0.5,
+      "expandScale": 1.8,
+      "retractTime": 2
+    },
     "death": {
-      "restTime": 0.5,
+      "restTime": 0.1,
       "retractScale": 0.6,
       "retractTime": 2.5,
       "edgeRetractTime": 1,
@@ -34,15 +40,17 @@
     "infectBy": "special",
     "k": 0.5,
     "inoculation": {
-      "active": false,
+      "active": true,
       "by": "random",
-      "rate": 10
+      "rate": 1,
+      "limit": 10
     },
     "i": {
       "mayInfect": true,
       "mayRecover": true,
       "mayGetSusceptible": false,
       "mayDie": true,
+      "mayBeVaccinated": false,
       "base": {
         "infect": 1,
         "recover": 1,
@@ -55,6 +63,7 @@
       "mayBeInfected": false,
       "mayGetSusceptible": false,
       "mayDie": false,
+      "mayBeVaccinated": false,
       "base": {
         "infect": 0.15,
         "resist": 0.9,
@@ -67,6 +76,7 @@
       "mayBeInfected": true,
       "mayRecover": false,
       "mayDie": false,
+      "mayBeVaccinated": true,
       "base": {
         "infect": 0,
         "resist": 0,
@@ -101,9 +111,6 @@
   "generator": {
     "method": "fullRandom",
     "factory": {}
-  },
-  "inoculation": {
-    "method": 1
   },
   "vis": {
     "nodes": {

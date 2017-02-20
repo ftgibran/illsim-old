@@ -4,23 +4,26 @@
     "groups": [
       {
         "ref": "i",
+        "percent": false,
         "quant": 3
       },
       {
         "ref": "v",
+        "percent": false,
         "quant": 0
       }
     ],
     "rate": {
       "infect": 0.5,
       "resist": 0,
-      "recover": 0.1,
-      "death": 0.3
+      "recover": 0.05,
+      "susceptible": 0.05,
+      "death": 0.05
     }
   },
   "edge": {
     "rate": {
-      "infect": 0.1
+      "infect": 0.05
     }
   }
 }

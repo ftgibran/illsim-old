@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div v-show="config">
         <ui-slider
                 v-if="config"
                 label="Escala de tempo"
@@ -21,7 +21,7 @@
 
                     <ui-slider
                             v-if="config"
-                            label="Tempo de pausa (s)"
+                            label="Tempo de pausa"
                             :val.sync="config.infect.restTime"
                             step="0.1"
                             min="0"
@@ -109,7 +109,7 @@
 
                     <ui-slider
                             v-if="config"
-                            label="Tempo de pausa (s)"
+                            label="Tempo de pausa"
                             :val.sync="config.recover.restTime"
                             step="0.1"
                             min="0"
@@ -159,13 +159,69 @@
             <li class="collection-item">
 
                 <div class="collapsible-header">
-                    <i class="fa fa-square black-text" aria-hidden="true"></i> Morte
+                    <i class="fa fa-square green-text" aria-hidden="true"></i> Vacinação
                 </div>
                 <div class="collapsible-body pl pr">
 
                     <ui-slider
                             v-if="config"
-                            label="Tempo de pausa (s)"
+                            label="Tempo de pausa"
+                            :val.sync="config.vaccinate.restTime"
+                            step="0.1"
+                            min="0"
+                            max="10"
+                            decimals="1"
+                            postfix=""
+                    ></ui-slider>
+
+                    <ui-slider
+                            v-if="config"
+                            label="Duração de expansão (s)"
+                            :val.sync="config.vaccinate.expandTime"
+                            step="0.1"
+                            min="0"
+                            max="3"
+                            decimals="1"
+                            postfix=""
+                    ></ui-slider>
+
+                    <ui-slider
+                            v-if="config"
+                            label="Escala de expansão"
+                            :val.sync="config.vaccinate.expandScale"
+                            step="0.1"
+                            min="1"
+                            max="2"
+                            decimals="1"
+                            postfix=""
+                    ></ui-slider>
+
+                    <ui-slider
+                            v-if="config"
+                            label="Duração de retração (s)"
+                            :val.sync="config.vaccinate.retractTime"
+                            step="0.1"
+                            min="0"
+                            max="3"
+                            decimals="1"
+                            postfix=""
+                    ></ui-slider>
+
+
+                </div>
+
+            </li>
+
+            <li class="collection-item">
+
+                <div class="collapsible-header">
+                    <i class="fa fa-square black-text" aria-hidden="true"></i> Falecimento
+                </div>
+                <div class="collapsible-body pl pr">
+
+                    <ui-slider
+                            v-if="config"
+                            label="Tempo de pausa"
                             :val.sync="config.death.restTime"
                             step="0.1"
                             min="0"
