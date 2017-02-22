@@ -831,6 +831,7 @@ const app = new Vue({
 
         factoryUniformFormat: function () {
             var $self = this;
+            var $factory = Data.config.generator.factory.uniformFormat;
 
             Data.config.vis.physics.forceAtlas2Based.centralGravity = 0.001;
 
@@ -840,8 +841,8 @@ const app = new Vue({
             };
 
             function nodesFactory() {
-                var nodeConfig = Data.config.generator.factory.node;
-                var quant = Math.pow(Data.config.generator.factory.level, 2);
+                var nodeConfig = $factory.node;
+                var quant = Math.pow($factory.level, 2);
 
                 for (var i = 0; i < quant; i++)
                     Data.nodes.add({
@@ -863,9 +864,9 @@ const app = new Vue({
             }
 
             function edgesFactory() {
-                var edgeConfig = Data.config.generator.factory.edge;
-                var row = Data.config.generator.factory.level;
-                var line = Data.config.generator.factory.level - 1;
+                var edgeConfig = $factory.edge;
+                var row = $factory.level;
+                var line = $factory.level - 1;
 
                 for (var i = 0; i < row; i++)
                     for (var j = 0; j < line; j++) {
@@ -897,6 +898,7 @@ const app = new Vue({
 
         factoryFullRandom: function () {
             var $self = this;
+            var $factory = Data.config.generator.factory.fullRandom;
 
             return {
                 nodes: nodesFactory(),
@@ -905,7 +907,7 @@ const app = new Vue({
 
             function nodesFactory() {
 
-                var nodeConfig = Data.config.generator.factory.node;
+                var nodeConfig = $factory.node;
                 var rate = nodeConfig.rate;
 
                 // Get the number of nodes that will be generate
@@ -952,7 +954,7 @@ const app = new Vue({
 
             function edgesFactory() {
 
-                var edgeConfig = Data.config.generator.factory.edge;
+                var edgeConfig = $factory.edge;
                 var rate = edgeConfig.rate;
 
                 var quant = _.random(edgeConfig.min, edgeConfig.max);
@@ -985,7 +987,7 @@ const app = new Vue({
                     var edge = $self.filterEdgesByNodes(node1, node2);
 
                     //The nodes can't exceed the max edges setted
-                    if (neighbors1.length < Data.config.generator.factory.edge.density && neighbors2.length < Data.config.generator.factory.edge.density)
+                    if (neighbors1.length < $factory.edge.density && neighbors2.length < $factory.edge.density)
                         if (_.isEmpty(edge)) {
                             Data.edges.add({
                                 from: node1.id,

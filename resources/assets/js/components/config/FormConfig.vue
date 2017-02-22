@@ -46,7 +46,7 @@
             <form-config-simulation :config="config.simulation"></form-config-simulation>
         </div>
         <div id="generator" class="ml mr">
-            <form-config-generator :config="config.generator"></form-config-generator>
+            <form-config-generator :config="config.generator" v-ref:generator></form-config-generator>
         </div>
 
     </div>
@@ -75,6 +75,8 @@
 
             onReaderLoad(event){
                 this.config = JSON.parse(event.target.result);
+                document.getElementById("file").value = "";
+                alert("Configurações carregadas com sucesso!");
             },
 
             load() {

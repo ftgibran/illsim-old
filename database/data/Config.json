@@ -110,7 +110,91 @@
   },
   "generator": {
     "method": "fullRandom",
-    "factory": {}
+    "factory": {
+      "fullRandom": {
+        "node": {
+          "min": 80,
+          "max": 100,
+          "groups": [
+            {
+              "ref": "s"
+            },
+            {
+              "ref": "i",
+              "percent": false,
+              "quant": 5
+            },
+            {
+              "ref": "v",
+              "percent": false,
+              "quant": 0
+            }
+          ],
+          "rate": {
+            "infect": {
+              "min": 0.5,
+              "max": 1
+            },
+            "resist": {
+              "min": 0,
+              "max": 0.5
+            },
+            "recover": {
+              "min": 0.01,
+              "max": 0.05
+            },
+            "susceptible": {
+              "min": 0.01,
+              "max": 0.05
+            },
+            "death": {
+              "min": 0.01,
+              "max": 0.05
+            }
+          }
+        },
+        "edge": {
+          "min": 100,
+          "max": 150,
+          "density": 4,
+          "rate": {
+            "infect": {
+              "min": 0.01,
+              "max": 0.05
+            }
+          }
+        }
+      },
+      "uniformFormat": {
+        "level": 6,
+        "node": {
+          "groups": [
+            {
+              "ref": "i",
+              "percent": false,
+              "quant": 3
+            },
+            {
+              "ref": "v",
+              "percent": false,
+              "quant": 0
+            }
+          ],
+          "rate": {
+            "infect": 0.5,
+            "resist": 0,
+            "recover": 0.05,
+            "susceptible": 0.05,
+            "death": 0.05
+          }
+        },
+        "edge": {
+          "rate": {
+            "infect": 0.05
+          }
+        }
+      }
+    }
   },
   "vis": {
     "nodes": {
