@@ -61,9 +61,7 @@ const app = new Vue({
 
     ready() {
         var $self = this;
-
         $self.$refs.loader.hide();
-
         this.$refs.config.$on('submit', this.init);
     },
 
