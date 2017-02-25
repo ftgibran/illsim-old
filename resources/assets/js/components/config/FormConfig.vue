@@ -23,7 +23,7 @@
                     </li>
                 </ul>
                 <div class="right">
-                    <button type="button" @click="run()"
+                    <button type="button" @click="simulate()"
                             class="blue-grey lighten-5 black-text fw-b btn-large">
                         Simular
                     </button>
@@ -68,7 +68,6 @@
 
                 var onReaderLoad = (event) => {
                     this.config = JSON.parse(event.target.result);
-//                    document.getElementById("file").value = "";
 
                     this.$emit('load');
 
@@ -76,8 +75,6 @@
                 };
 
                 var onChange = (event) => {
-//                    this.config = {};
-
                     this.$emit('reset');
 
                     var reader = new FileReader();
@@ -88,8 +85,8 @@
                 document.getElementById('file').addEventListener('change', onChange);
             },
 
-            run() {
-                this.$emit('submit', this.config);
+            simulate() {
+                this.$root.$emit('simulate', this.config);
             },
 
             upload() {

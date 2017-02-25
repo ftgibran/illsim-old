@@ -8,7 +8,7 @@
                         class="btn-floating btn-large waves-effect waves-light"><i class="material-icons">settings</i></a>
                 </li>
                 <li>
-                    <a @click="this.$parent.$refs.config.run()"
+                    <a @click="this.$parent.$refs.config.simulate()"
                         class="pos-a"
                         style="color:black; z-index: 1;"><i class="material-icons left">replay</i>
                         <span class="fw-b">Simular</span>

@@ -25,18 +25,37 @@
 
     export default {
 
+        props: {
+            time: {
+                type: Number,
+                default: 1
+            },
+        },
+
+        events: {
+            shown() {
+                $(document).on('click', (e) => {
+                    if ($(e.target).closest(this.$el).length === 0) {
+                        this.hide();
+                    }
+                });
+            },
+            hidden() {
+                $(document).off('click');
+            }
+        },
+
         data() {
             return {
-                time: 1
+                hidden: false
             }
         },
 
         methods: {
             show() {
                 var el = $(this.$el);
-                var $self = this;
 
-                TweenMax.to(el, $self.time, {
+                TweenMax.to(el, this.time, {
                     x: 0,
                     ease: Power3.easeOut
                 });
@@ -44,9 +63,8 @@
 
             hide() {
                 var el = $(this.$el);
-                var $self = this;
 
-                TweenMax.to(el, $self.time, {
+                TweenMax.to(el, this.time, {
                     x: -el.width(),
                     ease: Power3.easeOut
                 });
@@ -55,22 +73,25 @@
 
         ready() {
             var el = $(this.$el);
-            var $self = this;
 
             $(el).hover(
-                    function () {
-                        TweenMax.to(el, $self.time, {
+                    (e) => {
+                        TweenMax.to(el, this.time, {
                             opacity: 1,
                             ease: Power3.easeOut
                         });
                     },
-                    function () {
-                        TweenMax.to(el, $self.time, {
+                    (e) => {
+                        TweenMax.to(el, this.time, {
                             opacity: 0.4,
                             ease: Power1.easeOut
                         });
                     }
-            )
+            );
+
+            this.$root.$on('reset', () => {
+                this.hide();
+            });
         }
     }
 </script>

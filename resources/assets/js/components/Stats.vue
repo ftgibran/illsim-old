@@ -4,7 +4,7 @@
        
        <div class="ta-l">
             <div class="fl-r ml-s">
-                {{ $root.susceptible }}
+                {{ $parent.$parent.susceptible }}
             </div>
             <div style="overflow: hidden;">
                 <label>
@@ -16,7 +16,7 @@
 
         <div class="ta-l">
             <div class="fl-r ml-s">
-                {{ $root.infected }}
+                {{ $parent.$parent.infected }}
             </div>
             <div style="overflow: hidden;">
                 <label>
@@ -28,7 +28,7 @@
 
         <div class="ta-l">
             <div class="fl-r ml-s">
-                {{ $root.recovered }}
+                {{ $parent.$parent.recovered }}
             </div>
             <div style="overflow: hidden;">
                 <label>
@@ -40,7 +40,7 @@
 
         <div class="ta-l">
             <div class="fl-r ml-s">
-                {{ $root.vaccinated }}
+                {{ $parent.$parent.vaccinated }}
             </div>
             <div style="overflow: hidden;">
                 <label>
@@ -52,7 +52,7 @@
 
         <div class="ta-l">
             <div class="fl-r ml-s">
-                {{ $root.death }}
+                {{ $parent.$parent.death }}
             </div>
             <div style="overflow: hidden;">
                 <label>
@@ -64,7 +64,7 @@
 
         <div class="ta-l">
             <div class="fl-r ml-s">
-                {{ $root.population }}
+                {{ $parent.$parent.population }}
             </div>
             <div style="overflow: hidden;">
                 <label>

@@ -1,6 +1,6 @@
 <template>
     <div class="pos-r" style="height: 100%;">
-        <div v-if="!done" class="loader">
+        <div v-if="!done && !lazy" class="loader">
             <div class="preloader-wrapper big active">
                 <div class="spinner-layer">
                     <div class="circle-clipper left">
@@ -32,7 +32,7 @@
 
     export default {
 
-        props: ['onLoad'],
+        props: ['onLoad', 'lazy'],
 
         data() {
             return {
@@ -64,6 +64,7 @@
             });
             this.$parent.$on('reset', () => {
                 this.done = false;
+                this.lazy = false;
             });
         }
     }
