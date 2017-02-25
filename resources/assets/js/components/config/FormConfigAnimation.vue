@@ -1,5 +1,15 @@
 <template>
-    <div v-show="config">
+    <div>
+
+        <div v-if="mode == 'scientific'">
+            <div class="card amber lighten-5">
+                <div class="card-content ta-c">
+                    <p>A simulação está no modo Científico. As animações são desativadas nesse modo por questão de
+                        performance.</p>
+                </div>
+            </div>
+        </div>
+
         <ui-slider
                 v-if="config"
                 label="Escala de tempo"
@@ -341,7 +351,7 @@
 <script>
     export default {
 
-        props: ['config'],
+        props: ['config', 'mode'],
 
         ready() {
             $(this.$el).find('.collapsible').collapsible();

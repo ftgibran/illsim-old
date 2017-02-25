@@ -5,26 +5,13 @@
  */
 
 require('./bootstrap');
+require('./components');
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to
  * the body of the page. From here, you may begin adding components to
  * the application, or feel free to tweak this setup for your needs.
  */
-
-Vue.component('ui-loader', require('./components/Loader.vue'));
-Vue.component('ui-nav', require('./components/Nav.vue'));
-Vue.component('ui-sidenav', require('./components/SideNav.vue'));
-Vue.component('ui-slider', require('./components/Slider.vue'));
-Vue.component('ui-checkbox', require('./components/Checkbox.vue'));
-Vue.component('ui-select', require('./components/Select.vue'));
-Vue.component('ui-stats', require('./components/Stats.vue'));
-Vue.component('form-config', require('./components/config/FormConfig.vue'));
-Vue.component('form-config-animation', require('./components/config/FormConfigAnimation.vue'));
-Vue.component('form-config-simulation', require('./components/config/FormConfigSimulation.vue'));
-Vue.component('form-config-generator', require('./components/config/FormConfigGenerator.vue'));
-Vue.component('form-config-uniform-format', require('./components/config/FormConfigUniformFormat.vue'));
-Vue.component('form-config-full-random', require('./components/config/FormConfigFullRandom.vue'));
 
 const Data = {
     const: {
@@ -54,14 +41,14 @@ const Data = {
     nodes: null,
     edges: null,
     config: null
-}
+};
 
 const app = new Vue({
-    el: 'body',
+    el: '#app',
 
     ready() {
         var $self = this;
-        $self.$refs.loader.hide();
+        // $self.$refs.loader.hide();
         this.$refs.config.$on('submit', this.init);
     },
 
@@ -140,7 +127,8 @@ const app = new Vue({
             $self.reset();
 
             $self.$refs.sidenav.hide();
-            $self.$refs.loader.show();
+            // $self.$refs.loader.show();
+            $self.$emit('reset');
 
             _.delay(function () {
                 Data.config = config;
@@ -148,11 +136,6 @@ const app = new Vue({
                 //Creates Data.network
                 $self.create();
 
-                //Set attempts interval loop
-                Data.network.once('afterDrawing', function () {
-                    $self.$refs.loader.hide();
-                    Data.loop = setInterval($self.step, Data.config.simulation.step);
-                });
             }, $self.$refs.sidenav.time * 1000);
 
         },
@@ -165,18 +148,33 @@ const app = new Vue({
 
             $self.setStats();
 
-            Data.network = new vis.Network(container, data, Data.config.vis);
+            if ($self.mode('visual')) {
+                Data.network = new vis.Network(container, data, Data.config.vis);
 
-            var canvas = document.getElementsByTagName("canvas")[0];
-            Data.context = canvas.getContext("2d");
+                var canvas = document.getElementsByTagName("canvas")[0];
+                Data.context = canvas.getContext("2d");
+
+                //Set attempts interval loop
+                Data.network.once('afterDrawing', function () {
+                    // $self.$refs.loader.hide();
+                    $self.$emit('load');
+                    Data.loop = setInterval($self.step, Data.config.simulation.step);
+                });
+            }
+
+            if ($self.mode('scientific')) {
+                // $self.$refs.loader.hide();
+                $self.$emit('load');
+                Data.loop = setInterval($self.step, 0);
+            }
         },
 
         reset: function () {
-            if (_.isNull(Data.network)) return;
+            if (!_.isNull(Data.network))
+                Data.network.destroy();
 
             clearInterval(Data.loop);
             TweenMax.killAll();
-            Data.network.destroy();
 
             Data.nodes = null;
             Data.edges = null;
@@ -318,6 +316,13 @@ const app = new Vue({
             return false;
         },
 
+        mode: function (value) {
+            if (Data.config.simulation.mode == value)
+                return true;
+
+            return false;
+        },
+
         filterEdgesByNodes: function (node1, node2) {
             return Data.edges.get({
                 filter: function (edge) {
@@ -447,6 +452,9 @@ const app = new Vue({
 
             function infect_ani(target) {
 
+                if ($self.mode('scientific'))
+                    return $self.$emit('statusChange', target, Data.const.status.INFECTED);
+
                 const DOT_MOVIMENT_TIME = Number(Data.config.animation.infect.dotMovimentTime);
                 const INFECT_EXPAND_TIME = Number(Data.config.animation.infect.expandTime);
                 const INFECT_EXPAND_DELAY = Number(Data.config.animation.infect.expandDelay);
@@ -547,6 +555,9 @@ const app = new Vue({
 
             function recover_ani(status) {
 
+                if ($self.mode('scientific'))
+                    return $self.$emit('statusChange', target, status);
+
                 const RECOVER_EXPAND_TIME = Number(Data.config.animation.recover.expandTime);
                 const RECOVER_EXPAND_SCALE = Number(Data.config.animation.recover.expandScale);
                 const RECOVER_RETRACT_TIME = Number(Data.config.animation.recover.retractTime);
@@ -591,6 +602,13 @@ const app = new Vue({
             }
 
             function death_ani() {
+
+                if ($self.mode('scientific')) {
+                    if (Data.config.simulation.d.birthWhenDie)
+                        return $self.$emit('statusChange', target, Data.const.status.SUSCEPTIBLE);
+                    else
+                        return $self.$emit('statusChange', target, Data.const.status.DEATH);
+                }
 
                 const DEATH_RETRACT_SCALE = Number(Data.config.animation.death.retractScale);
                 const DEATH_RETRACT_TIME = Number(Data.config.animation.death.retractTime);
@@ -774,13 +792,16 @@ const app = new Vue({
 
             function vaccinate_ani(target) {
 
+                $self.shots++;
+                if ($self.mode('scientific'))
+                    return $self.$emit('statusChange', target, Data.const.status.VACCINATED);
+
                 const VACCINATE_EXPAND_TIME = Number(Data.config.animation.vaccinate.expandTime);
                 const VACCINATE_EXPAND_SCALE = Number(Data.config.animation.vaccinate.expandScale);
                 const VACCINATE_RETRACT_TIME = Number(Data.config.animation.vaccinate.retractTime);
                 const REST_TIME = VACCINATE_EXPAND_TIME + VACCINATE_RETRACT_TIME +
                     Number(Data.config.animation.vaccinate.restTime); //2.4
 
-                $self.shots++;
                 $self.rest(target, REST_TIME);
 
                 TweenMax.to(target, VACCINATE_EXPAND_TIME * Data.config.animation.scale, {

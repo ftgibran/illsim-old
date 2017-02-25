@@ -9,7 +9,6 @@
 
     <ui-stats></ui-stats>
 
-    <ui-loader v-ref:loader></ui-loader>
+    <network></network>
 
-    <div id="network" style="height: 100vh;" @click="this.$refs.sidenav.hide()"></div>
 @stop

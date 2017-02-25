@@ -48,8 +48,14 @@
                 },
                 update: function (value) {
                     $(this.el).val(value).trigger('change');
-                },
-            },
+                }
+            }
+        },
+
+        watch: {
+            options() {
+                $('select').material_select();
+            }
         },
 
         ready() {

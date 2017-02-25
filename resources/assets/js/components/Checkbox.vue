@@ -1,6 +1,6 @@
 <template>
 
-	<div class="ta-l">
+	<div class="ta-l mt-s">
         <input v-model="checked" type="checkbox" class="filled-in" id="{{name}}" name="{{name}}"/>
 		<label class="truncate" for="{{name}}">{{label}}</label>
 	</div>

@@ -1,8 +1,14 @@
 <template>
-    <div v-show="config">
+    <div>
 
         <div v-if="config">
+
+            <div class="input-field ta-l">
+                <ui-select label="Modo de simulação" :options="mode" :val.sync="config.mode"></ui-select>
+            </div>
+
             <ui-slider
+                    v-show="config.mode == 'visual'"
                     label="Intervalo de tempo (ms)"
                     :val.sync="config.step"
                     step="50"
@@ -36,21 +42,43 @@
                                        :options="inoculationBy"
                                        :val.sync="config.inoculation.by">
                             </ui-select>
-                            <ui-slider
-                                    label="Número de distribuição / Passo de Tempo"
-                                    :val.sync="config.inoculation.rate"
-                                    step="1"
-                                    min="1"
-                                    max="100"
-                                    decimals="0"
-                            ></ui-slider>
-                            <ui-slider
-                                    label="Limite de distribuição"
-                                    :val.sync="config.inoculation.limit"
-                                    step="1"
-                                    min="0"
-                                    max="1000"
-                            ></ui-slider>
+
+                            <div v-if="config.mode == 'visual'">
+                                <ui-slider
+                                        label="Número de distribuições / passo de tempo"
+                                        :val.sync="config.inoculation.rate"
+                                        step="1"
+                                        min="1"
+                                        max="10"
+                                        decimals="0"
+                                ></ui-slider>
+                                <ui-slider
+                                        label="Limite de distribuição"
+                                        :val.sync="config.inoculation.limit"
+                                        step="1"
+                                        min="0"
+                                        max="200"
+                                ></ui-slider>
+                            </div>
+
+                            <div v-if="config.mode == 'scientific'">
+                                <ui-slider
+                                        label="Número de distribuições / passo de tempo"
+                                        :val.sync="config.inoculation.rate"
+                                        step="1"
+                                        min="1"
+                                        max="100"
+                                        decimals="0"
+                                ></ui-slider>
+                                <ui-slider
+                                        label="Limite de distribuição"
+                                        :val.sync="config.inoculation.limit"
+                                        step="50"
+                                        min="0"
+                                        max="20000"
+                                ></ui-slider>
+                            </div>
+
                         </div>
                     </ui-checkbox>
                 </li>
@@ -384,6 +412,10 @@
 
         data() {
             return {
+                mode: [
+                    {"label": "Rede em tempo real (baixa escala de dados)", "val": "visual"},
+                    {"label": "Científico (alta escala de dados)", "val": "scientific"},
+                ],
                 infectBy: [
                     {"label": "Nó", "val": "node"},
                     {"label": "Aresta", "val": "edge"},

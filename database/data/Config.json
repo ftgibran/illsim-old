@@ -8,7 +8,7 @@
       "expandDelay": 0.5,
       "expandScale": 1.5,
       "retractTime": 0.4,
-      "shakeRadius": 15
+      "shakeRadius": 25
     },
     "recover": {
       "restTime": 0.1,
@@ -36,6 +36,7 @@
     }
   },
   "simulation": {
+    "mode": "visual",
     "step": 200,
     "infectBy": "special",
     "k": 0.5,

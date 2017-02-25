@@ -9,15 +9,30 @@
         <li class="grey lighten-5">
             <div class="collapsible-header">Nível</div>
             <div class="collapsible-body pl pr">
-                <ui-slider
-                        v-if="factory.level"
-                        label="Nível"
-                        :val.sync="factory.level"
-                        step="1"
-                        min="1"
-                        max="20"
-                        decimals="0"
-                ></ui-slider>
+
+                <div v-if="mode == 'visual'">
+                    <ui-slider
+                            v-if="factory.level"
+                            label="Nível"
+                            :val.sync="factory.level"
+                            step="1"
+                            min="1"
+                            max="20"
+                            decimals="0"
+                    ></ui-slider>
+                </div>
+                <div v-if="mode == 'scientific'">
+                    <ui-slider
+                            v-if="factory.level"
+                            label="Nível"
+                            :val.sync="factory.level"
+                            step="1"
+                            min="20"
+                            max="120"
+                            decimals="0"
+                    ></ui-slider>
+                </div>
+
             </div>
         </li>
 
@@ -149,26 +164,24 @@
 
 <script>
     export default {
-        props: ['factory'],
+        props: ['factory', 'mode'],
 
         computed: {
             groupInfect() {
-                if(!this.factory.node) return {};
+                if (!this.factory.node) return {};
 
-                for(var i in this.factory.node.groups)
-                {
+                for (var i in this.factory.node.groups) {
                     var group = this.factory.node.groups[i];
-                    if(group.ref == 'i') return group;
+                    if (group.ref == 'i') return group;
                 }
             },
 
             groupVacinated() {
-                if(!this.factory.node) return {};
+                if (!this.factory.node) return {};
 
-                for(var i in this.factory.node.groups)
-                {
+                for (var i in this.factory.node.groups) {
                     var group = this.factory.node.groups[i];
-                    if(group.ref == 'v') return group;
+                    if (group.ref == 'v') return group;
                 }
             }
 

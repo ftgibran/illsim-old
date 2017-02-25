@@ -29,6 +29,10 @@
 
 @media #{$large-and-up} {}
 
+html, body, #app {
+    height: 100%;
+}
+
 html {
     font-family: 'Raleway', sans-serif;
 }

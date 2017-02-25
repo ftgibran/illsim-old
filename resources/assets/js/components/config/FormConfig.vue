@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <ui-loader :on-load="init">
         <nav class="blue-grey darken-2 white-text pl pr nav-extended">
             <div class="nav-wrapper">
                 <div class="left">
@@ -9,14 +9,14 @@
                 </div>
                 <ul>
                     <li>
-                        <a @click="load()">
+                        <a @click="upload()">
                             <i class="fa fa-cloud-upload" aria-hidden="true"></i>
                             Carregar
                         </a>
                         <input id="file" type="file" style="display: none;"/>
                     </li>
                     <li>
-                        <a @click="save(config, 'config.json')">
+                        <a @click="download(config, 'config.json')">
                             <i class="fa fa-cloud-download" aria-hidden="true"></i>
                             Salvar
                         </a>
@@ -39,17 +39,17 @@
             </div>
         </nav>
 
-        <div id="animation" class="ml mr">
-            <form-config-animation :config="config.animation"></form-config-animation>
+        <div id="animation" class="ml mr mt mb">
+            <form-config-animation :config="config.animation" :mode.sync="config.simulation.mode"></form-config-animation>
         </div>
-        <div id="simulation" class="ml mr">
+        <div id="simulation" class="ml mr mt mb">
             <form-config-simulation :config="config.simulation"></form-config-simulation>
         </div>
-        <div id="generator" class="ml mr">
-            <form-config-generator :config="config.generator" v-ref:generator></form-config-generator>
+        <div id="generator" class="ml mr mt mb">
+            <form-config-generator :config="config.generator" :mode.sync="config.simulation.mode"></form-config-generator>
         </div>
 
-    </div>
+    </ui-loader>
 </template>
 
 <script>
@@ -62,30 +62,43 @@
         },
 
         methods: {
+
+            init() {
+                $('ul.tabs').tabs();
+
+                var onReaderLoad = (event) => {
+                    this.config = JSON.parse(event.target.result);
+//                    document.getElementById("file").value = "";
+
+                    this.$emit('load');
+
+                    alert("Configurações carregadas com sucesso!");
+                };
+
+                var onChange = (event) => {
+//                    this.config = {};
+
+                    this.$emit('reset');
+
+                    var reader = new FileReader();
+                    reader.onload = onReaderLoad;
+                    reader.readAsText(event.target.files[0]);
+                };
+
+                document.getElementById('file').addEventListener('change', onChange);
+            },
+
             run() {
                 this.$emit('submit', this.config);
             },
 
-            onChange(event) {
-                this.config = {};
-                var reader = new FileReader();
-                reader.onload = this.onReaderLoad;
-                reader.readAsText(event.target.files[0]);
-            },
-
-            onReaderLoad(event){
-                this.config = JSON.parse(event.target.result);
-                document.getElementById("file").value = "";
-                alert("Configurações carregadas com sucesso!");
-            },
-
-            load() {
+            upload() {
                 var e = document.createEvent('MouseEvents');
                 e.initMouseEvent('click', true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
                 document.getElementById('file').dispatchEvent(e);
             },
 
-            save(data, filename) {
+            download(data, filename) {
                 if (!data) {
                     console.error('No data');
                     return;
@@ -110,9 +123,10 @@
         },
 
         ready() {
-            $('ul.tabs').tabs();
-            document.getElementById('file').addEventListener('change', this.onChange);
-            $.getJSON('api/getConfig', (data) => this.config = data);
+            $.getJSON('api/getConfig', (data) => {
+                this.config = data;
+                this.$emit('load');
+            });
         }
     }
 </script>
