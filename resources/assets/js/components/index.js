@@ -1,4 +1,5 @@
 Vue.component('network', require('./Network.vue'));
+Vue.component('analytics', require('./Analytics.vue'));
 
 Vue.component('ui-loader', require('./Loader.vue'));
 Vue.component('ui-nav', require('./Nav.vue'));

@@ -8,6 +8,8 @@
         <div id="network"></div>
     </div>
 
+    <analytics v-ref:analytics></analytics>
+
 </template>
 
 <style lang="sass" rel="stylesheet/scss" scoped>
@@ -32,7 +34,6 @@
     export default {
 
         ready() {
-            var $self = this;
             this.$root.$on('simulate', this.init);
         },
 
@@ -105,24 +106,16 @@
              */
 
             init: function (config) {
-                var $self = this;
-
                 //Resets Data.network
-                $self.reset();
+                this.reset();
 
-                $self.$root.$emit('reset');
-                $self.$emit('reset');
-
-                _.delay(function () {
-                    Data.config = config;
-
-                    //Creates Data.network
-                    $self.create();
-                }, 1000);
-
+                //Creates Data.network
+                _.delay(() => { this.create(config) }, 1000);
             },
 
-            create: function () {
+            create: function (config) {
+                Data.config = config;
+
                 var $self = this;
 
                 var container = document.getElementById('network');
@@ -145,6 +138,7 @@
 
                 if ($self.mode('scientific')) {
                     $self.$emit('load');
+                    $self.$refs.analytics.open();
                     Data.loop = setInterval($self.step, 0);
                 }
             },
@@ -168,6 +162,9 @@
                 this.death = 0;
                 this.population = 0;
                 this.shots = 0;
+
+                this.$emit('reset');
+                this.$root.$emit('reset');
             },
 
             normalize: function (data) {
@@ -325,6 +322,16 @@
 
             step: function () {
                 var $self = this;
+
+                $self.$emit('step', {
+                    susceptible: this.susceptible,
+                    infected: this.infected,
+                    recovered: this.recovered,
+                    vaccinated: this.vaccinated,
+                    death: this.death,
+                    population: this.population,
+                    shots: this.shots
+                });
 
                 if (Data.config.simulation.inoculation.active) {
                     $self.inoculate();

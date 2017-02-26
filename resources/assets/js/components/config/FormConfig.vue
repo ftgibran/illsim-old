@@ -3,9 +3,9 @@
         <nav class="blue-grey darken-2 white-text pl pr nav-extended">
             <div class="nav-wrapper">
                 <div class="left">
-                    <a @click="this.$parent.$parent.$refs.sidenav.hide()"
-                       class="btn-floating btn-large waves-effect waves-light"><i
-                            class="material-icons">settings</i></a>
+                    <a @click="$parent.hide()"
+                       class="btn-floating btn-large blue-grey lighten-5 waves-effect waves-light"><i
+                            class="black-text material-icons">settings</i></a>
                 </div>
                 <ul>
                     <li>
@@ -71,7 +71,7 @@
 
                     this.$emit('load');
 
-                    alert("Configurações carregadas com sucesso!");
+                    Materialize.toast('Configurações carregadas com sucesso!', 4000);
                 };
 
                 var onChange = (event) => {
