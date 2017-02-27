@@ -1,10 +1,10 @@
 <template>
 
-    <div>
+    <div class="input-field">
         <select :name="name" v-select="val">
             <option v-for="opt in options" :value="opt.val">{{opt.label}}</option>
         </select>
-        <label class="mt-s mb">{{label}}</label>
+        <label><i class="fa {{icon}}" aria-hidden="true"></i> {{label}}</label>
     </div>
 
 </template>
@@ -13,6 +13,10 @@
     export default {
 
         props: {
+            icon: {
+                type: String,
+                default: ''
+            },
             name: {
                 type: String
             },

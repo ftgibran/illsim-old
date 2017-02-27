@@ -10,8 +10,27 @@
                 <li>
                     <a @click="this.$parent.$refs.config.simulate()"
                        class="pos-r"
-                       style="color:black; z-index: 1;"><i class="material-icons left">replay</i>
-                        <span class="fw-b">Simular</span>
+                       style="color:black; z-index: 1;">
+                        <i class="material-icons left">replay</i>
+                        <span class="fw-b">Reset</span>
+                    </a>
+                </li>
+                <li v-if="$parent.$refs.network">
+                    <a v-if="$parent.$refs.network.state == 'paused'"
+                       @click="$parent.$refs.network.play()"
+                       class="pos-r"
+                       style="color:black; z-index: 1;"
+                    >
+                        <i class="material-icons left">play_arrow</i>
+                        <span class="fw-b">Play</span>
+                    </a>
+                    <a v-if="$parent.$refs.network.state == 'playing'"
+                       @click="$parent.$refs.network.stop()"
+                       class="pos-r"
+                       style="color:black; z-index: 1;"
+                    >
+                        <i class="material-icons left">pause</i>
+                        <span class="fw-b">Pausar</span>
                     </a>
                 </li>
             </ul>
@@ -27,7 +46,7 @@
             </ul>
 
             <div class="brand-logo center grey-text">
-                <span class="illsim">ILLSIM</span>
+                <span class="sahitya">ILLSIM</span>
             </div>
         </div>
     </nav>

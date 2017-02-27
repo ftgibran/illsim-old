@@ -10,15 +10,15 @@
                 <ul>
                     <li>
                         <a @click="upload()">
-                            <i class="fa fa-cloud-upload" aria-hidden="true"></i>
-                            Carregar
+                            <i class="material-icons left">file_upload</i>
+                            <span class="fw-b">Carregar</span>
                         </a>
                         <input id="file" type="file" style="display: none;"/>
                     </li>
                     <li>
                         <a @click="download(config, 'config.json')">
-                            <i class="fa fa-cloud-download" aria-hidden="true"></i>
-                            Salvar
+                            <i class="material-icons left">file_download</i>
+                            <span class="fw-b">Salvar</span>
                         </a>
                     </li>
                 </ul>
@@ -32,21 +32,39 @@
 
             <div class="nav-content">
                 <ul class="tabs tabs-transparent tabs-fixed-width">
-                    <li class="tab"><a href="#animation">Animação</a></li>
-                    <li class="tab"><a href="#simulation" class="active">Simulação</a></li>
-                    <li class="tab"><a href="#generator">Gerador</a></li>
+                    <li class="tab"><a href="#animation">
+                        <i class="material-icons">timelapse</i>
+                    </a></li>
+                    <li class="tab"><a href="#simulation" class="active">
+                        <i class="material-icons">tune</i>
+                    </a></li>
+                    <li class="tab"><a href="#generator">
+                        <i class="material-icons">grain</i>
+                    </a></li>
+                    <li class="tab"><a href="#analytics">
+                        <i class="material-icons">timeline</i>
+                    </a></li>
                 </ul>
             </div>
         </nav>
 
         <div id="animation" class="ml mr mt mb">
-            <form-config-animation :config="config.animation" :mode.sync="config.simulation.mode"></form-config-animation>
+            <h2 class="mt-s ta-c sahitya">Animação</h2>
+            <form-config-animation :config="config.animation"
+                                   :mode.sync="config.simulation.mode"></form-config-animation>
         </div>
         <div id="simulation" class="ml mr mt mb">
+            <h2 class="mt-s ta-c sahitya">Simulação</h2>
             <form-config-simulation :config="config.simulation"></form-config-simulation>
         </div>
         <div id="generator" class="ml mr mt mb">
-            <form-config-generator :config="config.generator" :mode.sync="config.simulation.mode"></form-config-generator>
+            <h2 class="mt-s ta-c sahitya">Gerador</h2>
+            <form-config-generator :config="config.generator"
+                                   :mode.sync="config.simulation.mode"></form-config-generator>
+        </div>
+        <div id="analytics" class="ml mr mt mb">
+            <h2 class="mt-s ta-c sahitya">Analytics</h2>
+            <form-config-analytics :config="config.analytics"></form-config-analytics>
         </div>
 
     </ui-loader>

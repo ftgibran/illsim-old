@@ -197,6 +197,20 @@
       }
     }
   },
+  "analytics": {
+    "step": "days",
+    "length": {
+      "value": 2,
+      "unit": "years"
+    },
+    "variables": [
+      "infected",
+      "recovered",
+      "susceptible",
+      "vaccinated",
+      "death"
+    ]
+  },
   "vis": {
     "nodes": {
       "borderWidth": 0,

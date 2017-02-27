@@ -15,3 +15,4 @@ Vue.component('form-config-simulation', require('./config/FormConfigSimulation.v
 Vue.component('form-config-generator', require('./config/FormConfigGenerator.vue'));
 Vue.component('form-config-uniform-format', require('./config/FormConfigUniformFormat.vue'));
 Vue.component('form-config-full-random', require('./config/FormConfigFullRandom.vue'));
+Vue.component('form-config-analytics', require('./config/FormConfigAnalytics.vue'));

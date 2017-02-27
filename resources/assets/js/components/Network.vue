@@ -39,6 +39,7 @@
 
         data() {
             return {
+                state: null,
                 susceptible: 0,
                 infected: 0,
                 recovered: 0,
@@ -50,6 +51,21 @@
         },
 
         events: {
+
+            play: function (rate) {
+                this.state = 'playing';
+                Data.loop = setInterval(this.step, rate);
+            },
+
+            stop: function () {
+                this.state = 'paused';
+                clearInterval(Data.loop);
+            },
+
+            reset: function () {
+                this.state = 'reset';
+            },
+
             statusChange: function (target, group) {
                 var $self = this;
 
@@ -101,46 +117,67 @@
 
         methods: {
 
-            /**
-             * Initialization
-             */
-
             init: function (config) {
                 //Resets Data.network
                 this.reset();
 
                 //Creates Data.network
-                _.delay(() => { this.create(config) }, 1000);
+                _.delay(() => {
+                    this.create(config)
+                }, 1000);
             },
 
             create: function (config) {
                 Data.config = config;
 
-                var $self = this;
-
                 var container = document.getElementById('network');
-                var data = $self.normalize($self.factory());
+                var data = this.normalize(this.factory());
 
-                $self.setStats();
+                this.setStats();
 
-                if ($self.mode('visual')) {
+                if (this.mode('visual')) {
                     Data.network = new vis.Network(container, data, Data.config.vis);
 
                     var canvas = document.getElementsByTagName("canvas")[0];
                     Data.context = canvas.getContext("2d");
 
                     //Set attempts interval loop
-                    Data.network.once('afterDrawing', function () {
-                        $self.$emit('load');
-                        Data.loop = setInterval($self.step, Data.config.simulation.step);
+                    Data.network.once('afterDrawing', () => {
+                        this.load();
+                        this.play();
                     });
                 }
 
-                if ($self.mode('scientific')) {
-                    $self.$emit('load');
-                    $self.$refs.analytics.open();
-                    Data.loop = setInterval($self.step, 0);
+                if (this.mode('scientific')) {
+                    this.load();
+                    this.play(0);
+                    this.$refs.analytics.open();
                 }
+            },
+
+            play: function (rate) {
+                if(this.state != 'paused' && this.state != 'reset')
+                    return;
+
+                if (Data.loop != null)
+                    Data.loop = null;
+
+                if(rate == null)
+                    rate = Data.config.simulation.step;
+
+                this.$emit('play', rate);
+            },
+
+            stop: function () {
+                if(this.state != 'playing')
+                    return;
+
+                this.$emit('stop');
+            },
+
+            load: function () {
+                this.$refs.analytics.init(Data.config.analytics);
+                this.$emit('load');
             },
 
             reset: function () {
@@ -164,6 +201,7 @@
                 this.shots = 0;
 
                 this.$emit('reset');
+                this.$refs.analytics.$emit('reset');
                 this.$root.$emit('reset');
             },
 
@@ -321,9 +359,8 @@
              */
 
             step: function () {
-                var $self = this;
 
-                $self.$emit('step', {
+                this.$emit('step', {
                     susceptible: this.susceptible,
                     infected: this.infected,
                     recovered: this.recovered,
@@ -333,16 +370,15 @@
                     shots: this.shots
                 });
 
-                if (Data.config.simulation.inoculation.active) {
-                    $self.inoculate();
-                }
-
                 //Each step do an attempt
-                Data.nodes.forEach(function (node) {
-                    $self.infectAttempt(node);
-                    $self.recoverAttempt(node);
-                    $self.killAttempt(node);
+                Data.nodes.forEach((node) => {
+                    this.infectAttempt(node);
+                    this.recoverAttempt(node);
+                    this.killAttempt(node);
                 });
+
+                if (Data.config.simulation.inoculation.active)
+                    this.inoculate();
             },
 
             //Infect Attempt

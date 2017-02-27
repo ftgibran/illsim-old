@@ -8,6 +8,6 @@
         <form-config v-ref:config></form-config>
     </ui-sidenav>
 
-    <network></network>
+    <network v-ref:network></network>
 
 @stop
