@@ -1,14 +1,6 @@
 <template>
     <div>
 
-        <div v-if="mode == 'scientific'">
-            <div class="card red lighten-5">
-                <div class="card-content ta-c">
-                    <p>Este método de geração não pode ser utilizado para simulação no modo Científico. </p>
-                </div>
-            </div>
-        </div>
-
         <ul class="collapsible popout" data-collapsible="accordion">
 
             <li class="card-panel blue-grey darken-2 white-text mt-0 mb-0 pt-s pb-s ta-l">
@@ -39,8 +31,8 @@
                                 :val-min.sync="factory.node.min"
                                 :val-max.sync="factory.node.max"
                                 step="50"
-                                min="0"
-                                max="20000"
+                                min="2500"
+                                max="12500"
                                 decimals="0"
                                 :range="true"
                         ></ui-slider>
@@ -191,9 +183,9 @@
                                 label="Quantidade (mínimo e máximo)"
                                 :val-min.sync="factory.edge.min"
                                 :val-max.sync="factory.edge.max"
-                                step="100"
-                                min="0"
-                                max="40000"
+                                step="200"
+                                min="5000"
+                                max="45000"
                                 decimals="0"
                                 :range="true"
                         ></ui-slider>
@@ -202,8 +194,8 @@
                                 label="Máximo de arestas por nó"
                                 :val.sync="factory.edge.density"
                                 step="1"
-                                min="0"
-                                max="30"
+                                min="500"
+                                max="1000"
                                 decimals="0"
                         ></ui-slider>
                     </div>

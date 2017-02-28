@@ -976,7 +976,8 @@
                     addNode(groupLeft, quant - Data.nodes.length);
 
                     function addNode(group, quant) {
-                        for (var i = 0; i < quant; i++)
+                        for (var i = 0; i < quant; i++){
+
                             Data.nodes.add({
                                 id: Data.nodes.length,
                                 group: group.ref,
@@ -988,6 +989,9 @@
                                     death: _.random(rate.death.min, rate.death.max, true)
                                 }
                             });
+
+                            console.log(Data.nodes.length);
+                        }
                     }
 
                     return Data.nodes.get();
@@ -1037,6 +1041,7 @@
                                         infect: _.random(rate.infect.min, rate.infect.max, true)
                                     }
                                 });
+                                console.log(Data.edges.length);
                                 return true;
                             }
                         return false;

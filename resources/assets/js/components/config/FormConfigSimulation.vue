@@ -107,7 +107,7 @@
                                     label="Taxa de infecção base"
                                     icon="fa-square red-text"
                                     :val.sync="config.i.base.infect"
-                                    step="0.1"
+                                    step="0.5"
                                     decimals="1"
                                     postfix="%"
                             ></ui-slider>
@@ -121,7 +121,7 @@
                                     label="Taxa de recuperação base"
                                     icon="fa-square yellow-text"
                                     :val.sync="config.i.base.recover"
-                                    step="0.1"
+                                    step="0.5"
                                     decimals="1"
                                     postfix="%"
                             ></ui-slider>
@@ -135,7 +135,7 @@
                                     label="Taxa de suscetibilidade base"
                                     icon="fa-square grey-text"
                                     :val.sync="config.i.base.susceptible"
-                                    step="0.1"
+                                    step="0.5"
                                     decimals="1"
                                     postfix="%"
                             ></ui-slider>
@@ -155,7 +155,7 @@
                                     label="Taxa de falecimento base"
                                     icon="fa-square black-text"
                                     :val.sync="config.i.base.death"
-                                    step="0.1"
+                                    step="0.5"
                                     decimals="1"
                                     postfix="%"
                             ></ui-slider>
@@ -179,7 +179,7 @@
                                     label="Taxa de infecção base"
                                     icon="fa-square red-text"
                                     :val.sync="config.r.base.infect"
-                                    step="0.1"
+                                    step="0.5"
                                     decimals="1"
                                     postfix="%"
                             ></ui-slider>
@@ -193,7 +193,7 @@
                                     label="Taxa de resistência base"
                                     icon="fa-square-o green-text"
                                     :val.sync="config.r.base.resist"
-                                    step="0.1"
+                                    step="0.5"
                                     decimals="1"
                                     postfix="%"
                             ></ui-slider>
@@ -207,7 +207,7 @@
                                     label="Taxa de suscetibilidade base"
                                     icon="fa-square grey-text"
                                     :val.sync="config.r.base.susceptible"
-                                    step="0.1"
+                                    step="0.5"
                                     decimals="1"
                                     postfix="%"
                             ></ui-slider>
@@ -227,7 +227,7 @@
                                     label="Taxa de falecimento base"
                                     icon="fa-square black-text"
                                     :val.sync="config.r.base.death"
-                                    step="0.1"
+                                    step="0.5"
                                     decimals="1"
                                     postfix="%"
                             ></ui-slider>
@@ -251,7 +251,7 @@
                                     label="Taxa de infecção base"
                                     icon="fa-square red-text"
                                     :val.sync="config.s.base.infect"
-                                    step="0.1"
+                                    step="0.5"
                                     decimals="1"
                                     postfix="%"
                             ></ui-slider>
@@ -265,7 +265,7 @@
                                     label="Taxa de resistência base"
                                     icon="fa-square-o green-text"
                                     :val.sync="config.s.base.resist"
-                                    step="0.1"
+                                    step="0.5"
                                     decimals="1"
                                     postfix="%"
                             ></ui-slider>
@@ -279,7 +279,7 @@
                                     label="Taxa de recuperação base"
                                     icon="fa-square yellow-text"
                                     :val.sync="config.s.base.recover"
-                                    step="0.1"
+                                    step="0.5"
                                     decimals="1"
                                     postfix="%"
                             ></ui-slider>
@@ -299,7 +299,7 @@
                                     label="Taxa de falecimento base"
                                     icon="fa-square black-text"
                                     :val.sync="config.s.base.death"
-                                    step="0.1"
+                                    step="0.5"
                                     decimals="1"
                                     postfix="%"
                             ></ui-slider>
@@ -323,7 +323,7 @@
                                     label="Taxa de infecção base"
                                     icon="fa-square red-text"
                                     :val.sync="config.v.base.infect"
-                                    step="0.1"
+                                    step="0.5"
                                     decimals="1"
                                     postfix="%"
                             ></ui-slider>
@@ -337,7 +337,7 @@
                                     label="Taxa de resistência base"
                                     icon="fa-square-o green-text"
                                     :val.sync="config.v.base.resist"
-                                    step="0.1"
+                                    step="0.5"
                                     decimals="1"
                                     postfix="%"
                             ></ui-slider>
@@ -351,7 +351,7 @@
                                     label="Taxa de recuperação base"
                                     icon="fa-square yellow-text"
                                     :val.sync="config.v.base.recover"
-                                    step="0.1"
+                                    step="0.5"
                                     decimals="1"
                                     postfix="%"
                             ></ui-slider>
@@ -365,7 +365,7 @@
                                     label="Taxa de suscetibilidade base"
                                     icon="fa-square grey-text"
                                     :val.sync="config.v.base.susceptible"
-                                    step="0.1"
+                                    step="0.5"
                                     decimals="1"
                                     postfix="%"
                             ></ui-slider>
@@ -379,7 +379,7 @@
                                     label="Taxa de falecimento base"
                                     icon="fa-square black-text"
                                     :val.sync="config.v.base.death"
-                                    step="0.1"
+                                    step="0.5"
                                     decimals="1"
                                     postfix="%"
                             ></ui-slider>

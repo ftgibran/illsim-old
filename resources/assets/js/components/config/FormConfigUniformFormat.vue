@@ -27,7 +27,7 @@
                             label="Nível"
                             :val.sync="factory.level"
                             step="1"
-                            min="20"
+                            min="50"
                             max="120"
                             decimals="0"
                     ></ui-slider>

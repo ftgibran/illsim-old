@@ -45,14 +45,15 @@
 
         watch: {
             mode(val) {
-                if (val == 'scientific') {
-                    this.methods = [
-                        this.uniformFormat
-                    ];
-                    this.config.method = 'uniformFormat';
-                } else {
-                    this.init();
-                }
+//                if (val == 'scientific') {
+//                    this.methods = [
+//                        this.uniformFormat
+//                    ];
+//                    this.config.method = 'uniformFormat';
+//                } else {
+//                    this.init();
+//                }
+                this.init();
             }
         },
 
