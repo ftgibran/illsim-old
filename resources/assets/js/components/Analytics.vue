@@ -3,6 +3,12 @@
         <nav class="blue-grey darken-2 white-text pl pr nav-extended">
             <div class="nav-wrapper">
                 <ul>
+                    <li>
+                        <a @click="$root.$refs.sidenav.show()"
+                           class="btn-floating btn-large blue-grey lighten-5 waves-effect waves-light">
+                            <i class="black-text material-icons">settings</i>
+                        </a>
+                    </li>
                     <li v-if="$root.$refs.network">
                         <a v-if="$root.$refs.network.state == null"
                            @click="$root.$refs.config.simulate()"

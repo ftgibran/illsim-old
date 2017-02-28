@@ -16,7 +16,7 @@
         top: 0;
         bottom: 0;
         width: 500px;
-        z-index: 100;
+        z-index: 10000;
     }
 
 </style>
