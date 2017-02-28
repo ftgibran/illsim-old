@@ -14,5 +14,10 @@ require('./components');
  */
 
 const app = new Vue({
-    el: '#app'
+    el: '#app',
+    events: {
+        simulate(config) {
+            this.$refs.network.init(config);
+        }
+    }
 });

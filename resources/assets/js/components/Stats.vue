@@ -1,95 +1,69 @@
-
 <template>
-    <div class="stats card-panel blue-grey lighten-5 z-depth-0">
-       
-       <div class="ta-l">
-            <div class="fl-r ml-s">
-                {{ $parent.$parent.susceptible }}
-            </div>
-            <div style="overflow: hidden;">
-                <label>
-                    <i class="fa fa-square grey-text" aria-hidden="true"></i>
-                    Suscetíveis:
-                </label>
-            </div>
-        </div>
 
-        <div class="ta-l">
-            <div class="fl-r ml-s">
+    <ul class="stats">
+        <li class="chip">
+            <i class="fa fa-square red-text" aria-hidden="true"></i>
+            Infectados
+            <span class="badge">
                 {{ $parent.$parent.infected }}
-            </div>
-            <div style="overflow: hidden;">
-                <label>
-                    <i class="fa fa-square red-text" aria-hidden="true"></i>
-                    Infectados:
-                </label>
-            </div>
-        </div>
-
-        <div class="ta-l">
-            <div class="fl-r ml-s">
+            </span>
+        </li>
+        <li class="chip">
+            <i class="fa fa-square yellow-text" aria-hidden="true"></i>
+            Recuperados
+            <span class="badge">
                 {{ $parent.$parent.recovered }}
-            </div>
-            <div style="overflow: hidden;">
-                <label>
-                    <i class="fa fa-square yellow-text" aria-hidden="true"></i>
-                    Recuperados:
-                </label>
-            </div>
-        </div>
-
-        <div class="ta-l">
-            <div class="fl-r ml-s">
+            </span>
+        </li>
+        <li class="chip">
+            <i class="fa fa-square grey-text" aria-hidden="true"></i>
+            Suscetíveis
+            <span class="badge">
+                {{ $parent.$parent.susceptible }}
+            </span>
+        </li>
+        <li class="chip">
+            <i class="fa fa-square green-text" aria-hidden="true"></i>
+            Vacinados
+            <span class="badge">
                 {{ $parent.$parent.vaccinated }}
-            </div>
-            <div style="overflow: hidden;">
-                <label>
-                    <i class="fa fa-square green-text" aria-hidden="true"></i>
-                    Vacinados:
-                </label>
-            </div>
-        </div>
-
-        <div class="ta-l">
-            <div class="fl-r ml-s">
+            </span>
+        </li>
+        <li class="chip">
+            <i class="fa fa-square black-text" aria-hidden="true"></i>
+            Falecidos
+            <span class="badge">
                 {{ $parent.$parent.death }}
-            </div>
-            <div style="overflow: hidden;">
-                <label>
-                    <i class="fa fa-square black-text" aria-hidden="true"></i>
-                    Mortos:
-                </label>
-            </div>
-        </div>
-
-        <div class="ta-l">
-            <div class="fl-r ml-s">
+            </span>
+        </li>
+        <li class="chip">
+            População
+            <span class="badge">
                 {{ $parent.$parent.population }}
-            </div>
-            <div style="overflow: hidden;">
-                <label>
-                    <i class="fa fa-users grey-text" aria-hidden="true"></i>
-                    População:
-                </label>
-            </div>
-        </div>
+            </span>
+        </li>
+    </ul>
 
-    </div>
 </template>
 
-<style>
+<style lang="sass" rel="stylesheet/scss" scoped>
     .stats {
-        text-align: right;
-        margin: 1em;
+        display: flex;
+        flex-direction: column;
+        margin: .5em;
         position: absolute;
-        top: 3em;
-        right: 0em;
+        top: 64px;
+        right: 0;
+
+        .badge {
+            margin: 4px auto;
+        }
     }
 </style>
 
 <script>
     export default {
-        ready() {	
+        ready() {
 
         }
     }

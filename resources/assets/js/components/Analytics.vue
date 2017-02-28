@@ -3,9 +3,17 @@
         <nav class="blue-grey darken-2 white-text pl pr nav-extended">
             <div class="nav-wrapper">
                 <ul>
-                    <li>
-                        <a @click="$root.$refs.config.simulate()">
-                            <i class="material-icons left">replay</i>
+                    <li v-if="$root.$refs.network">
+                        <a v-if="$root.$refs.network.state == null"
+                           @click="$root.$refs.config.simulate()"
+                        >
+                            <i class="material-icons left">play_arrow</i>
+                            <span class="fw-b">Simular</span>
+                        </a>
+                        <a v-if="$root.$refs.network.state != null"
+                           @click="$root.$refs.config.simulate()"
+                        >
+                            <i class="material-icons left">refresh</i>
                             <span class="fw-b">Reset</span>
                         </a>
                     </li>
@@ -19,8 +27,8 @@
                             <span class="fw-b">Pausar</span>
                         </a>
                     </li>
-                    <li>
-                        <a>
+                    <li v-if="$root.$refs.network">
+                        <a v-if="$root.$refs.network.state == 'playing' || $root.$refs.network.state == 'paused'">
                             <i class="material-icons left">file_download</i>
                             <span class="fw-b">Salvar dados</span>
                         </a>
@@ -34,10 +42,10 @@
             </div>
         </nav>
 
-        <div class="bar">
+        <div class="variables">
             <ui-loader :lazy="true">
                 <ul class="flex">
-                    <li v-for="item in variables" class="chip">
+                    <li v-for="item in variables" v-show="item" class="chip">
                         <i class="fa fa-square {{item.color}}-text" aria-hidden="true"></i>
                         {{item.label}}
                         <span class="badge">{{this[item.value]}}</span>
@@ -52,7 +60,7 @@
 
 <style lang="sass" rel="stylesheet/scss">
 
-    .bar {
+    .variables {
         height: 10em;
 
         .flex {
@@ -66,6 +74,21 @@
                 }
             }
         }
+    }
+
+    .modal {
+        top: 0 !important;
+        bottom: 0;
+        width: 100%;
+        max-height: 100%;
+    }
+
+    .vis-timeline {
+        position: absolute;
+        top: 115px;
+        bottom: 0;
+        left: 0;
+        right: 0;
     }
 
     .infected {
@@ -103,20 +126,6 @@
         stroke: #666666;
     }
 
-    .modal {
-        top: 0 !important;
-        bottom: 0;
-        width: 100%;
-        max-height: 100%;
-    }
-
-    .vis-timeline {
-        position: absolute;
-        top: 115px;
-        bottom: 0;
-        left: 0;
-        right: 0;
-    }
 </style>
 
 <script>
@@ -183,8 +192,6 @@
 
             init(config) {
                 Analytics.config = config;
-
-                this.$emit('load');
             },
 
             normalize() {
@@ -318,11 +325,11 @@
             },
 
             options() {
-                var start = moment().format('YYYY-MM-DD HH:mm:ss');
-                var end = moment().add(Analytics.config.length.value, Analytics.config.length.unit).format('YYYY-MM-DD HH:mm:ss');
+                var start = moment();
+                var end = moment().add(Analytics.config.length.value, Analytics.config.length.unit);
                 return {
-                    start: start,
-                    end: end,
+                    start: start.format('YYYY-MM-DD HH:mm:ss'),
+                    end: end.format('YYYY-MM-DD HH:mm:ss'),
                     legend: {
                         enabled: true,
                         left: {
@@ -367,9 +374,6 @@
                 this.$parent.$on('step', () => {
                     this.add();
                     Analytics.currentDate = moment(Analytics.currentDate).add(Analytics.config.step, 1);
-
-//                    if(status.infected == 0)
-//                        this.$parent.stop();
                 });
             },
 
@@ -380,7 +384,7 @@
                 Analytics.data.clear();
                 Analytics.currentDate = new Date();
                 Analytics.config = null;
-                Analytics.variables = [];
+                this.variables = [];
 
                 this.$parent.$off('step');
             }

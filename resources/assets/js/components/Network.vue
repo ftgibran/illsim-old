@@ -33,10 +33,6 @@
 
     export default {
 
-        ready() {
-            this.$root.$on('simulate', this.init);
-        },
-
         data() {
             return {
                 state: null,
@@ -45,8 +41,13 @@
                 recovered: 0,
                 vaccinated: 0,
                 death: 0,
-                population: 0,
                 shots: 0
+            }
+        },
+
+        computed: {
+            population() {
+                return this.susceptible + this.infected + this.recovered + this.vaccinated;
             }
         },
 
@@ -63,15 +64,11 @@
             },
 
             reset: function () {
-                this.state = 'reset';
+                this.state = 'initializing';
             },
 
             statusChange: function (target, group) {
                 var $self = this;
-
-                if ($self.isGroup(target, Data.const.status.DEATH))
-                    if (group === Data.const.status.SUSCEPTIBLE)
-                        $self.population++;
 
                 switch (target.group) {
                     case Data.const.status.SUSCEPTIBLE:
@@ -106,7 +103,6 @@
                         break;
                     case Data.const.status.DEATH:
                         $self.death++;
-                        $self.population--;
                         break;
                 }
 
@@ -129,6 +125,9 @@
 
             create: function (config) {
                 Data.config = config;
+
+                //Analytics
+                this.$refs.analytics.init(Data.config.analytics);
 
                 var container = document.getElementById('network');
                 var data = this.normalize(this.factory());
@@ -156,28 +155,28 @@
             },
 
             play: function (rate) {
-                if(this.state != 'paused' && this.state != 'reset')
+                if (this.state != 'paused' && this.state != 'initializing')
                     return;
 
                 if (Data.loop != null)
                     Data.loop = null;
 
-                if(rate == null)
+                if (rate == null)
                     rate = Data.config.simulation.step;
 
                 this.$emit('play', rate);
             },
 
             stop: function () {
-                if(this.state != 'playing')
+                if (this.state != 'playing')
                     return;
 
                 this.$emit('stop');
             },
 
             load: function () {
-                this.$refs.analytics.init(Data.config.analytics);
                 this.$emit('load');
+                this.$refs.analytics.$emit('load');
             },
 
             reset: function () {

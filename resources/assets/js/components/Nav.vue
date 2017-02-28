@@ -3,15 +3,23 @@
         <div class="nav-wrapper">
             <ul class="left">
                 <li>
-                    <a @click="this.$parent.$refs.sidenav.show()"
+                    <a @click="$parent.$refs.sidenav.show()"
                        class="btn-floating btn-large waves-effect waves-light"><i
                             class="material-icons">settings</i></a>
                 </li>
-                <li>
-                    <a @click="this.$parent.$refs.config.simulate()"
+                <li v-if="$parent.$refs.network">
+                    <a v-if="$parent.$refs.network.state == null"
+                       @click="$parent.$refs.config.simulate()"
                        class="pos-r"
                        style="color:black; z-index: 1;">
-                        <i class="material-icons left">replay</i>
+                        <i class="material-icons left">play_arrow</i>
+                        <span class="fw-b">Simular</span>
+                    </a>
+                    <a v-if="$parent.$refs.network.state != null"
+                       @click="$parent.$refs.config.simulate()"
+                       class="pos-r"
+                       style="color:black; z-index: 1;">
+                        <i class="material-icons left">refresh</i>
                         <span class="fw-b">Reset</span>
                     </a>
                 </li>
@@ -35,7 +43,7 @@
                 </li>
             </ul>
 
-            <ul class="right hide-on-med-and-down">
+            <ul class="right hide-on-small-only">
                 <li>
                     <a href="#bmodal"
                        class="btn waves-effect waves-light">

@@ -5,7 +5,7 @@
                 <div class="left">
                     <a @click="$parent.hide()"
                        class="btn-floating btn-large blue-grey lighten-5 waves-effect waves-light"><i
-                            class="black-text material-icons">settings</i></a>
+                            class="black-text material-icons">arrow_back</i></a>
                 </div>
                 <ul>
                     <li>
