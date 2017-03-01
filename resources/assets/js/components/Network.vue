@@ -940,7 +940,6 @@
             },
 
             factoryFullRandom: function () {
-                var $self = this;
                 var $factory = Data.config.generator.factory.fullRandom;
 
                 return groupFactory();
@@ -971,9 +970,24 @@
                             var group2 = groups[j];
 
                             var quant = _.random($factory.group.connections.min, $factory.group.connections.max);
-                            var nodes = _.concat(group1.nodes, group2.nodes);
 
-                            edgesFactory(quant, nodes, false);
+                            while(quant > 0) {
+                                var node1 = _.sample(group1.nodes);
+                                var pool = group2.nodes;
+
+                                do {
+                                    var node2 = _.sample(group2.nodes);
+                                    pool = _.without(pool, node2);
+
+                                    if (addEdge(node1, node2, false)) {
+                                        quant--;
+                                        break;
+                                    }
+                                } while (!_.isEmpty(pool)); //Attempt limit
+
+                                if(_.isEmpty(pool)) break;
+                            }
+
                         }
                     }
 
@@ -1018,12 +1032,8 @@
                     return Data.nodes.get(ids);
                 }
 
-                function edgesFactory(quant, nodes, limited = true) {
+                function edgesFactory(quant, nodes) {
 
-                    var edgeConfig = $factory.edge;
-                    var rate = edgeConfig.rate;
-
-                    //Adds edges
                     while (quant > 0) {
                         var changed = false;
                         nodes.forEach(function (node1) {
@@ -1043,39 +1053,42 @@
                         if (!changed) break;
                     }
 
-                    function addEdge(node1, node2) {
-                        /**
-                         * Not Allowed:
-                         *  - Node1 and Node 2 are the same node
-                         *  - Node1 and Node 2 are neighbors
-                         *  - Node1's neighbors length are greater than the max edges configured per nodes
-                         *  - Node2's neighbors length are greater than the max edges configured per nodes
-                         */
-                        if (node1.id === node2.id) return false;
-                        if (_.has(node1.neighbors, node2.id)) return false;
-                        if (limited) {
-                            if (node1.neighbors.length >= $factory.edge.density) return false;
-                            if (node2.neighbors.length >= $factory.edge.density) return false;
-                        }
+                    return Data.edges.get();
+                }
 
-                        Data.edges.add({
-                            from: node1.id,
-                            to: node2.id,
-                            rate: {
-                                infect: _.random(rate.infect.min, rate.infect.max, true)
-                            }
-                        });
-
-                        node1.neighbors.push(node2.id);
-                        node2.neighbors.push(node1.id);
-
-                        Data.nodes.update(node1);
-                        Data.nodes.update(node2);
-
-                        return true;
+                function addEdge(node1, node2, limited) {
+                    /**
+                     * Not Allowed:
+                     *  - Node1 and Node 2 are the same node
+                     *  - Node1 and Node 2 are neighbors
+                     *  - Node1's neighbors length are greater than the max edges configured per nodes
+                     *  - Node2's neighbors length are greater than the max edges configured per nodes
+                     */
+                    if (node1.id === node2.id) return false;
+                    if (_.includes(node1.neighbors, node2.id)) return false;
+                    if (_.includes(node2.neighbors, node1.id)) return false;
+                    if(limited) {
+                        if (node1.neighbors.length >= $factory.edge.density) return false;
+                        if (node2.neighbors.length >= $factory.edge.density) return false;
                     }
 
-                    return Data.edges.get();
+                    Data.edges.add({
+                        from: node1.id,
+                        to: node2.id,
+                        rate: {
+                            infect: _.random($factory.edge.rate.infect.min, $factory.edge.rate.infect.max, true)
+                        }
+                    });
+
+                    node1.neighbors.push(node2.id);
+                    node2.neighbors.push(node1.id);
+
+                    Data.nodes.update(node1);
+                    Data.nodes.update(node2);
+
+                    console.log(Data.edges.length);
+
+                    return true;
                 }
 
             }

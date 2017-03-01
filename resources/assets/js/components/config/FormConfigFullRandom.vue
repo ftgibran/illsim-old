@@ -27,8 +27,8 @@
                                 :val-min.sync="factory.group.connections.min"
                                 :val-max.sync="factory.group.connections.max"
                                 step="1"
-                                min="3"
-                                max="12"
+                                min="0"
+                                max="6"
                                 decimals="0"
                                 :range="true"
                         ></ui-slider>
@@ -49,8 +49,8 @@
                                 :val-min.sync="factory.group.connections.min"
                                 :val-max.sync="factory.group.connections.max"
                                 step="1"
-                                min="5"
-                                max="100"
+                                min="0"
+                                max="30"
                                 decimals="0"
                                 :range="true"
                         ></ui-slider>
@@ -81,9 +81,9 @@
                                 label="Quantidade (mínimo e máximo) por grupo"
                                 :val-min.sync="factory.node.min"
                                 :val-max.sync="factory.node.max"
-                                step="50"
-                                min="2500"
-                                max="12500"
+                                step="1"
+                                min="0"
+                                max="400"
                                 decimals="0"
                                 :range="true"
                         ></ui-slider>
@@ -221,8 +221,8 @@
                                 label="Máximo de arestas por nó"
                                 :val.sync="factory.edge.density"
                                 step="1"
-                                min="0"
-                                max="10"
+                                min="2"
+                                max="12"
                                 decimals="0"
                         ></ui-slider>
                     </div>
@@ -234,9 +234,9 @@
                                 label="Quantidade (mínimo e máximo)"
                                 :val-min.sync="factory.edge.min"
                                 :val-max.sync="factory.edge.max"
-                                step="200"
-                                min="5000"
-                                max="45000"
+                                step="1"
+                                min="0"
+                                max="800"
                                 decimals="0"
                                 :range="true"
                         ></ui-slider>
@@ -245,8 +245,8 @@
                                 label="Máximo de arestas por nó"
                                 :val.sync="factory.edge.density"
                                 step="1"
-                                min="500"
-                                max="1000"
+                                min="3"
+                                max="15"
                                 decimals="0"
                         ></ui-slider>
                     </div>

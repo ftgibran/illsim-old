@@ -54,19 +54,19 @@
       "mayBeVaccinated": false,
       "base": {
         "infect": 1,
-        "recover": 1,
-        "susceptible": 1,
-        "death": 1
+        "recover": 0.8,
+        "susceptible": 0.3,
+        "death": 0.3
       }
     },
     "r": {
       "mayInfect": false,
       "mayBeInfected": false,
-      "mayGetSusceptible": false,
+      "mayGetSusceptible": true,
       "mayDie": false,
       "mayBeVaccinated": false,
       "base": {
-        "infect": 0.15,
+        "infect": 0.2,
         "resist": 0.9,
         "susceptible": 0.1,
         "death": 0.05
@@ -103,8 +103,9 @@
       "birthWhenDie": false,
       "base": {
         "infect": 0,
-        "resist": 1,
+        "resist": 0,
         "recover": 0,
+        "susceptible": 0,
         "death": 0
       }
     }
@@ -116,8 +117,8 @@
         "group": {
           "quant": 3,
           "connections": {
-            "min": 3,
-            "max": 6
+            "min": 1,
+            "max": 3
           }
         },
         "node": {
@@ -127,7 +128,7 @@
             {
               "ref": "i",
               "percent": false,
-              "quant": 5
+              "quant": 1
             },
             {
               "ref": "v",
@@ -159,8 +160,8 @@
           }
         },
         "edge": {
-          "min": 75,
-          "max": 100,
+          "min": 50,
+          "max": 75,
           "density": 4,
           "rate": {
             "infect": {
