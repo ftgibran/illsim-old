@@ -214,16 +214,6 @@
                             if (Data.config.simulation.infectBy === 'node' || Data.config.simulation.infectBy === "both")
                                 node.base = node.size += node.rate.infect * Data.const.node.sizeFactor;
                         },
-                        neighbors: function (node) {
-                            var neighbors = [];
-                            $.each(data.edges, function (index, edge) {
-                                if (edge.from === node.id)
-                                    neighbors.push(edge.to);
-                                else if (edge.to === node.id)
-                                    neighbors.push(edge.from);
-                            });
-                            node.neighbors = neighbors;
-                        },
                         borderWidth: function (node) {
                             node.borderWidth = node.borderWidthSelected = Data.config.vis.nodes.borderWidth + node.rate.resist * Data.const.node.widthFactor;
                         },
@@ -248,7 +238,6 @@
 
                 _.forEach(data.nodes, function (node) {
                     $set.node.size(node);
-                    $set.node.neighbors(node);
                     $set.node.borderWidth(node);
                     $set.node.label(node);
                 });
@@ -889,6 +878,7 @@
                         Data.nodes.add({
                             id: i,
                             group: Data.const.status.SUSCEPTIBLE,
+                            neighbors: [],
                             rate: nodeConfig.rate
                         });
 
@@ -919,6 +909,12 @@
                                 to: node2.id,
                                 rate: edgeConfig.rate
                             });
+
+                            node1.neighbors.push(node2.id);
+                            node2.neighbors.push(node1.id);
+
+                            Data.nodes.update(node1);
+                            Data.nodes.update(node2);
                         }
 
                     for (var i = 0; i < row; i++)
@@ -931,6 +927,12 @@
                                 to: node2.id,
                                 rate: edgeConfig.rate
                             });
+
+                            node1.neighbors.push(node2.id);
+                            node2.neighbors.push(node1.id);
+
+                            Data.nodes.update(node1);
+                            Data.nodes.update(node2);
                         }
 
                     return Data.edges.get();
@@ -941,75 +943,92 @@
                 var $self = this;
                 var $factory = Data.config.generator.factory.fullRandom;
 
-                return {
-                    nodes: nodesFactory(),
-                    edges: edgesFactory()
-                };
+                return groupFactory();
 
-                function nodesFactory() {
+                function groupFactory() {
 
-                    var nodeConfig = $factory.node;
-                    var rate = nodeConfig.rate;
+                    var groups = [];
+                    var quant = $factory.group.quant;
 
-                    // Get the number of nodes that will be generate
-                    var quant = _.random(nodeConfig.min, nodeConfig.max);
+                    //Creates all Groups
+                    for (var i = 0; i < quant; i++) {
+                        var nodesQuant = _.random($factory.node.min, $factory.node.max);
+                        var edgesQuant = _.random($factory.edge.min, $factory.edge.max);
 
-                    //Get a group left to avoid undefined
-                    var groupLeft = {
-                        "ref": Data.const.status.SUSCEPTIBLE
-                    };
+                        var nodes = nodesFactory(nodesQuant);
+                        var edges = edgesFactory(edgesQuant, nodes);
 
-                    //Scan each node group and apply the quantity
-                    _.forEach(nodeConfig.groups, function (group) {
-                        if (group.quant === undefined) {
-                            groupLeft = group;
-                            return;
-                        }
-                        if (group.percent)
-                            addNode(group, group.quant / 100 * quant);
-                        else
-                            addNode(group, group.quant);
+                        groups[i] = {
+                            nodes: nodes,
+                            edges: edges
+                        };
+                    }
 
-                    });
+                    //Connect Groups
+                    for (var i = 0; i < groups.length; i++) {
+                        var group1 = groups[i];
+                        for (var j = i + 1; j < groups.length; j++) {
+                            var group2 = groups[j];
 
-                    //Add what is left
-                    addNode(groupLeft, quant - Data.nodes.length);
+                            var quant = _.random($factory.group.connections.min, $factory.group.connections.max);
+                            var nodes = _.concat(group1.nodes, group2.nodes);
 
-                    function addNode(group, quant) {
-                        for (var i = 0; i < quant; i++){
-
-                            Data.nodes.add({
-                                id: Data.nodes.length,
-                                group: group.ref,
-                                rate: {
-                                    infect: _.random(rate.infect.min, rate.infect.max, true),
-                                    resist: _.random(rate.resist.min, rate.resist.max, true),
-                                    recover: _.random(rate.recover.min, rate.recover.max, true),
-                                    susceptible: _.random(rate.susceptible.min, rate.susceptible.max, true),
-                                    death: _.random(rate.death.min, rate.death.max, true)
-                                }
-                            });
-
-                            console.log(Data.nodes.length);
+                            edgesFactory(quant, nodes, false);
                         }
                     }
 
-                    return Data.nodes.get();
+                    //Scan each node group and apply the quantity
+                    _.forEach($factory.node.groups, function (group) {
+                        for (var i = 0; i < group.quant; i++) {
+                            var node = _.sample(Data.nodes.get());
+                            node.group = group.ref;
+                            Data.nodes.update(node);
+                        }
+                    });
+
+                    return {
+                        nodes: Data.nodes.get(),
+                        edges: Data.edges.get()
+                    };
                 }
 
-                function edgesFactory() {
+                function nodesFactory(quant) {
+                    var ids = [];
+                    var rate = $factory.node.rate;
+
+                    for (var i = 0; i < quant; i++) {
+                        var id = Data.nodes.length;
+                        ids.push(id);
+
+                        Data.nodes.add({
+                            id: id,
+                            group: Data.const.status.SUSCEPTIBLE,
+                            neighbors: [],
+                            rate: {
+                                infect: _.random(rate.infect.min, rate.infect.max, true),
+                                resist: _.random(rate.resist.min, rate.resist.max, true),
+                                recover: _.random(rate.recover.min, rate.recover.max, true),
+                                susceptible: _.random(rate.susceptible.min, rate.susceptible.max, true),
+                                death: _.random(rate.death.min, rate.death.max, true)
+                            }
+                        });
+
+                    }
+
+                    return Data.nodes.get(ids);
+                }
+
+                function edgesFactory(quant, nodes, limited = true) {
 
                     var edgeConfig = $factory.edge;
                     var rate = edgeConfig.rate;
 
-                    var quant = _.random(edgeConfig.min, edgeConfig.max);
-
                     //Adds edges
                     while (quant > 0) {
                         var changed = false;
-                        Data.nodes.forEach(function (node1) {
+                        nodes.forEach(function (node1) {
                             if (quant <= 0) return;
-                            var pool = Data.nodes.get();
+                            var pool = nodes;
                             do {
                                 var node2 = _.sample(pool); //get a random node
                                 pool = _.without(pool, node2); //pop node2 from the pool
@@ -1025,37 +1044,35 @@
                     }
 
                     function addEdge(node1, node2) {
+                        /**
+                         * Not Allowed:
+                         *  - Node1 and Node 2 are the same node
+                         *  - Node1 and Node 2 are neighbors
+                         *  - Node1's neighbors length are greater than the max edges configured per nodes
+                         *  - Node2's neighbors length are greater than the max edges configured per nodes
+                         */
                         if (node1.id === node2.id) return false;
+                        if (_.has(node1.neighbors, node2.id)) return false;
+                        if (limited) {
+                            if (node1.neighbors.length >= $factory.edge.density) return false;
+                            if (node2.neighbors.length >= $factory.edge.density) return false;
+                        }
 
-                        var neighbors1 = getNeighbors(node1);
-                        var neighbors2 = getNeighbors(node2);
-                        var edge = $self.filterEdgesByNodes(node1, node2);
-
-                        //The nodes can't exceed the max edges setted
-                        if (neighbors1.length < $factory.edge.density && neighbors2.length < $factory.edge.density)
-                            if (_.isEmpty(edge)) {
-                                Data.edges.add({
-                                    from: node1.id,
-                                    to: node2.id,
-                                    rate: {
-                                        infect: _.random(rate.infect.min, rate.infect.max, true)
-                                    }
-                                });
-                                console.log(Data.edges.length);
-                                return true;
+                        Data.edges.add({
+                            from: node1.id,
+                            to: node2.id,
+                            rate: {
+                                infect: _.random(rate.infect.min, rate.infect.max, true)
                             }
-                        return false;
-                    }
-
-                    function getNeighbors(node) {
-                        var neighbors = [];
-                        Data.edges.forEach(function (edge) {
-                            if (edge.from === node.id)
-                                neighbors.push(Data.nodes.get(edge.to));
-                            else if (edge.to === node.id)
-                                neighbors.push(Data.nodes.get(edge.from));
                         });
-                        return neighbors;
+
+                        node1.neighbors.push(node2.id);
+                        node2.neighbors.push(node1.id);
+
+                        Data.nodes.update(node1);
+                        Data.nodes.update(node2);
+
+                        return true;
                     }
 
                     return Data.edges.get();

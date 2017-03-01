@@ -113,13 +113,17 @@
     "method": "fullRandom",
     "factory": {
       "fullRandom": {
+        "group": {
+          "quant": 3,
+          "connections": {
+            "min": 3,
+            "max": 6
+          }
+        },
         "node": {
-          "min": 80,
-          "max": 100,
+          "min": 30,
+          "max": 50,
           "groups": [
-            {
-              "ref": "s"
-            },
             {
               "ref": "i",
               "percent": false,
@@ -155,8 +159,8 @@
           }
         },
         "edge": {
-          "min": 100,
-          "max": 150,
+          "min": 75,
+          "max": 100,
           "density": 4,
           "rate": {
             "infect": {
@@ -223,11 +227,19 @@
       "width": 3,
       "smooth": false
     },
+    "layout": {
+      "improvedLayout": false
+    },
     "interaction": {
       "hover": true,
       "selectConnectedEdges": false
     },
     "physics": {
+      "barnesHut": {
+        "gravitationalConstant": -80000,
+        "springConstant": 0.001,
+        "springLength": 200
+      },
       "minVelocity": 0.05,
       "forceAtlas2Based": {
         "centralGravity": 0.007

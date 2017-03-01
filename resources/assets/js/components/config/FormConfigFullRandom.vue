@@ -8,13 +8,64 @@
             </li>
 
             <li class="grey lighten-5">
+                <div class="collapsible-header">Grupo</div>
+                <div class="collapsible-body pl pr">
+
+                    <div v-if="mode == 'visual'">
+                        <ui-slider
+                                v-if="factory.group"
+                                label="Quantidade de grupos"
+                                :val.sync="factory.group.quant"
+                                step="1"
+                                min="1"
+                                max="5"
+                                decimals="0"
+                        ></ui-slider>
+                        <ui-slider
+                                v-if="factory.group"
+                                label="Conexões entre os grupos (mínimo e máximo)"
+                                :val-min.sync="factory.group.connections.min"
+                                :val-max.sync="factory.group.connections.max"
+                                step="1"
+                                min="3"
+                                max="12"
+                                decimals="0"
+                                :range="true"
+                        ></ui-slider>
+                    </div>
+                    <div v-if="mode == 'scientific'">
+                        <ui-slider
+                                v-if="factory.group"
+                                label="Quantidade de grupos"
+                                :val.sync="factory.group.quant"
+                                step="1"
+                                min="1"
+                                max="100"
+                                decimals="0"
+                        ></ui-slider>
+                        <ui-slider
+                                v-if="factory.group"
+                                label="Conexões entre os grupos (mínimo e máximo)"
+                                :val-min.sync="factory.group.connections.min"
+                                :val-max.sync="factory.group.connections.max"
+                                step="1"
+                                min="5"
+                                max="100"
+                                decimals="0"
+                                :range="true"
+                        ></ui-slider>
+                    </div>
+                </div>
+            </li>
+
+            <li class="grey lighten-5">
                 <div class="collapsible-header">Nós</div>
                 <div class="collapsible-body pl pr">
 
                     <div v-if="mode == 'visual'">
                         <ui-slider
                                 v-if="factory.node"
-                                label="Quantidade (mínimo e máximo)"
+                                label="Quantidade (mínimo e máximo) por grupo"
                                 :val-min.sync="factory.node.min"
                                 :val-max.sync="factory.node.max"
                                 step="1"
@@ -27,7 +78,7 @@
                     <div v-if="mode == 'scientific'">
                         <ui-slider
                                 v-if="factory.node"
-                                label="Quantidade (mínimo e máximo)"
+                                label="Quantidade (mínimo e máximo) por grupo"
                                 :val-min.sync="factory.node.min"
                                 :val-max.sync="factory.node.max"
                                 step="50"
@@ -156,7 +207,7 @@
                         <ui-slider
                                 v-if="factory.edge"
                                 name="factory[edge]"
-                                label="Quantidade (mínimo e máximo)"
+                                label="Quantidade (mínimo e máximo) por grupo"
                                 :val-min.sync="factory.edge.min"
                                 :val-max.sync="factory.edge.max"
                                 step="1"
