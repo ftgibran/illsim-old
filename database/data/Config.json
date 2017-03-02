@@ -55,18 +55,18 @@
       "base": {
         "infect": 1,
         "recover": 0.8,
-        "susceptible": 0.3,
-        "death": 0.3
+        "susceptible": 1,
+        "death": 0.4
       }
     },
     "r": {
       "mayInfect": false,
       "mayBeInfected": false,
-      "mayGetSusceptible": true,
+      "mayGetSusceptible": false,
       "mayDie": false,
       "mayBeVaccinated": false,
       "base": {
-        "infect": 0.2,
+        "infect": 0.15,
         "resist": 0.9,
         "susceptible": 0.1,
         "death": 0.05
@@ -103,9 +103,8 @@
       "birthWhenDie": false,
       "base": {
         "infect": 0,
-        "resist": 0,
+        "resist": 1,
         "recover": 0,
-        "susceptible": 0,
         "death": 0
       }
     }
@@ -119,6 +118,10 @@
           "connections": {
             "min": 1,
             "max": 3
+          },
+          "startingValuesByGroup": {
+            "enabled": true,
+            "quant": 1
           }
         },
         "node": {
@@ -128,7 +131,7 @@
             {
               "ref": "i",
               "percent": false,
-              "quant": 1
+              "quant": 3
             },
             {
               "ref": "v",
@@ -244,6 +247,11 @@
       "minVelocity": 0.05,
       "forceAtlas2Based": {
         "centralGravity": 0.007
+      },
+      "repulsion": {
+        "centralGravity": 0.25,
+        "springLength": 0,
+        "damping": 0.5
       },
       "solver": "forceAtlas2Based"
     },

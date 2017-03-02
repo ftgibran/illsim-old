@@ -34,7 +34,8 @@
                         </a>
                     </li>
                     <li v-if="$root.$refs.network">
-                        <a v-if="$root.$refs.network.state == 'playing' || $root.$refs.network.state == 'paused'">
+                        <a @click="saveAsImage()"
+                           v-if="$root.$refs.network.state == 'playing' || $root.$refs.network.state == 'paused'">
                             <i class="material-icons left">file_download</i>
                             <span class="fw-b">Salvar dados</span>
                         </a>
@@ -194,6 +195,13 @@
 
             close() {
                 $('#bmodal').modal('close');
+            },
+
+            saveAsImage() {
+                var canvas = document.getElementById("mycanvas");
+                var img    = canvas.toDataURL("image/png");
+
+                document.write('<img src="'+img+'"/>');
             },
 
             init(config) {

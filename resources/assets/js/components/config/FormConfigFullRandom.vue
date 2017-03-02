@@ -19,7 +19,6 @@
                                 step="1"
                                 min="1"
                                 max="5"
-                                decimals="0"
                         ></ui-slider>
                         <ui-slider
                                 v-if="factory.group"
@@ -29,9 +28,26 @@
                                 step="1"
                                 min="0"
                                 max="6"
-                                decimals="0"
                                 :range="true"
                         ></ui-slider>
+
+                        <ul class="collection" style="overflow: visible;">
+                            <li class="collection-item">
+                                <ui-checkbox :checked.sync="factory.group.startingValuesByGroup.enabled"
+                                             name="factory.group.startingValuesByGroup.enabled"
+                                             label='Valores iniciais por grupo'>
+                                    <ui-slider
+                                            v-if="factory.group"
+                                            label="Quantidade de grupos"
+                                            :val.sync="factory.group.startingValuesByGroup.quant"
+                                            step="1"
+                                            min="1"
+                                            max="5"
+                                    ></ui-slider>
+                                </ui-checkbox>
+                            </li>
+                        </ul>
+
                     </div>
                     <div v-if="mode == 'scientific'">
                         <ui-slider
@@ -41,7 +57,6 @@
                                 step="1"
                                 min="1"
                                 max="100"
-                                decimals="0"
                         ></ui-slider>
                         <ui-slider
                                 v-if="factory.group"
@@ -51,9 +66,26 @@
                                 step="1"
                                 min="0"
                                 max="30"
-                                decimals="0"
                                 :range="true"
                         ></ui-slider>
+
+                        <ul class="collection" style="overflow: visible;">
+                            <li class="collection-item">
+                                <ui-checkbox :checked.sync="factory.group.startingValuesByGroup.enabled"
+                                             name="factory.group.startingValuesByGroup.enabled"
+                                             label='Valores iniciais por grupo'>
+                                    <ui-slider
+                                            v-if="factory.group"
+                                            label="Quantidade de grupos"
+                                            :val.sync="factory.group.startingValuesByGroup.quant"
+                                            step="1"
+                                            min="1"
+                                            max="100"
+                                    ></ui-slider>
+                                </ui-checkbox>
+                            </li>
+                        </ul>
+
                     </div>
                 </div>
             </li>
@@ -83,7 +115,7 @@
                                 :val-max.sync="factory.node.max"
                                 step="1"
                                 min="0"
-                                max="400"
+                                max="1000"
                                 decimals="0"
                                 :range="true"
                         ></ui-slider>
@@ -92,16 +124,17 @@
                     <div v-if="factory.node" class="row">
                         <div class="input-field s12 m6 col">
                             <div class="fl-r">
-                                <input type="checkbox" class="filled-in" id="i-percent"
-                                       v-model="groupInfect.percent"/>
-                                <label for="i-percent">%</label>
+                                <ui-checkbox :checked.sync="groupInfected.percent"
+                                             name="groupInfected"
+                                             label='%'
+                                ></ui-checkbox>
                             </div>
                             <div style="overflow: hidden;">
                                 <label class="active truncate" for="i-quant">
                                     <i class="fa fa-square red-text" aria-hidden="true"></i>
                                     Quantidade de infectados</label>
                                 <input type="number" id="i-quant"
-                                       v-model="groupInfect.quant" required>
+                                       v-model="groupInfected.quant">
                             </div>
 
                             <div class="cl-b"></div>
@@ -109,17 +142,18 @@
 
                         <div class="input-field s12 m6 col">
                             <div class="fl-r">
-                                <input type="checkbox" class="filled-in" id="v-percent"
-                                       v-model="groupVacinated.percent"/>
-                                <label for="v-percent">%</label>
+                                <ui-checkbox :checked.sync="groupVaccinated.percent"
+                                             name="groupVaccinated"
+                                             label='%'
+                                ></ui-checkbox>
                             </div>
                             <div style="overflow: hidden;">
                                 <label class="active truncate" for="v-quant">
                                     <i class="fa fa-square green-text" aria-hidden="true"></i>
                                     Quantidade de vacinados</label>
                                 <input type="number" id="v-quant"
-                                       v-model="groupVacinated.quant"
-                                       required>
+                                       v-model="groupVaccinated.quant"
+                                       >
                             </div>
 
                             <div class="cl-b"></div>
@@ -236,7 +270,7 @@
                                 :val-max.sync="factory.edge.max"
                                 step="1"
                                 min="0"
-                                max="800"
+                                max="2000"
                                 decimals="0"
                                 :range="true"
                         ></ui-slider>
@@ -279,7 +313,7 @@
         props: ['factory', 'mode'],
 
         computed: {
-            groupInfect() {
+            groupInfected() {
                 if (!this.factory.node) return {};
 
                 for (var i in this.factory.node.groups) {
@@ -288,7 +322,7 @@
                 }
             },
 
-            groupVacinated() {
+            groupVaccinated() {
                 if (!this.factory.node) return {};
 
                 for (var i in this.factory.node.groups) {

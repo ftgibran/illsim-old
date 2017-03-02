@@ -43,16 +43,17 @@
                 <div v-if="factory.node" class="row">
                     <div class="input-field s12 m6 col">
                         <div class="fl-r">
-                            <input type="checkbox" class="filled-in" id="i-percent" name="i-percent"
-                                   v-model="groupInfect.percent"/>
-                            <label for="i-percent">%</label>
+                            <ui-checkbox :checked.sync="groupInfected.percent"
+                                         name="groupInfected"
+                                         label='%'
+                            ></ui-checkbox>
                         </div>
                         <div style="overflow: hidden;">
                             <label class="active truncate" for="i-quant">
                                 <i class="fa fa-square red-text" aria-hidden="true"></i>
                                 Quantidade de infectados</label>
                             <input type="number" id="i-quant"
-                                   v-model="groupInfect.quant" required>
+                                   v-model="groupInfected.quant">
                         </div>
 
                         <div class="cl-b"></div>
@@ -60,16 +61,17 @@
 
                     <div class="input-field s12 m6 col">
                         <div class="fl-r">
-                            <input type="checkbox" class="filled-in" id="v-percent" name="v-percent"
-                                   v-model="groupVacinated.percent"/>
-                            <label for="v-percent">%</label>
+                            <ui-checkbox :checked.sync="groupVaccinated.percent"
+                                         name="groupVaccinated"
+                                         label='%'
+                            ></ui-checkbox>
                         </div>
                         <div style="overflow: hidden;">
                             <label class="active truncate" for="v-quant">
                                 <i class="fa fa-square green-text" aria-hidden="true"></i>
                                 Quantidade de vacinados</label>
                             <input type="number" id="v-quant"
-                                   v-model="groupVacinated.quant"
+                                   v-model="groupVaccinated.quant"
                                    required>
                         </div>
 
@@ -167,7 +169,7 @@
         props: ['factory', 'mode'],
 
         computed: {
-            groupInfect() {
+            groupInfected() {
                 if (!this.factory.node) return {};
 
                 for (var i in this.factory.node.groups) {
@@ -176,7 +178,7 @@
                 }
             },
 
-            groupVacinated() {
+            groupVaccinated() {
                 if (!this.factory.node) return {};
 
                 for (var i in this.factory.node.groups) {

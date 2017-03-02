@@ -860,10 +860,9 @@
             },
 
             factoryUniformFormat: function () {
-                var $self = this;
                 var $factory = Data.config.generator.factory.uniformFormat;
 
-                Data.config.vis.physics.forceAtlas2Based.centralGravity = 0.001;
+                Data.config.vis.physics.solver = 'repulsion';
 
                 return {
                     nodes: nodesFactory(),
@@ -871,7 +870,6 @@
                 };
 
                 function nodesFactory() {
-                    var nodeConfig = $factory.node;
                     var quant = Math.pow($factory.level, 2);
 
                     for (var i = 0; i < quant; i++)
@@ -879,16 +877,19 @@
                             id: i,
                             group: Data.const.status.SUSCEPTIBLE,
                             neighbors: [],
-                            rate: nodeConfig.rate
+                            rate: $factory.node.rate
                         });
 
-                    //Scan each node group and apply the quantity
-                    _.forEach(nodeConfig.groups, function (group) {
-                        for (var i = 0; i < group.quant; i++) {
-                            var node = _.sample(Data.nodes.get());
+                    _.forEach($factory.node.groups, function (group) {
+                        var quant = group.quant;
+                        if (group.percent)
+                            quant = group.quant / 100 * Data.nodes.length;
+
+                        var samples = _.sampleSize(Data.nodes.get(), _.round(quant));
+                        _.forEach(samples, (node) => {
                             node.group = group.ref;
                             Data.nodes.update(node);
-                        }
+                        });
                     });
 
                     return Data.nodes.get();
@@ -971,7 +972,7 @@
 
                             var quant = _.random($factory.group.connections.min, $factory.group.connections.max);
 
-                            while(quant > 0) {
+                            while (quant > 0) {
                                 var node1 = _.sample(group1.nodes);
                                 var pool = group2.nodes;
 
@@ -985,25 +986,41 @@
                                     }
                                 } while (!_.isEmpty(pool)); //Attempt limit
 
-                                if(_.isEmpty(pool)) break;
+                                if (_.isEmpty(pool)) break;
                             }
 
                         }
                     }
 
-                    //Scan each node group and apply the quantity
-                    _.forEach($factory.node.groups, function (group) {
-                        for (var i = 0; i < group.quant; i++) {
-                            var node = _.sample(Data.nodes.get());
-                            node.group = group.ref;
-                            Data.nodes.update(node);
-                        }
-                    });
+                    //Apply Starting Values
+                    if (!$factory.group.startingValuesByGroup.enabled)
+                        applyStartingValues(Data.nodes.get());
+                    else {
+                        var samples = _.sampleSize(groups, $factory.group.startingValuesByGroup.quant)
+                        _.forEach(samples, (group) => {
+                            applyStartingValues(group.nodes);
+                        });
+                    }
 
                     return {
                         nodes: Data.nodes.get(),
                         edges: Data.edges.get()
                     };
+
+                    //Scan each node group and apply the quantity
+                    function applyStartingValues(nodes) {
+                        _.forEach($factory.node.groups, function (group) {
+                            var quant = group.quant;
+                            if (group.percent)
+                                quant = group.quant / 100 * nodes.length;
+
+                            var samples = _.sampleSize(nodes, _.round(quant));
+                            _.forEach(samples, (node) => {
+                                node.group = group.ref;
+                                Data.nodes.update(node);
+                            });
+                        });
+                    }
                 }
 
                 function nodesFactory(quant) {
@@ -1056,7 +1073,7 @@
                     return Data.edges.get();
                 }
 
-                function addEdge(node1, node2, limited) {
+                function addEdge(node1, node2, limited = true) {
                     /**
                      * Not Allowed:
                      *  - Node1 and Node 2 are the same node
@@ -1067,7 +1084,7 @@
                     if (node1.id === node2.id) return false;
                     if (_.includes(node1.neighbors, node2.id)) return false;
                     if (_.includes(node2.neighbors, node1.id)) return false;
-                    if(limited) {
+                    if (limited) {
                         if (node1.neighbors.length >= $factory.edge.density) return false;
                         if (node2.neighbors.length >= $factory.edge.density) return false;
                     }
@@ -1085,8 +1102,6 @@
 
                     Data.nodes.update(node1);
                     Data.nodes.update(node2);
-
-                    console.log(Data.edges.length);
 
                     return true;
                 }

@@ -3,10 +3,7 @@
 
         <div v-if="config">
 
-            <div class="input-field ta-l">
-                <ui-select label="Modo de simulação" :options="mode" :val.sync="config.mode"></ui-select>
-            </div>
-
+            <ui-select label="Modo de simulação" :options="mode" :val.sync="config.mode"></ui-select>
             <ui-slider
                     v-show="config.mode == 'visual'"
                     label="Intervalo de tempo (ms)"
@@ -20,10 +17,7 @@
             <ul class="collection" style="overflow: visible;">
 
                 <li class="collection-item">
-                    <div class="input-field ta-l">
-                        <ui-select label="Tipo de infecção" :options="infectBy" :val.sync="config.infectBy"></ui-select>
-                    </div>
-
+                    <ui-select label="Tipo de infecção" :options="infectBy" :val.sync="config.infectBy"></ui-select>
                     <ui-slider v-if="config.infectBy == 'special'"
                                label="Constante k"
                                :val.sync="config.k"
