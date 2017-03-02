@@ -387,7 +387,7 @@
 
                 this.$parent.$on('step', () => {
                     this.add();
-                    Analytics.currentDate = moment(Analytics.currentDate).add(Analytics.config.step, 1);
+                    Analytics.currentDate = moment(Analytics.currentDate).add(1, Analytics.config.step);
                 });
             },
 
