@@ -50,21 +50,37 @@
 
         <div id="animation" class="ml mr mt mb">
             <h2 class="mt-s ta-c sahitya">Animação</h2>
-            <form-config-animation :config="config.animation"
-                                   :mode.sync="config.simulation.mode"></form-config-animation>
+
+            <form-config-animation
+                    :config="config.animation"
+                    :mode.sync="config.simulation.mode"
+            ></form-config-animation>
         </div>
+
         <div id="simulation" class="ml mr mt mb">
             <h2 class="mt-s ta-c sahitya">Simulação</h2>
-            <form-config-simulation :config="config.simulation"></form-config-simulation>
+
+            <form-config-simulation
+                    :config="config.simulation"
+            ></form-config-simulation>
         </div>
+
         <div id="generator" class="ml mr mt mb">
             <h2 class="mt-s ta-c sahitya">Gerador</h2>
-            <form-config-generator :config="config.generator"
-                                   :mode.sync="config.simulation.mode"></form-config-generator>
+
+            <form-config-generator
+                    :config="config.generator"
+                    :mode.sync="config.simulation.mode"
+                    :infect-by.sync="config.simulation.infectBy"
+            ></form-config-generator>
         </div>
+
         <div id="analytics" class="ml mr mt mb">
             <h2 class="mt-s ta-c sahitya">Analytics</h2>
-            <form-config-analytics :config="config.analytics"></form-config-analytics>
+
+            <form-config-analytics
+                    :config="config.analytics"
+            ></form-config-analytics>
         </div>
 
     </ui-loader>
@@ -126,8 +142,8 @@
                 }
 
                 var blob = new Blob([data], {type: 'text/json'}),
-                        e = document.createEvent('MouseEvents'),
-                        a = document.createElement('a');
+                    e = document.createEvent('MouseEvents'),
+                    a = document.createElement('a');
 
                 a.download = filename;
                 a.href = window.URL.createObjectURL(blob);

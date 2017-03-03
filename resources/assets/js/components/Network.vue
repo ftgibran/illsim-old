@@ -55,12 +55,12 @@
 
             play: function (rate) {
                 this.state = 'playing';
-                Data.loop = setInterval(this.step, rate);
+                Data.step = setInterval(this.step, rate);
             },
 
             stop: function () {
                 this.state = 'paused';
-                clearInterval(Data.loop);
+                clearInterval(Data.step);
             },
 
             reset: function () {
@@ -158,8 +158,8 @@
                 if (this.state != 'paused' && this.state != 'initializing')
                     return;
 
-                if (Data.loop != null)
-                    Data.loop = null;
+                if (Data.step != null)
+                    Data.step = null;
 
                 if (rate == null)
                     rate = Data.config.simulation.step;
@@ -183,7 +183,7 @@
                 if (!_.isNull(Data.network))
                     Data.network.destroy();
 
-                clearInterval(Data.loop);
+                clearInterval(Data.step);
                 TweenMax.killAll();
 
                 Data.nodes = null;
@@ -348,15 +348,12 @@
 
             step: function () {
 
-                this.$emit('step', {
-                    susceptible: this.susceptible,
-                    infected: this.infected,
-                    recovered: this.recovered,
-                    vaccinated: this.vaccinated,
-                    death: this.death,
-                    population: this.population,
-                    shots: this.shots
-                });
+                this.$emit('step');
+
+                this.$refs.analytics.step();
+
+                if (Data.config.simulation.inoculation.active)
+                    this.inoculate();
 
                 //Each step do an attempt
                 Data.nodes.forEach((node) => {
@@ -365,8 +362,6 @@
                     this.killAttempt(node);
                 });
 
-                if (Data.config.simulation.inoculation.active)
-                    this.inoculate();
             },
 
             //Infect Attempt

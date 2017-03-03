@@ -10,12 +10,14 @@
                 v-show="config.method == 'fullRandom'"
                 :factory="config.factory.fullRandom"
                 :mode.sync="mode"
+                :infect-by.sync="infectBy"
         ></form-config-full-random>
 
         <form-config-uniform-format
                 v-show="config.method == 'uniformFormat'"
                 :factory="config.factory.uniformFormat"
                 :mode.sync="mode"
+                :infect-by.sync="infectBy"
         ></form-config-uniform-format>
 
     </ui-loader>
@@ -41,21 +43,7 @@
             }
         },
 
-        props: ['config', 'mode'],
-
-        watch: {
-            mode(val) {
-//                if (val == 'scientific') {
-//                    this.methods = [
-//                        this.uniformFormat
-//                    ];
-//                    this.config.method = 'uniformFormat';
-//                } else {
-//                    this.init();
-//                }
-                this.init();
-            }
-        },
+        props: ['config', 'mode', 'infectBy'],
 
         methods: {
             init() {

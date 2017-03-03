@@ -161,7 +161,7 @@
                     </div>
 
                     <ui-slider
-                            v-if="factory.node"
+                            v-if="factory.node && (infectBy == 'node' || infectBy == 'both')"
                             icon="fa-square red-text"
                             label="Taxa de infecção"
                             :val-min.sync="factory.node.rate.infect.min"
@@ -286,7 +286,7 @@
                     </div>
 
                     <ui-slider
-                            v-if="factory.edge"
+                            v-if="factory.edge && (infectBy == 'edge' || infectBy == 'both')"
                             icon="fa-square red-text"
                             name="factory[edge][rate][infect]"
                             label="Taxa de infecção"
@@ -310,7 +310,7 @@
 
 <script>
     export default {
-        props: ['factory', 'mode'],
+        props: ['factory', 'mode', 'infectBy'],
 
         computed: {
             groupInfected() {

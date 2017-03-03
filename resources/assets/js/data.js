@@ -22,7 +22,7 @@ module.exports = {
     },
     context: null,
     network: null,
-    loop: null,
+    step: null,
     nodes: null,
     edges: null,
     config: null

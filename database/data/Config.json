@@ -168,8 +168,8 @@
           "density": 4,
           "rate": {
             "infect": {
-              "min": 0.01,
-              "max": 0.05
+              "min": 0.5,
+              "max": 1
             }
           }
         }

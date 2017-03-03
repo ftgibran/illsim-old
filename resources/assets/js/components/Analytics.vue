@@ -198,10 +198,6 @@
             },
 
             saveAsImage() {
-                var canvas = document.getElementById("mycanvas");
-                var img    = canvas.toDataURL("image/png");
-
-                document.write('<img src="'+img+'"/>');
             },
 
             init(config) {
@@ -359,7 +355,7 @@
                 };
             },
 
-            add() {
+            step() {
                 if (this.variables[0])
                     Analytics.data.add({x: Analytics.currentDate, y: this[this.variables[0].value], group: 0});
 
@@ -374,6 +370,9 @@
 
                 if (this.variables[4])
                     Analytics.data.add({x: Analytics.currentDate, y: this[this.variables[4].value], group: 4});
+
+                //Next x-axis
+                Analytics.currentDate = moment(Analytics.currentDate).add(1, Analytics.config.step);
             }
 
         },
@@ -384,11 +383,6 @@
 
                 var container = document.getElementById('graph');
                 Analytics.graph2d = new vis.Graph2d(container, Analytics.data, this.groups(), this.options());
-
-                this.$parent.$on('step', () => {
-                    this.add();
-                    Analytics.currentDate = moment(Analytics.currentDate).add(1, Analytics.config.step);
-                });
             },
 
             reset() {
