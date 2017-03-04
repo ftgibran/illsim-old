@@ -32,26 +32,46 @@
                     <ui-checkbox :checked.sync="config.inoculation.active" name="config.inoculation.active"
                                  label='Ativar Inoculação'>
                         <div style="position: relative; margin-top: 1em;">
-                            <ui-select label="Tipo de vacinação"
-                                       :options="inoculationBy"
-                                       :val.sync="config.inoculation.by">
-                            </ui-select>
+
+                            <div class="row">
+
+                                <ui-select label="Tipo de distribuição"
+                                           class="col s12 m6"
+                                           :options="inoculationBy"
+                                           :val.sync="config.inoculation.by">
+                                </ui-select>
+
+                                <div class="col s12 m6 input-field">
+                                    <div class="fl-r">
+                                        <ui-checkbox :checked.sync="config.inoculation.limit.percent"
+                                                     name="config.inoculation.limit.percent"
+                                                     label='%'
+                                        ></ui-checkbox>
+                                    </div>
+                                    <div style="overflow: hidden; margin-right: 1em;">
+                                        <label class="active truncate" for="quant">
+                                            Limite de distribuição
+                                        </label>
+
+                                        <input type="number"
+                                               id="quant"
+                                               v-model="config.inoculation.limit.quant"
+                                        >
+                                    </div>
+
+                                    <div class="cl-b"></div>
+                                </div>
+
+                            </div>
 
                             <div v-if="config.mode == 'visual'">
                                 <ui-slider
                                         label="Número de distribuições / passo de tempo"
                                         :val.sync="config.inoculation.rate"
                                         step="1"
-                                        min="1"
-                                        max="10"
-                                        decimals="0"
-                                ></ui-slider>
-                                <ui-slider
-                                        label="Limite de distribuição"
-                                        :val.sync="config.inoculation.limit"
-                                        step="1"
                                         min="0"
-                                        max="200"
+                                        max="50"
+                                        decimals="0"
                                 ></ui-slider>
                             </div>
 
@@ -60,18 +80,12 @@
                                         label="Número de distribuições / passo de tempo"
                                         :val.sync="config.inoculation.rate"
                                         step="1"
-                                        min="1"
-                                        max="100"
+                                        min="0"
+                                        max="200"
                                         decimals="0"
                                 ></ui-slider>
-                                <ui-slider
-                                        label="Limite de distribuição"
-                                        :val.sync="config.inoculation.limit"
-                                        step="50"
-                                        min="0"
-                                        max="20000"
-                                ></ui-slider>
                             </div>
+
 
                         </div>
                     </ui-checkbox>

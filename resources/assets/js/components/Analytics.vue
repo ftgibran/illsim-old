@@ -52,10 +52,12 @@
         <div class="variables">
             <ui-loader :lazy="true">
                 <ul class="flex">
-                    <li v-for="item in variables" v-show="item" class="chip">
+                    <li v-for="item in display" v-show="item" class="chip">
                         <i class="fa fa-square {{item.color}}-text" aria-hidden="true"></i>
                         {{item.label}}
-                        <span class="badge">{{this[item.value]}}</span>
+                        <span class="badge" style="width: 4em;">
+                            {{this[item.value]}}
+                        </span>
                     </li>
                 </ul>
             </ui-loader>
@@ -143,7 +145,9 @@
 
     const Analytics = {
         data: new vis.DataSet(),
-        currentDate: new Date(),
+        currentDate: null,
+        inoculateDate: null,
+        population: null,
         graph2d: null,
         config: null
     };
@@ -151,44 +155,76 @@
     export default {
         data() {
             return {
-                variables: []
+                display: []
             }
         },
 
         computed: {
             infected() {
-                return this.$parent['infected'];
+                var display = this.$parent['infected'];
+                return this.displayValue(display);
             },
             infected_n_recovered() {
-                return this.$parent['infected'] + this.$parent['recovered'];
+                var display = this.$parent['infected'] +
+                    this.$parent['recovered'];
+                return this.displayValue(display);
             },
             recovered() {
-                return this.$parent['recovered'];
+                var display = this.$parent['recovered'];
+                return this.displayValue(display);
             },
             alive() {
-                return this.$parent['infected'] + this.$parent['recovered'] + this.$parent['susceptible'] + this.$parent['vaccinated'];
+                var display = this.$parent['infected'] +
+                    this.$parent['recovered'] +
+                    this.$parent['susceptible'] +
+                    this.$parent['vaccinated'];
+                return this.displayValue(display);
             },
             susceptible() {
-                return this.$parent['susceptible'];
+                var display = this.$parent['susceptible'];
+                return this.displayValue(display);
             },
             susceptible_n_vaccinated() {
-                return this.$parent['susceptible'] + this.$parent['vaccinated'];
+                var display = this.$parent['susceptible'] +
+                    this.$parent['vaccinated'];
+                return this.displayValue(display);
             },
             susceptible_n_recovered() {
-                return this.$parent['susceptible'] + this.$parent['recovered'];
+                var display = this.$parent['susceptible'] +
+                    this.$parent['recovered'];
+                return this.displayValue(display);
             },
             vaccinated() {
-                return this.$parent['vaccinated'];
+                var display = this.$parent['vaccinated'];
+                return this.displayValue(display);
             },
             healthy() {
-                return this.$parent['recovered'] + this.$parent['susceptible'] + this.$parent['vaccinated'];
+                var display = this.$parent['recovered'] +
+                    this.$parent['susceptible'] +
+                    this.$parent['vaccinated'];
+                return this.displayValue(display);
             },
             death() {
-                return this.$parent['death'];
+                var display = this.$parent['death'];
+                return this.displayValue(display);
             }
         },
 
         methods: {
+            displayValue(value) {
+                if (this.isRelative())
+                    return _.round(Number(value) / Number(Analytics.population),
+                        Analytics.config.variables.relative.precision);
+
+                return value;
+            },
+
+            isRelative() {
+                if (Analytics.config && Analytics.config.variables.relative.enabled)
+                    return true;
+                return false;
+            },
+
             open() {
                 $('#bmodal').modal('open');
             },
@@ -205,16 +241,16 @@
             },
 
             normalize() {
-                switch (Analytics.config.variables[0]) {
+                switch (Analytics.config.variables.display[0]) {
                     case 'infected':
-                        this.variables[0] = {
+                        this.display[0] = {
                             color: 'red',
                             label: 'Infectados',
                             value: 'infected'
                         };
                         break;
                     case 'infected_n_recovered':
-                        this.variables[0] = {
+                        this.display[0] = {
                             color: 'red',
                             label: 'Infectados & Recuperados',
                             value: 'infected_n_recovered'
@@ -222,16 +258,16 @@
                         break;
                 }
 
-                switch (Analytics.config.variables[1]) {
+                switch (Analytics.config.variables.display[1]) {
                     case 'recovered':
-                        this.variables[1] = {
+                        this.display[1] = {
                             color: 'yellow',
                             label: 'Recuperados',
                             value: 'recovered'
                         };
                         break;
                     case 'alive':
-                        this.variables[1] = {
+                        this.display[1] = {
                             color: 'yellow',
                             label: 'Vivos',
                             value: 'alive'
@@ -239,23 +275,23 @@
                         break;
                 }
 
-                switch (Analytics.config.variables[2]) {
+                switch (Analytics.config.variables.display[2]) {
                     case 'susceptible':
-                        this.variables[2] = {
+                        this.display[2] = {
                             color: 'grey',
                             label: 'Suscetíveis',
                             value: 'susceptible'
                         };
                         break;
                     case 'susceptible_n_vaccinated':
-                        this.variables[2] = {
+                        this.display[2] = {
                             color: 'grey',
                             label: 'Suscetíveis & Vacinados',
                             value: 'susceptible_n_vaccinated'
                         };
                         break;
                     case 'susceptible_n_recovered':
-                        this.variables[2] = {
+                        this.display[2] = {
                             color: 'grey',
                             label: 'Suscetíveis & Recuperados',
                             value: 'susceptible_n_recovered'
@@ -263,16 +299,16 @@
                         break;
                 }
 
-                switch (Analytics.config.variables[3]) {
+                switch (Analytics.config.variables.display[3]) {
                     case 'vaccinated':
-                        this.variables[3] = {
+                        this.display[3] = {
                             color: 'green',
                             label: 'Vacinados',
                             value: 'vaccinated'
                         };
                         break;
                     case 'healthy':
-                        this.variables[3] = {
+                        this.display[3] = {
                             color: 'green',
                             label: 'Saudáveis',
                             value: 'healthy'
@@ -280,9 +316,9 @@
                         break;
                 }
 
-                switch (Analytics.config.variables[4]) {
+                switch (Analytics.config.variables.display[4]) {
                     case 'death':
-                        this.variables[4] = {
+                        this.display[4] = {
                             color: 'black',
                             label: 'Falecidos',
                             value: 'death'
@@ -294,40 +330,40 @@
             groups() {
                 var groups = new vis.DataSet();
 
-                if (this.variables[0])
+                if (this.display[0])
                     groups.add({
                         id: 0,
-                        content: this.variables[0].label,
+                        content: this.display[0].label,
                         className: 'infected',
                         options: {shaded: true}
                     });
 
-                if (this.variables[1])
+                if (this.display[1])
                     groups.add({
                         id: 1,
-                        content: this.variables[1].label,
+                        content: this.display[1].label,
                         className: 'recovered'
                     });
 
-                if (this.variables[2])
+                if (this.display[2])
                     groups.add({
                         id: 2,
-                        content: this.variables[2].label,
+                        content: this.display[2].label,
                         className: 'susceptible'
                     });
 
-                if (this.variables[3])
+                if (this.display[3])
                     groups.add({
                         id: 3,
-                        content: this.variables[3].label,
+                        content: this.display[3].label,
                         className: 'vaccinated',
                         options: {shaded: true}
                     });
 
-                if (this.variables[4])
+                if (this.display[4])
                     groups.add({
                         id: 4,
-                        content: this.variables[4].label,
+                        content: this.display[4].label,
                         className: 'death'
                     });
 
@@ -356,30 +392,50 @@
             },
 
             step() {
-                if (this.variables[0])
-                    Analytics.data.add({x: Analytics.currentDate, y: this[this.variables[0].value], group: 0});
+                if (this.display[0])
+                    Analytics.data.add({x: Analytics.currentDate, y: this[this.display[0].value], group: 0});
 
-                if (this.variables[1])
-                    Analytics.data.add({x: Analytics.currentDate, y: this[this.variables[1].value], group: 1});
+                if (this.display[1])
+                    Analytics.data.add({x: Analytics.currentDate, y: this[this.display[1].value], group: 1});
 
-                if (this.variables[2])
-                    Analytics.data.add({x: Analytics.currentDate, y: this[this.variables[2].value], group: 2});
+                if (this.display[2])
+                    Analytics.data.add({x: Analytics.currentDate, y: this[this.display[2].value], group: 2});
 
-                if (this.variables[3])
-                    Analytics.data.add({x: Analytics.currentDate, y: this[this.variables[3].value], group: 3});
+                if (this.display[3])
+                    Analytics.data.add({x: Analytics.currentDate, y: this[this.display[3].value], group: 3});
 
-                if (this.variables[4])
-                    Analytics.data.add({x: Analytics.currentDate, y: this[this.variables[4].value], group: 4});
+                if (this.display[4])
+                    Analytics.data.add({x: Analytics.currentDate, y: this[this.display[4].value], group: 4});
 
                 //Next x-axis
                 Analytics.currentDate = moment(Analytics.currentDate).add(1, Analytics.config.step);
+
+                this.checkInoculateDelay();
+            },
+
+            checkInoculateDelay() {
+                if (!Analytics.config.inoculationDelay.enabled)
+                    return;
+
+                if (!this.$parent.mayInoculate)
+                    if (Analytics.inoculateDate.isBefore(Analytics.currentDate))
+                        this.$parent.mayInoculate = true;
             }
 
         },
 
         events: {
-            load() {
+            load(population) {
                 this.normalize();
+
+                Analytics.currentDate = moment();
+                Analytics.inoculateDate = moment();
+                Analytics.population = population;
+
+                if (Analytics.config.inoculationDelay.enabled) {
+                    this.$parent.mayInoculate = false;
+                    Analytics.inoculateDate = moment().add(Analytics.config.inoculationDelay.value, Analytics.config.inoculationDelay.unit);
+                }
 
                 var container = document.getElementById('graph');
                 Analytics.graph2d = new vis.Graph2d(container, Analytics.data, this.groups(), this.options());
@@ -390,9 +446,11 @@
                     Analytics.graph2d.destroy();
 
                 Analytics.data.clear();
-                Analytics.currentDate = new Date();
+                Analytics.currentDate = null;
+                Analytics.inoculateDate = null;
+                Analytics.population = null;
                 Analytics.config = null;
-                this.variables = [];
+                this.display = [];
 
                 this.$parent.$off('step');
             }

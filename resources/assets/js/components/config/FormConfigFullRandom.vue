@@ -265,7 +265,7 @@
                         <ui-slider
                                 v-if="factory.edge"
                                 name="factory[edge]"
-                                label="Quantidade (mínimo e máximo)"
+                                label="Quantidade (mínimo e máximo) por grupo"
                                 :val-min.sync="factory.edge.min"
                                 :val-max.sync="factory.edge.max"
                                 step="1"

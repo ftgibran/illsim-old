@@ -20,6 +20,7 @@ module.exports = {
             DEATH: "d"
         }
     },
+    population: null,
     context: null,
     network: null,
     step: null,

@@ -41,13 +41,22 @@
                 recovered: 0,
                 vaccinated: 0,
                 death: 0,
-                shots: 0
+                shots: 0,
+                mayInoculate: true
             }
         },
 
         computed: {
             population() {
                 return this.susceptible + this.infected + this.recovered + this.vaccinated;
+            },
+            limit() {
+                var limit = Data.config.simulation.inoculation.limit.quant;
+
+                if (Data.config.simulation.inoculation.limit.percent)
+                    limit = _.round(Data.config.simulation.inoculation.limit.quant / 100 * Data.population);
+
+                return limit;
             }
         },
 
@@ -176,7 +185,7 @@
 
             load: function () {
                 this.$emit('load');
-                this.$refs.analytics.$emit('load');
+                this.$refs.analytics.$emit('load', Data.population);
             },
 
             reset: function () {
@@ -190,14 +199,15 @@
                 Data.edges = null;
                 Data.config = null;
                 Data.context = null;
+                Data.population = null;
 
                 this.susceptible = 0;
                 this.infected = 0;
                 this.recovered = 0;
                 this.vaccinated = 0;
                 this.death = 0;
-                this.population = 0;
                 this.shots = 0;
+                this.mayInoculate = true;
 
                 this.$emit('reset');
                 this.$refs.analytics.$emit('reset');
@@ -258,34 +268,13 @@
             },
 
             setStats: function () {
-                var $self = this;
+                Data.population = Data.nodes.length;
 
-                $self.population = Data.nodes.length;
-
-                _.forEach(Data.nodes.get(), function (node) {
-                    switch (node.group) {
-                        case Data.const.status.SUSCEPTIBLE:
-                            $self.susceptible++;
-                            break;
-
-                        case Data.const.status.INFECTED:
-                            $self.infected++;
-                            break;
-
-                        case Data.const.status.RECOVERED:
-                            $self.recovered++;
-                            break;
-
-                        case Data.const.status.VACCINATED:
-                            $self.vaccinated++;
-                            break;
-
-                        case Data.const.status.DEATH:
-                            $self.death++;
-                            break;
-
-                    }
-                });
+                this.susceptible = this.filterNodesByGroup(Data.const.status.SUSCEPTIBLE).length;
+                this.infected = this.filterNodesByGroup(Data.const.status.INFECTED).length;
+                this.recovered = this.filterNodesByGroup(Data.const.status.RECOVERED).length;
+                this.vaccinated = this.filterNodesByGroup(Data.const.status.VACCINATED).length;
+                this.death = this.filterNodesByGroup(Data.const.status.DEATH).length;
             },
 
             /**
@@ -352,7 +341,7 @@
 
                 this.$refs.analytics.step();
 
-                if (Data.config.simulation.inoculation.active)
+                if (Data.config.simulation.inoculation.active && this.mayInoculate)
                     this.inoculate();
 
                 //Each step do an attempt
@@ -468,7 +457,7 @@
                     const INFECT_RETRACT_TIME = Number(Data.config.animation.infect.retractTime);
                     const SHAKE_RADIUS = Number(Data.config.animation.infect.shakeRadius);
                     const REST_TIME = INFECT_EXPAND_TIME +
-                            INFECT_EXPAND_DELAY + INFECT_RETRACT_TIME + Number(Data.config.animation.infect.restTime); //1.5
+                        INFECT_EXPAND_DELAY + INFECT_RETRACT_TIME + Number(Data.config.animation.infect.restTime); //1.5
 
                     $self.rest(infected, REST_TIME);
                     $self.rest(target, REST_TIME);
@@ -519,9 +508,9 @@
                             var hip = SHAKE_RADIUS;
                             var angle = Math.atan2(targetPos.y - infectedPos.y, targetPos.x - infectedPos.x);
                             Data.network.moveNode(
-                                    target.id,
-                                    targetPos.x + Math.cos(angle) * hip,
-                                    targetPos.y + Math.sin(angle) * hip
+                                target.id,
+                                targetPos.x + Math.cos(angle) * hip,
+                                targetPos.y + Math.sin(angle) * hip
                             );
 
                             //Node retract animation
@@ -568,7 +557,7 @@
                     const RECOVER_EXPAND_SCALE = Number(Data.config.animation.recover.expandScale);
                     const RECOVER_RETRACT_TIME = Number(Data.config.animation.recover.retractTime);
                     const REST_TIME = RECOVER_EXPAND_TIME + RECOVER_RETRACT_TIME +
-                            Number(Data.config.animation.recover.restTime); //2.4
+                        Number(Data.config.animation.recover.restTime); //2.4
 
                     $self.rest(target, REST_TIME);
 
@@ -626,7 +615,7 @@
                     const BIRTH_EXPAND_SCALE = Number(Data.config.animation.death.birthExpandScale);
                     const BIRTH_RETRACT_TIME = Number(Data.config.animation.death.birthRetractTime);
                     const REST_TIME = DEATH_RETRACT_TIME + BIRTH_EXPAND_TIME +
-                            BIRTH_EXPAND_DELAY + BIRTH_RETRACT_TIME + Number(Data.config.animation.death.restTime); //6.9
+                        BIRTH_EXPAND_DELAY + BIRTH_RETRACT_TIME + Number(Data.config.animation.death.restTime); //6.9
 
                     $self.rest(target, REST_TIME);
 
@@ -715,7 +704,7 @@
                 var $self = this;
 
                 //Gets the number of vaccines remaining
-                var left = Data.config.simulation.inoculation.limit - $self.shots;
+                var left = this.limit - this.shots;
                 if (left <= 0) return;
 
                 var quant = _.min([Data.config.simulation.inoculation.rate, left]);
@@ -727,18 +716,18 @@
                 });
 
                 switch (Data.config.simulation.inoculation.by) {
-                        //Method 1 - Random
-                        //Just get random nodes and inoculate them
+                    //Method 1 - Random
+                    //Just get random nodes and inoculate them
                     case 'random':
                         random();
                         break;
-                        //Method 2 - Grades
-                        //Sort all nodes by grades (the number of infected neighbors) and inoculate them
+                    //Method 2 - Grades
+                    //Sort all nodes by grades (the number of infected neighbors) and inoculate them
                     case 'grade':
                         grade();
                         break;
-                        //Method 3 - Neighbor
-                        //Sort all nodes by grades and inoculates their neighbors
+                    //Method 3 - Neighbor
+                    //Sort all nodes by grades and inoculates their neighbors
                     case 'neighbor':
                         neighbor();
                         break;
@@ -776,6 +765,9 @@
                         }
                     });
 
+                    if(_.isEmpty(neighbors))
+                        return random();
+
                     //Takes some nodes according by configuration
                     neighbors = _.take(neighbors, quant);
 
@@ -806,7 +798,7 @@
                     const VACCINATE_EXPAND_SCALE = Number(Data.config.animation.vaccinate.expandScale);
                     const VACCINATE_RETRACT_TIME = Number(Data.config.animation.vaccinate.retractTime);
                     const REST_TIME = VACCINATE_EXPAND_TIME + VACCINATE_RETRACT_TIME +
-                            Number(Data.config.animation.vaccinate.restTime); //2.4
+                        Number(Data.config.animation.vaccinate.restTime); //2.4
 
                     $self.rest(target, REST_TIME);
 
@@ -882,9 +874,10 @@
 
                         var samples = _.sampleSize(Data.nodes.get(), _.round(quant));
                         _.forEach(samples, (node) => {
-                            node.group = group.ref;
-                            Data.nodes.update(node);
-                        });
+                                node.group = group.ref;
+                                Data.nodes.update(node);
+                            }
+                        );
                     });
 
                     return Data.nodes.get();
@@ -991,7 +984,7 @@
                     if (!$factory.group.startingValuesByGroup.enabled)
                         applyStartingValues(Data.nodes.get());
                     else {
-                        var samples = _.sampleSize(groups, $factory.group.startingValuesByGroup.quant)
+                        var samples = _.sampleSize(groups, $factory.group.startingValuesByGroup.quant);
                         _.forEach(samples, (group) => {
                             applyStartingValues(group.nodes);
                         });

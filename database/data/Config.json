@@ -44,7 +44,10 @@
       "active": true,
       "by": "random",
       "rate": 1,
-      "limit": 10
+      "limit": {
+        "quant": 10,
+        "percent": true
+      }
     },
     "i": {
       "mayInfect": true,
@@ -211,13 +214,24 @@
       "value": 2,
       "unit": "years"
     },
-    "variables": [
-      "infected",
-      "recovered",
-      "susceptible",
-      "vaccinated",
-      "death"
-    ]
+    "inoculationDelay": {
+      "enabled": false,
+      "value": 2,
+      "unit": "months"
+    },
+    "variables": {
+      "relative": {
+        "enabled": false,
+        "precision": 2
+      },
+      "display": [
+        "infected",
+        "recovered",
+        "susceptible",
+        "vaccinated",
+        "death"
+      ]
+    }
   },
   "vis": {
     "nodes": {
