@@ -49,14 +49,6 @@
         computed: {
             population() {
                 return this.susceptible + this.infected + this.recovered + this.vaccinated;
-            },
-            limit() {
-                var limit = Data.config.simulation.inoculation.limit.quant;
-
-                if (Data.config.simulation.inoculation.limit.percent)
-                    limit = _.round(Data.config.simulation.inoculation.limit.quant / 100 * Data.population);
-
-                return limit;
             }
         },
 
@@ -703,8 +695,13 @@
             inoculate: function () {
                 var $self = this;
 
+                var limit = Data.config.simulation.inoculation.limit.quant;
+
+                if (Data.config.simulation.inoculation.limit.percent)
+                    limit = _.round(Data.config.simulation.inoculation.limit.quant / 100 * Data.population);
+
                 //Gets the number of vaccines remaining
-                var left = this.limit - this.shots;
+                var left = limit - this.shots;
                 if (left <= 0) return;
 
                 var quant = _.min([Data.config.simulation.inoculation.rate, left]);
