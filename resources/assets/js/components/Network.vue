@@ -979,11 +979,11 @@
 
                     //Apply Starting Values
                     if (!$factory.group.startingValuesByGroup.enabled)
-                        applyStartingValues(Data.nodes.get());
+                        applyStartingValues(Data.nodes.getIds());
                     else {
                         var samples = _.sampleSize(groups, $factory.group.startingValuesByGroup.quant);
                         _.forEach(samples, (group) => {
-                            applyStartingValues(group.nodes);
+                            applyStartingValues(_.map(group.nodes, (node) => node.id));
                         });
                     }
 
@@ -993,13 +993,17 @@
                     };
 
                     //Scan each node group and apply the quantity
-                    function applyStartingValues(nodes) {
+                    function applyStartingValues(ids) {
                         _.forEach($factory.node.groups, function (group) {
                             var quant = group.quant;
                             if (group.percent)
-                                quant = group.quant / 100 * nodes.length;
+                                quant = _.round(group.quant / 100 * ids.length);
 
-                            var samples = _.sampleSize(nodes, _.round(quant));
+                            var nodes = Data.nodes.get(ids, {
+                                filter: (node) => node.group === Data.const.status.SUSCEPTIBLE
+                            });
+
+                            var samples = _.sampleSize(nodes, quant);
                             _.forEach(samples, (node) => {
                                 node.group = group.ref;
                                 Data.nodes.update(node);
