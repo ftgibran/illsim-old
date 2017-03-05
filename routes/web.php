@@ -21,11 +21,3 @@ Route::get('api/getConfig', function () {
 	return File::get(database_path("data/Config.json"));
 });
 
-Route::get('api/getFactoryFullRandom', function () {
-    return File::get(database_path("data/FactoryFullRandom.json"));
-});
-
-Route::get('api/getFactoryUniformFormat', function () {
-    return File::get(database_path("data/FactoryUniformFormat.json"));
-});
-

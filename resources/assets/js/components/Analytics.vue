@@ -34,7 +34,7 @@
                         </a>
                     </li>
                     <li v-if="$root.$refs.network">
-                        <a @click="saveAsImage()"
+                        <a @click="saveAsJson()"
                            v-if="$root.$refs.network.state == 'playing' || $root.$refs.network.state == 'paused'">
                             <i class="material-icons left">file_download</i>
                             <span class="fw-b">Salvar dados</span>
@@ -63,7 +63,9 @@
             </ui-loader>
         </div>
 
+        <div id="editor"></div>
         <div id="graph"></div>
+
     </div>
 </template>
 
@@ -145,6 +147,7 @@
 
     const Analytics = {
         data: new vis.DataSet(),
+        group: new vis.DataSet(),
         currentDate: null,
         inoculateDate: null,
         population: null,
@@ -211,20 +214,6 @@
         },
 
         methods: {
-            displayValue(value) {
-                if (this.isRelative())
-                    return _.round(Number(value) / Number(Analytics.population),
-                        Analytics.config.variables.relative.precision);
-
-                return value;
-            },
-
-            isRelative() {
-                if (Analytics.config && Analytics.config.variables.relative.enabled)
-                    return true;
-                return false;
-            },
-
             open() {
                 $('#bmodal').modal('open');
             },
@@ -233,7 +222,40 @@
                 $('#bmodal').modal('close');
             },
 
-            saveAsImage() {
+            saveAsJson() {
+                this.$parent.stop();
+
+                var data = {};
+
+                Analytics.group.forEach((group) => {
+                    var content = Analytics.data.get({ filter: (item) => item.group === group.id });
+                    data[group.type] = _.map(content, (item) => item['y']);
+                });
+
+                this.download(data, 'graph.json');
+            },
+
+            download(data, filename) {
+                if (!data) {
+                    console.error('No data');
+                    return;
+                }
+
+                if (!filename) filename = 'console.json';
+
+                if (typeof data === "object") {
+                    data = JSON.stringify(data, undefined, 4)
+                }
+
+                var blob = new Blob([data], {type: 'text/json'}),
+                    e = document.createEvent('MouseEvents'),
+                    a = document.createElement('a');
+
+                a.download = filename;
+                a.href = window.URL.createObjectURL(blob);
+                a.dataset.downloadurl = ['text/json', a.download, a.href].join(':');
+                e.initMouseEvent('click', true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+                a.dispatchEvent(e);
             },
 
             init(config) {
@@ -327,47 +349,49 @@
                 }
             },
 
-            groups() {
-                var groups = new vis.DataSet();
-
+            setGroups() {
                 if (this.display[0])
-                    groups.add({
+                    Analytics.group.add({
                         id: 0,
+                        type: this.display[0].value,
                         content: this.display[0].label,
                         className: 'infected',
                         options: {shaded: true}
                     });
 
                 if (this.display[1])
-                    groups.add({
+                    Analytics.group.add({
                         id: 1,
+                        type: this.display[1].value,
                         content: this.display[1].label,
                         className: 'recovered'
                     });
 
                 if (this.display[2])
-                    groups.add({
+                    Analytics.group.add({
                         id: 2,
+                        type: this.display[2].value,
                         content: this.display[2].label,
                         className: 'susceptible'
                     });
 
                 if (this.display[3])
-                    groups.add({
+                    Analytics.group.add({
                         id: 3,
+                        type: this.display[3].value,
                         content: this.display[3].label,
                         className: 'vaccinated',
                         options: {shaded: true}
                     });
 
                 if (this.display[4])
-                    groups.add({
+                    Analytics.group.add({
                         id: 4,
+                        type: this.display[4].value,
                         content: this.display[4].label,
                         className: 'death'
                     });
 
-                return groups;
             },
 
             options() {
@@ -420,6 +444,20 @@
                 if (!this.$parent.mayInoculate)
                     if (Analytics.inoculateDate.isBefore(Analytics.currentDate))
                         this.$parent.mayInoculate = true;
+            },
+
+            displayValue(value) {
+                if (this.isRelative())
+                    return _.round(Number(value) / Number(Analytics.population),
+                        Analytics.config.variables.relative.precision);
+
+                return value;
+            },
+
+            isRelative() {
+                if (Analytics.config && Analytics.config.variables.relative.enabled)
+                    return true;
+                return false;
             }
 
         },
@@ -427,6 +465,7 @@
         events: {
             load(population) {
                 this.normalize();
+                this.setGroups();
 
                 Analytics.currentDate = moment();
                 Analytics.inoculateDate = moment();
@@ -438,7 +477,7 @@
                 }
 
                 var container = document.getElementById('graph');
-                Analytics.graph2d = new vis.Graph2d(container, Analytics.data, this.groups(), this.options());
+                Analytics.graph2d = new vis.Graph2d(container, Analytics.data, Analytics.group, this.options());
             },
 
             reset() {
@@ -446,6 +485,7 @@
                     Analytics.graph2d.destroy();
 
                 Analytics.data.clear();
+                Analytics.group.clear();
                 Analytics.currentDate = null;
                 Analytics.inoculateDate = null;
                 Analytics.population = null;
