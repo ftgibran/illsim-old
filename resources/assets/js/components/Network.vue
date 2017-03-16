@@ -336,9 +336,10 @@
                 if (Data.config.simulation.inoculation.active && this.mayInoculate)
                     this.inoculate();
 
+                this.infestation();
+
                 //Each step do an attempt
                 Data.nodes.forEach((node) => {
-                    this.infectAttempt(node);
                     this.recoverAttempt(node);
                     this.killAttempt(node);
                 });
@@ -346,98 +347,116 @@
             },
 
             //Infect Attempt
-            infectAttempt: function (infected) {
+            infestation: function () {
                 var $self = this;
+                var $infectBy = Data.config.simulation.infectBy;
 
-                if ($self.allowed(infected, "mayInfect")) {
-                    if (Data.config.simulation.infectBy === 'special')
-                        specialInfect();
-                    else
-                        standardInfect();
+                if ($infectBy === 'node' || $infectBy === 'both') {
+                    //Filter nodes by may infect
+                    var nodes = Data.nodes.get({
+                        filter: function (node) {
+                            return $self.allowed(node, "mayInfect");
+                        }
+                    });
+
+                    nodes.forEach((infected) => {
+                        infectByNode(infected)
+                    });
                 }
 
-                function specialInfect() {
+                if ($infectBy === 'edge' || $infectBy === 'both') {
+                    //Filter edges by edges which has a node that may infect and other node that may be infected
+                    var edges = Data.edges.get({
+                        filter: function (edge) {
+                            var from = Data.nodes.get(edge.from);
+                            var to = Data.nodes.get(edge.to);
+
+                            return ($self.allowed(from, "mayInfect") && $self.allowed(to, "mayBeInfected"))
+                                || ($self.allowed(to, "mayInfect") && $self.allowed(from, "mayBeInfected"));
+                        }
+                    });
+
+                    edges.forEach((edge) => {
+                        infectByEdge(edge)
+                    });
+                }
+
+                if ($infectBy === 'special') {
+                    //Filter nodes by may be infected
+                    var nodes = Data.nodes.get({
+                        filter: function (node) {
+                            return $self.allowed(node, "mayBeInfected");
+                        }
+                    });
+
+                    nodes.forEach((target) => {
+                        infectByFormula(target);
+                    });
+                }
+
+                function infectByFormula(target) {
 
                     const K = Data.config.simulation.k;
 
+                    var neighbors = Data.nodes.get(target.neighbors, {
+                        filter: function (node) {
+                            return $self.allowed(node, "mayInfect");
+                        }
+                    });
+
+                    neighbors.forEach((infected) => {
+                        if (!$self.allowed(infected, "mayInfect")) return;
+                        if (!$self.allowed(target, "mayBeInfected")) return;
+
+                        var equation = (1 - Math.exp(-K * neighbors.length));
+
+                        if (Math.random() > Data.config.simulation[target.group].base.resist)
+                            if (Math.random() > target.rate.resist)
+                                if (Math.random() < equation * Data.config.simulation[infected.group].base.infect)
+                                    infect_ani(infected, target);
+                    });
+                }
+
+                function infectByNode(infected) {
                     var neighbors = Data.nodes.get(infected.neighbors, {
                         filter: function (node) {
                             return $self.allowed(node, "mayBeInfected");
                         }
                     });
 
-                    if (neighbors.length == 0) return;
+                    neighbors.forEach((target) => {
+                        if (!$self.allowed(infected, "mayInfect")) return;
+                        if (!$self.allowed(target, "mayBeInfected")) return;
 
-                    var target = _.sample(neighbors);
+                        if (Math.random() > Data.config.simulation[target.group].base.resist)
+                            if (Math.random() > target.rate.resist)
+                                if (Math.random() < infected.rate.infect * Data.config.simulation[infected.group].base.infect)
+                                    infect_ani(infected, target);
+                    });
+                }
 
-                    var equation = (1 - Math.exp(-K * neighbors.length));
+                function infectByEdge(edge) {
+                    var from = Data.nodes.get(edge.from);
+                    var to = Data.nodes.get(edge.to);
+
+                    var infected = null;
+                    var target = null;
+
+                    if ($self.allowed(from, "mayInfect") && $self.allowed(to, "mayBeInfected")) {
+                        infected = from;
+                        target = to;
+                    } else if ($self.allowed(to, "mayInfect") && $self.allowed(from, "mayBeInfected")) {
+                        infected = to;
+                        target = from;
+                    } else return;
 
                     if (Math.random() > Data.config.simulation[target.group].base.resist)
                         if (Math.random() > target.rate.resist)
-                            if (Math.random() < equation * Data.config.simulation[infected.group].base.infect)
-                                infect_ani(target);
-
+                            if (Math.random() < edge.rate.infect * Data.config.simulation[infected.group].base.infect)
+                                infect_ani(infected, target);
                 }
 
-                function standardInfect() {
-
-                    var neighbors = Data.nodes.get(infected.neighbors);
-                    neighbors.forEach(eachNeighbors);
-
-                    function eachNeighbors(target) {
-
-                        if ($self.allowed(target, "mayBeInfected")) {
-                            switch (Data.config.simulation.infectBy) {
-                                case "node":
-                                    infectByNode();
-                                    break;
-                                case "edge":
-                                    infectByEdge();
-                                    break;
-                                case "both":
-                                    infectByBoth();
-                                    break;
-                                default:
-                                    infectByEdge();
-                            }
-
-                            function infectByNode() {
-
-                                if (Math.random() > Data.config.simulation[target.group].base.resist)
-                                    if (Math.random() > target.rate.resist)
-                                        if (Math.random() < infected.rate.infect * Data.config.simulation[infected.group].base.infect)
-                                            infect_ani(target);
-                            }
-
-                            function infectByEdge() {
-
-                                var edge = $self.filterEdgesByNodes(infected, target)[0];
-                                if (edge == undefined) return;
-
-                                if (Math.random() > Data.config.simulation[target.group].base.resist)
-                                    if (Math.random() > target.rate.resist)
-                                        if (Math.random() < edge.rate.infect * Data.config.simulation[infected.group].base.infect)
-                                            infect_ani(target);
-                            }
-
-                            function infectByBoth() {
-
-                                var edge = $self.filterEdgesByNodes(infected, target)[0];
-                                if (edge == undefined) return;
-
-                                if (Math.random() > Data.config.simulation[target.group].base.resist)
-                                    if (Math.random() > target.rate.resist)
-                                        if (Math.random() < infected.rate.infect * edge.rate.infect * Data.config.simulation[infected.group].base.infect)
-                                            infect_ani(target);
-                            }
-
-                        }
-
-                    }
-
-                }
-
-                function infect_ani(target) {
+                function infect_ani(infected, target) {
 
                     if ($self.mode('scientific'))
                         return $self.$emit('statusChange', target, Data.const.status.INFECTED);
@@ -762,7 +781,7 @@
                         }
                     });
 
-                    if(_.isEmpty(neighbors))
+                    if (_.isEmpty(neighbors))
                         return random();
 
                     //Takes some nodes according by configuration
