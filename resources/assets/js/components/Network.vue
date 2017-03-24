@@ -20,6 +20,8 @@
         bottom: 0;
         left: 0;
         right: 0;
+        /*background-image: url("/img/bg.jpg");*/
+        /*background-size: cover;*/
     }
 
     .content {

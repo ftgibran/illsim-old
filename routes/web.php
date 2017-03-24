@@ -17,6 +17,10 @@ Route::get('/', function () {
     return view('home');
 });
 
+Route::get('/research', function () {
+    return view('research');
+});
+
 Route::get('api/getConfig', function () {
 	return File::get(database_path("data/Config.json"));
 });

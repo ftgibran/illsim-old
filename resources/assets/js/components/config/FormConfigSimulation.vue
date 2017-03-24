@@ -81,7 +81,7 @@
                                         :val.sync="config.inoculation.rate"
                                         step="1"
                                         min="0"
-                                        max="200"
+                                        max="1000"
                                         decimals="0"
                                 ></ui-slider>
                             </div>
