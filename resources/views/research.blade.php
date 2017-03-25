@@ -2819,6 +2819,26 @@
 		</div>
 	</div>
 
+	<p>
+		Nesta análise, as taxas de vacinação foi aumentado para 1429% (aproximadamente) em relação ao período de 100 dias e 476% em relação ao período de 30 dias. Para a distribuição <code class="code">Aleatória</code>, houve uma redução de <code class="code">28.5%</code> do número de vacinas. Porém, para as distribuições <code class="code">Maior Grau</code> e <code class="code">Vizinhos de Maior Grau</code>, os resultados não foram satisfatórios, mantendo o mesmo número de vacinas mesmo com uma alta taxa de distribuição diária. 
+	</p>
+
+	<p>
+		Observando o comportamento de uma distribuição agressiva, nota-se a doença chega num determinado ponto em que ela quase se erradica, mas o mínimo número dos agentes infectados faz com que a doença volte a se proliferar e se estabilize num determinado valor. Dessa forma, essa estratégia de vacinação acaba não sendo viável, podendo ocorrer certos desperdícios de vacinas.
+	</p>
+
+	<p>
+		Em relação ao período da doença na qual foi aplicada a inoculação, houve relevância em relação a distribuição <code class="code">Maior Grau</code>. Nota-se que para uma distribuição agressiva quando a doença já estiver estabilizada, os resultados são bastante satisfatórios. Precisou-se de apenas <code class="code">30%</code> de vacinados para que a doença se erradicasse - o menos número encontrado em todos os experimentos.
+	</p>
+
+	<p>
+		Para as outras distribuições, não há diferença alguma em qual período da doença iniciar a inoculação. 
+	</p>
+
+	<p>
+		Para finalizar, duas tabelas foram construídas com os dados obtidos acima e mais algumas simulações extras. As tabelas mostram um comparativo da quantidade do número de infectados em relação a quantidade de infectados no modelo padrão (<code class="code">4%</code>). Cada célula de dados da tabela possui esse valor (em baixo) e a taxa de vacinação diária (em cima). A primeira tabela são os dados obtidos nos testes de inoculação feitos na <ins>fase de dissipação</ins> da doença. A segunda tabela seria nos testes da <code><ins>fase de estabilização</ins></code>.
+	</p>
+
 	<h2>Tabela 1 - <ins>Inoculação na fase de dissipação</ins></h2>
 
 	<table class="table table-bordered code">
@@ -4171,6 +4191,34 @@
 
 
 	</table>
+
+	<h2>Conclusão 2</h2>
+
+	<p>
+		Na terceira parte do experimento, foi analizado o comportamento da doença em diferentes cenários de distribuições de vacinas. Cada cenário era caracterizado pelo método de distribuição, a taxa diária de distribuição, o número relacional de vacinados e o período da doença na qual a distribuição era iniciada.
+	</p>
+
+	<p>
+		As taxas de distribuições diárias de vacinas podem ser classificadas como baixas, moderadas e altas. Foi observado melhor eficiência na dissipação da doença taxas moderadas de distribuições. Considerando o passo de proliferação adotado nos experimentos (passo diário), a melhor taxa moderada encontrada foi de <code class="code">1.3%</code>. Segundo os testes, esta seria a taxa recomendada para uma doença em <ins>fase de proliferação</ins>, na qual necessitaria priorizar a vacinação de indivíduos com o maior número de contatos infectados. Dessa forma, com apenas <code class="code">40%</code> de vacinados na população, a doença deixaria de existir.
+	</p>
+
+	<p>
+		A taxa moderada de distribuição é a mais indicada para a <ins>fase de proliferação</ins> da doença. Apesar dos testes mostrarem que altas taxas não são relevantes para a maioria dos casos, há uma excessão. Existe apenas uma estratégia na qual as altas taxas se torna relevantes. Para este caso, só seria possível utilizar na <code><ins>fase de estabilização</ins></code> da doença. Com uma taxa de <code class="code">4.3%</code> - iniciando com a doença já estável, é possível erradicá-la desde que as vacinas sejam priorizadas à indivídos com o maior número de contatos infectados. Dessa forma, necessitaria de apenas <code class="code">30%</code> de vacinados na população para matar a doença.
+	</p>
+
+	<p>
+		Em suma, a melhor distribuição de vacina testada é a <code class="code">Maior Grau</code>. Se a doença estiver em seu início, a melhor forma de combatê-la é descobrindo o passo na qual a doença se prolifera, distribuindo <code class="code">1.3%</code> vacinas por passo até atingir <code class="code">40%</code> da população vacinada. Se a doença já estiver um bom tempo na população, será melhor vacinar <code class="code">30%</code> da mesma, distribuindo <code class="code">4.3%</code> vacinas por passo.
+	</p>
+
+	<h2>Conclusão Final</h2>
+
+	<p>
+		Foi analizado dois tipos de testes com o objetivo de erradicar doenças: através das características da mesma e através da distribuições de vacinas. As dezenas de simulações feitas durante a pesquisa comprovam que existem estratégias que são eficazes e outras não. Foi constado que existe um método de distribuição de vacinas que realmente trabalha melhor contra as doenças, e aplicando-a num ritmo correto e na fase da doença correta, é possível matar a doença com o mínimo de vacinas possíveis. 
+	</p>
+
+	<p>
+		Para complementar as distribuições, ainda é possível que as mesmas sejam mais eficiêntes quando a população está consciênte em relação à práticas saudáveis em suas vidas, fazendo com que o agente infeccioso tenha maior dificuldade de se proliferar contra indivíduos com um alto sistema imunológico.
+	</p>
 
 </div>
 
