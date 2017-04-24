@@ -176,6 +176,11 @@
                 var display = this.$parent['recovered'];
                 return this.displayValue(display);
             },
+            recovered_n_vaccinated() {
+                var display = this.$parent['recovered'] +
+                    this.$parent['vaccinated'];
+                return this.displayValue(display);
+            },
             alive() {
                 var display = this.$parent['infected'] +
                     this.$parent['recovered'] +
@@ -286,6 +291,13 @@
                             color: 'yellow',
                             label: 'Recuperados',
                             value: 'recovered'
+                        };
+                        break;
+                    case 'recovered_n_vaccinated':
+                        this.display[1] = {
+                            color: 'yellow',
+                            label: 'Recuperados & Vacinados',
+                            value: 'recovered_n_vaccinated'
                         };
                         break;
                     case 'alive':

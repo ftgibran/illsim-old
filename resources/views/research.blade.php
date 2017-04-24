@@ -83,7 +83,7 @@
 		O Illsim foi elaborado com o objetivo de estudar o comportamento de doenças em diferentes cenários. Para um estudo específico, será atribuído um modelo padrão para servir como referência para as diversas simulações que serão realizadas nesse relatório.
 	</p>
 	<p>
-		O objetivo do estudo é analizar diferentes estratégias de vacinação, nas quais será explorado o método distribuíção (aleatório, maior grau, vizinhos de maior grau), a taxa de distribuição, o número máximo de distribuição e o período da doença que ocorrerá a distribuição. Estas estratégias tem como finalidade extiguir uma pandemia, distribuindo o mínimo de vacinas possíveis na população. 
+		O objetivo do estudo é analisar diferentes estratégias de vacinação, nas quais será explorado o método distribuíção (aleatório, maior grau, vizinhos de maior grau), a taxa de distribuição, o número máximo de distribuição e o período da doença que ocorrerá a distribuição. Estas estratégias tem como finalidade extinguir uma pandemia, distribuindo o mínimo de vacinas possíveis na população. 
 	</p>
 
 	<h2>Parte 1 - Adotando um modelo padrão</h2>

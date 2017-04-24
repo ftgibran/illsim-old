@@ -126,6 +126,7 @@
                 variable2: [
                     {"label": "Vazio", "val": "none"},
                     {"label": "Recuperados", "val": "recovered"}, //Recovered
+                    {"label": "Recuperados & Vacinados", "val": "recovered_n_vaccinated"}, //Recovered + Vaccinated
                     {"label": "Vivos", "val": "alive"} //Susceptible + Vaccinated + Recovered + Infected
                 ],
                 variable3: [
