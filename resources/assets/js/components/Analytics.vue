@@ -34,7 +34,7 @@
                         </a>
                     </li>
                     <li v-if="$root.$refs.network">
-                        <a @click="saveAsJson()"
+                        <a @click="saveAsCsv()"
                            v-if="$root.$refs.network.state == 'playing' || $root.$refs.network.state == 'paused'">
                             <i class="material-icons left">file_download</i>
                             <span class="fw-b">Salvar dados</span>
@@ -141,6 +141,8 @@
 
 <script>
 
+    import _ from 'lodash';
+    import csv from '../functions/csv';
     import moment from 'moment';
     import 'moment/locale/pt-br';
     moment.locale('pt-BR');
@@ -227,13 +229,36 @@
                 $('#bmodal').modal('close');
             },
 
+            saveAsCsv() {
+                this.$parent.stop();
+
+                var data = {};
+
+                Analytics.group.forEach((group) => {
+                    var content = Analytics.data.get({filter: (item) => item.group === group.id});
+                    data[group.type] = _.map(content, (item) => item['y']);
+                });
+
+                var list = _.zip(..._.values(data));
+
+                list = list.map(item => {
+                    var result = {};
+                    Analytics.group.forEach((group, index) => {
+                        result[group.type] = item[index];
+                    });
+                    return result;
+                });
+
+                csv('graph.csv', list, {});
+            },
+
             saveAsJson() {
                 this.$parent.stop();
 
                 var data = {};
 
                 Analytics.group.forEach((group) => {
-                    var content = Analytics.data.get({ filter: (item) => item.group === group.id });
+                    var content = Analytics.data.get({filter: (item) => item.group === group.id});
                     data[group.type] = _.map(content, (item) => item['y']);
                 });
 

@@ -280,7 +280,7 @@
                                 :val.sync="factory.edge.density"
                                 step="1"
                                 min="3"
-                                max="15"
+                                max="150"
                                 decimals="0"
                         ></ui-slider>
                     </div>

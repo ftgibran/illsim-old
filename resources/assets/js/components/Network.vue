@@ -799,7 +799,8 @@
 
                         _.forEach(node.neighbors, function (id) {
                             var item = Data.nodes.get(id);
-                            if ($self.isGroup(item, Data.const.status.INFECTED)) quant++;
+//                            if ($self.isGroup(item, Data.const.status.INFECTED)) quant++;
+                            quant++;
                         });
 
                         return -quant;
